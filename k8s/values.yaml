@@ -5,6 +5,14 @@
 # Credentials must be supplied at deploy time - never hardcode secrets here.
 # ============================================================================
 
+# Optional resource naming overrides.
+# - `nameOverride` changes the chart/app name portion used in generated resource names.
+# - `fullnameOverride` replaces the generated release-based name entirely.
+#   Use `fullnameOverride` only for fresh installs or planned migrations, because
+#   changing it on an existing release renames most Kubernetes resources.
+nameOverride: ''
+fullnameOverride: ''
+
 # ------------------------------------------------------------------------------
 # Global
 # ------------------------------------------------------------------------------
@@ -102,10 +110,10 @@ analytics:
       pullPolicy: IfNotPresent
     resources:
       requests:
-        memory: 512Mi
+        memory: 1Gi
         cpu: 200m
       limits:
-        memory: 2Gi
+        memory: 4Gi
         cpu: 1000m
     persistence:
       enabled: true

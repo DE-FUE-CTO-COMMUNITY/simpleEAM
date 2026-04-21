@@ -16,6 +16,9 @@ Deploy the full NextGen Enterprise Architecture Management stack on Kubernetes.
 # 1. Add the chart (local clone)
 cd k8s/
 
+# Optional: choose any target namespace
+export NAMESPACE=nextgen-eam
+
 # 2. Create a values override with your secrets
 cat > my-values.yaml <<EOF
 global:
@@ -34,19 +37,30 @@ keycloak:
 EOF
 
 # 3. Install
-helm install nextgen-eam . -f my-values.yaml -n nextgen-eam --create-namespace
+helm install nextgen-eam . -f my-values.yaml -n "$NAMESPACE" --create-namespace
 ```
+
+The chart does not hardcode a Kubernetes namespace. Resources are created in whichever namespace you pass to Helm via `-n/--namespace`.
+
+Resource names are also configurable via Helm values:
+
+```yaml
+nameOverride: ''
+fullnameOverride: ''
+```
+
+Use `fullnameOverride` only for fresh installs or planned migrations. Changing it on an existing release renames most Kubernetes resources and is not a safe in-place cosmetic change.
 
 ## Image Registry
 
 Images are pulled from GitHub Container Registry (GHCR):
 
-| Service   | Image                                                   |
-| --------- | ------------------------------------------------------- |
-| Client    | `ghcr.io/<imageRepository>/nextgen-eam-client:<tag>`    |
-| Server    | `ghcr.io/<imageRepository>/nextgen-eam-server:<tag>`    |
+| Service           | Image                                                           |
+| ----------------- | --------------------------------------------------------------- |
+| Client            | `ghcr.io/<imageRepository>/nextgen-eam-client:<tag>`            |
+| Server            | `ghcr.io/<imageRepository>/nextgen-eam-server:<tag>`            |
 | Analytics Runtime | `ghcr.io/<imageRepository>/nextgen-eam-analytics-runtime:<tag>` |
-| AI Runtime | `ghcr.io/<imageRepository>/nextgen-eam-ai-runtime:<tag>` |
+| AI Runtime        | `ghcr.io/<imageRepository>/nextgen-eam-ai-runtime:<tag>`        |
 
 For private registries, create an image pull secret and reference it:
 
@@ -55,7 +69,7 @@ kubectl create secret docker-registry ghcr-pull-secret \
   --docker-server=ghcr.io \
   --docker-username=<github-user> \
   --docker-password=<github-pat> \
-  -n nextgen-eam
+  -n "$NAMESPACE"
 ```
 
 Then set in your values:
@@ -77,17 +91,24 @@ global:
 | `keycloak.admin.password` | Keycloak admin console password           |
 | `keycloak.db.password`    | Keycloak PostgreSQL password              |
 
+### Naming Overrides
+
+| Key                | Description                                                                                                                                |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `nameOverride`     | Overrides the chart/app name portion used in generated resource names.                                                                     |
+| `fullnameOverride` | Replaces the generated release-based resource prefix entirely. Safe for fresh installs; treat changes on existing releases as a migration. |
+
 ### Service URLs
 
 By default the chart creates Ingress resources for these subdomains:
 
-| Subdomain key                       | Default    | Service               |
-| ----------------------------------- | ---------- | --------------------- |
-| `ingress.subdomains.client`         | `eam`      | Next.js frontend      |
-| `ingress.subdomains.api`            | `api`      | GraphQL + AI API      |
-| `ingress.subdomains.auth`           | `auth`     | Keycloak              |
-| `ingress.subdomains.excalidrawRoom` | `room`     | Excalidraw room       |
-| `ingress.subdomains.temporalUi`     | `temporal` | Temporal UI |
+| Subdomain key                       | Default    | Service          |
+| ----------------------------------- | ---------- | ---------------- |
+| `ingress.subdomains.client`         | `eam`      | Next.js frontend |
+| `ingress.subdomains.api`            | `api`      | GraphQL + AI API |
+| `ingress.subdomains.auth`           | `auth`     | Keycloak         |
+| `ingress.subdomains.excalidrawRoom` | `room`     | Excalidraw room  |
+| `ingress.subdomains.temporalUi`     | `temporal` | Temporal UI      |
 
 ### TLS / cert-manager
 
@@ -159,7 +180,7 @@ Temporal is no longer treated as AI-only. The chart deploys **temporal-db**, **t
 
 ```bash
 yarn sync:cube-schema
-helm upgrade nextgen-eam . -f my-values.yaml -n nextgen-eam
+helm upgrade nextgen-eam . -f my-values.yaml -n "$NAMESPACE"
 ```
 
 The Helm chart packages its Cube schema from `k8s/files/cube`, which is generated from the canonical source in `analytics/cube`. Run `yarn sync:cube-schema` before packaging or upgrading the chart after Cube model changes.
@@ -167,9 +188,9 @@ The Helm chart packages its Cube schema from `k8s/files/cube`, which is generate
 ## Uninstall
 
 ```bash
-helm uninstall nextgen-eam -n nextgen-eam
+helm uninstall nextgen-eam -n "$NAMESPACE"
 # PVCs are NOT deleted automatically — delete manually if desired:
-kubectl delete pvc -l app.kubernetes.io/instance=nextgen-eam -n nextgen-eam
+kubectl delete pvc -l app.kubernetes.io/instance=nextgen-eam -n "$NAMESPACE"
 ```
 
 ## Chart Structure
