@@ -1,6 +1,6 @@
 {
   "name": "nextgen-eam-ai-runtime",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "NextGen EAM AI server",
   "license": "MIT",
   "main": "dist/index.js",

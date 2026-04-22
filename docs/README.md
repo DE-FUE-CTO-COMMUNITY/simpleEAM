@@ -24,14 +24,24 @@ The project is technically configured to block npm calls.
 This mono-repository contains all components of the NextGen EAM System:
 
 - **Neo4j Database**: Graph database for storing the Enterprise Architecture Model
-- **GraphQL Server**: API layer for efficient data communication
+- **GraphQL and Analytics API Server**: API layer for data access, analytics orchestration, and runtime contracts
 - **Keycloak**: Identity and access management
 - **Next.js Frontend**: Modern, responsive user interface
+- **Analytics Stack**: ClickHouse projections, Cube semantic model, and CubeStore caching
+- **Workflow Runtime**: Temporal-based execution for analytics refresh and AI runs
+- **AI Services**: Profile-based REST and worker services for AI orchestration
+- **Kubernetes Deployment**: Helm chart and values files for cluster-based installation
 
 ## Project Structure
 
 ```
 nextgen-eam/
+├── analytics/              # ClickHouse, Cube, and CubeStore assets
+│   ├── clickhouse/         # Projection database init scripts and data
+│   ├── cube/               # Cube semantic models
+│   └── cubestore/          # CubeStore persistence
+│   └── runtime/            # Temporal analytics worker and scheduler runtime
+├── ai-server/              # AI orchestration service and worker code
 ├── auth/                   # Keycloak configuration
 │   └── src/                # Keycloak customizations
 ├── client/                 # Next.js frontend
@@ -40,16 +50,18 @@ nextgen-eam/
 │       └── components/     # React components
 ├── db/                     # Neo4j database
 │   └── src/                # Database scripts, seed files
-├── server/                 # GraphQL server
+├── k8s/                    # Helm chart, templates, and deployment values
+├── server/                 # GraphQL and analytics server
 │   └── src/                # Server source code
-└── docker-compose.yml      # Docker configuration for all services
+├── tools/temporal/         # Temporal persistence assets
+└── compose.yml             # Docker Compose configuration for all services
 ```
 
 ## Technology Stack
 
 - **Frontend**: Next.js 15, Material UI 7, Excalidraw, TanStack Table/Form, Internationalization
-- **Backend**: GraphQL, Neo4j, Keycloak
-- **Infrastructure**: Docker, Docker Compose
+- **Backend**: GraphQL, Neo4j, Keycloak, ClickHouse, Cube
+- **Infrastructure**: Docker, Docker Compose, Temporal
 
 > **Important for Material UI 7**: We use the new Grid v2 API, which differs significantly from the legacy Grid component. Please use `size` instead of `xs/sm/md`, `<Grid container sx={{ width: '100%' }}>` for containers, and Stack for vertical layouts. See [example component](./client/src/components/common/GridV2Example.tsx) and [documentation](https://mui.com/material-ui/migration/upgrade-to-grid-v2/).
 
@@ -80,28 +92,59 @@ nextgen-eam/
    yarn
    ```
 
-3. Start system:
+3. Start the core platform:
 
    ```bash
-   docker-compose up -d
+   docker compose up -d
    ```
 
-4. Access the different components:
+4. Optional: start the AI profile as well:
+
+   ```bash
+   COMPOSE_PROFILES=ai docker compose up -d
+   ```
+
+5. Access the different components:
    - Frontend: http://localhost:3000
    - GraphQL Server: http://localhost:4000/graphql
+   - Analytics API: http://localhost:4000/analytics
+   - Cube API: http://localhost:4003/cubejs-api/v1
+   - ClickHouse HTTP: http://localhost:8123
+   - CubeStore HTTP: http://localhost:3030
    - Neo4j Browser: http://localhost:7474
    - Keycloak Admin: http://localhost:8080
+   - Temporal UI: http://localhost:8088
+   - Excalidraw Room: http://localhost:3001
+   - AI Server (optional `ai` profile): http://localhost:4001/health
 
 ## Development
 
 Each component can be developed independently:
 
 - **Client**: Work in the `client` directory
-- **Server**: Work in the `server` directory
+- **Server**: Work in the `server` directory for GraphQL and analytics API changes
+- **Analytics**: Update projection schemas in `analytics/` and analytics routes/schema in `server/src/analytics`
+- **Analytics Runtime**: Update Temporal analytics worker and scheduler code in `analytics/runtime`
+- **AI Services**: Work in `ai-server` for AI orchestration endpoints and Temporal workers
 - **Database**: Maintain scripts in the `db/src` directory
 - **Auth**: Customize Keycloak configurations in the `auth/src` directory
 
-**Important:** In this project we use **yarn** as package manager. Please do not use npm commands. For more details, see the [YARN.md](./YARN.md) documentation.
+## Deployment Options
+
+- **Docker Compose**: Use `compose.yml` for local and single-host deployments
+- **Kubernetes / Helm**: Use the Helm chart in `k8s/` for cluster deployments
+
+The Helm chart documentation lives in [../k8s/README.md](../k8s/README.md) and covers values, ingress, secrets, analytics services, and optional AI services.
+
+**Important:** In this project we use **yarn** as package manager. Please do not use npm commands.
+
+## Documentation Map
+
+- [ANALYTICS_CHANGE_CHECKLIST.md](./ANALYTICS_CHANGE_CHECKLIST.md): What to update when GraphQL or Neo4j model changes affect analytics projections
+- [RUNTIME_CONFIG.md](./RUNTIME_CONFIG.md): Runtime environment variables for client, server, analytics, and AI services
+- [BRANDING.md](./BRANDING.md): Runtime branding and theming configuration
+- [ENTITY-IMPLEMENTATION-PATTERN.md](./ENTITY-IMPLEMENTATION-PATTERN.md): Feature and entity implementation structure
+- [../k8s/README.md](../k8s/README.md): Helm-based Kubernetes deployment
 
 ## Branching Strategy
 

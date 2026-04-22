@@ -1,21 +1,23 @@
 # NextGen EAM (Enterprise Architecture Management)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](./VERSION)
+[![Version](https://img.shields.io/badge/version-1.3.4-blue.svg)](./VERSION)
 
 > **🤖 AI-Generated Project**: This code was fully created with GitHub Copilot in Agent mode. The entire project, including architecture, implementation and documentation, was realized through AI-assisted development.
 
-A modern Enterprise Architecture Management system that helps organizations manage, visualize and optimize their IT landscape.
+A modern Enterprise Architecture Management system that helps organizations manage, visualize and optimize their IT landscape across operational architecture, analytics, and AI-assisted workflows.
 
 ## 🚀 Features
 
 - **Visual Representation**: IT architecture visualization with Excalidraw
 - **Component Management**: Manage applications, services, databases and infrastructure
 - **Relationship Mapping**: Display dependencies between components
+- **Analytics Workspace**: Explore architecture projections through ClickHouse and Cube-backed analytics
 - **Multi-Language Support**: German and English
 - **Modern Tech Stack**: Next.js 15, Material-UI 7, Neo4j, GraphQL
 - **Runtime Configuration**: Change settings without rebuilding
 - **Secure Authentication**: Keycloak integration with role-based access control
+- **Workflow Automation**: Temporal-backed background processing for analytics refresh and AI runs
 
 ## 🛠️ Technology Stack
 
@@ -34,6 +36,9 @@ A modern Enterprise Architecture Management system that helps organizations mana
 - **GraphQL**: API layer
 - **Neo4j**: Graph database for architecture models
 - **Node.js**: Server runtime
+- **ClickHouse**: Projection database for analytics workloads
+- **Cube**: Semantic layer for analytics queries
+- **Temporal**: Durable workflow orchestration for analytics and AI jobs
 
 ### Infrastructure
 
@@ -43,7 +48,7 @@ A modern Enterprise Architecture Management system that helps organizations mana
 
 ## 📋 Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - Docker & Docker Compose
 - Yarn Berry (automatically configured)
 
@@ -75,12 +80,13 @@ cp env.template .env
 docker compose up -d
 ```
 
-5. **Optional: enable AI stack (`ai-server`, `ai-worker`, Temporal)**
+5. **Optional: enable AI stack (`ai-server`, `ai-worker`)**
 
 ```bash
-# set AI_LLM_URL in .env first
 COMPOSE_PROFILES=ai docker compose up -d
 ```
+
+AI model access is configured per company in the application data model (`Company.llmUrl`, `Company.llmModel`, `Company.llmKey`).
 
 6. **Start development server**
 
@@ -96,16 +102,20 @@ The application is then available at: http://localhost:3000
 ```
 nextgen-eam/
 ├── auth/                   # Keycloak configuration
+├── analytics/              # ClickHouse, Cube, and CubeStore analytics stack
+│   └── runtime/            # Temporal workers and scheduler for analytics refresh
+├── ai-server/              # AI orchestration service and worker runtime
 ├── client/                 # Next.js frontend
 │   ├── src/
 │   │   ├── app/           # Next.js App Router
 │   │   ├── components/    # React components
 │   │   └── graphql/       # GraphQL queries
 ├── db/                     # Neo4j database
-├── server/                 # GraphQL server (GraphQL only)
-├── ai-server/              # AI server (Temporal/LangGraph and AI REST API)
+├── k8s/                    # Kubernetes Helm chart and deployment assets
+├── server/                 # GraphQL and analytics API server
 ├── templates/              # Entity templates
 ├── scripts/               # Automation scripts
+├── tools/temporal/         # Temporal persistence assets
 └── docs/                  # Documentation
 ```
 
@@ -135,9 +145,9 @@ yarn lint             # Run ESLint
 
 # Version Management
 yarn version          # Show current version
-yarn version:patch    # Increment patch version (1.0.0 -> 1.0.1)
-yarn version:minor    # Increment minor version (1.0.0 -> 1.1.0)
-yarn version:major    # Increment major version (1.0.0 -> 2.0.0)
+yarn version:patch    # Increment patch version (1.3.4 -> 1.3.5)
+yarn version:minor    # Increment minor version (1.3.4 -> 1.4.0)
+yarn version:major    # Increment major version (1.3.4 -> 2.0.0)
 
 # Entity Management
 ./scripts/create-entity.sh [name]  # Create new entity
@@ -160,17 +170,24 @@ docker compose down                     # Stop all services
 Detailed documentation can be found in the [`docs/`](./docs/) directory:
 
 - [Architecture Overview](./docs/README.md)
+- [Analytics Change Checklist](./docs/ANALYTICS_CHANGE_CHECKLIST.md)
 - [Entity Pattern](./docs/ENTITY-IMPLEMENTATION-PATTERN.md)
 - [Development Guidelines](./docs/CONTRIBUTING.md)
 - [Runtime Configuration](./docs/RUNTIME_CONFIG.md)
 - [Branding and Theming](./docs/BRANDING.md)
+- [Kubernetes Helm Deployment](./k8s/README.md)
 
 ## 🌐 Services
 
 - **Frontend**: http://localhost:3000
 - **GraphQL Playground**: http://localhost:4000/graphql
+- **Analytics API**: http://localhost:4000/analytics
 - **AI Server** (AI profile): http://localhost:4001/health
-- **Temporal UI** (AI profile): http://localhost:8088
+- **Cube API**: http://localhost:4003/cubejs-api/v1
+- **ClickHouse HTTP**: http://localhost:8123
+- **Excalidraw Room**: http://localhost:3001
+- **Temporal UI**: http://localhost:8088
+- **CubeStore**: http://localhost:3030
 - **Neo4j Browser**: http://localhost:7474
 - **Keycloak Admin**: http://localhost:8080
 

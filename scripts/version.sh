@@ -17,6 +17,7 @@ SERVER_PACKAGE_JSON="server/package.json"
 AI_SERVER_PACKAGE_JSON="ai-server/package.json"
 ANALYTICS_RUNTIME_PACKAGE_JSON="analytics/runtime/package.json"
 HELM_CHART_FILE="k8s/Chart.yaml"
+README_FILE="README.md"
 
 # Get current version
 get_current_version() {
@@ -58,6 +59,23 @@ increment_version() {
     echo "${major}.${minor}.${patch}"
 }
 
+update_readme_version() {
+    local file=$1
+    local version=$2
+    local next_patch
+    local next_minor
+    local next_major
+
+    next_patch=$(increment_version "$version" patch)
+    next_minor=$(increment_version "$version" minor)
+    next_major=$(increment_version "$version" major)
+
+    sed -i -E "s|(https://img\.shields\.io/badge/version-)[0-9]+\.[0-9]+\.[0-9]+(-blue\.svg)|\1${version}\2|" "$file"
+    sed -i -E "s|yarn version:patch    # Increment patch version \([0-9]+\.[0-9]+\.[0-9]+ -> [0-9]+\.[0-9]+\.[0-9]+\)|yarn version:patch    # Increment patch version (${version} -> ${next_patch})|" "$file"
+    sed -i -E "s|yarn version:minor    # Increment minor version \([0-9]+\.[0-9]+\.[0-9]+ -> [0-9]+\.[0-9]+\.[0-9]+\)|yarn version:minor    # Increment minor version (${version} -> ${next_minor})|" "$file"
+    sed -i -E "s|yarn version:major    # Increment major version \([0-9]+\.[0-9]+\.[0-9]+ -> [0-9]+\.[0-9]+\.[0-9]+\)|yarn version:major    # Increment major version (${version} -> ${next_major})|" "$file"
+}
+
 # Update version in file
 update_version_in_file() {
     local file=$1
@@ -80,6 +98,8 @@ update_version_in_file() {
             sed -i -E "s/^version: .*/version: $version/" "$file"
             sed -i -E "s/^appVersion: .*/appVersion: '$version'/" "$file"
         fi
+    elif [[ "$file" == *.md ]]; then
+        update_readme_version "$file" "$version"
     else
         # Update VERSION file
         echo "$version" > "$file"
@@ -122,10 +142,11 @@ update_version_in_file "$SERVER_PACKAGE_JSON" "$new_version"
 update_version_in_file "$AI_SERVER_PACKAGE_JSON" "$new_version"
 update_version_in_file "$ANALYTICS_RUNTIME_PACKAGE_JSON" "$new_version"
 update_version_in_file "$HELM_CHART_FILE" "$new_version"
+update_version_in_file "$README_FILE" "$new_version"
 
 echo "✓ Version updated to $new_version"
 echo ""
 echo "Don't forget to:"
-echo "  1. Commit the changes: git add VERSION package.json client/package.json server/package.json ai-server/package.json analytics/runtime/package.json k8s/Chart.yaml"
+echo "  1. Commit the changes: git add VERSION package.json client/package.json server/package.json ai-server/package.json analytics/runtime/package.json k8s/Chart.yaml README.md"
 echo "  2. Create a git tag: git tag -a v$new_version -m 'Release v$new_version'"
 echo "  3. Push with tags: git push --follow-tags"

@@ -1,6 +1,6 @@
 {
   "name": "nextgen-eam",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Enterprise Architecture Management System with Neo4j, GraphQL, Keycloak and Next.js",
   "private": true,
   "scripts": {
