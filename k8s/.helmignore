@@ -14,6 +14,10 @@
 \*.md
 README.md
 
+# Large runtime assets are applied as standalone ConfigMaps before Helm install/upgrade.
+
+assets/
+
 # Editor and IDE files
 
 .vscode/

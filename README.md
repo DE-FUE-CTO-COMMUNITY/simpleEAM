@@ -115,6 +115,11 @@ cd k8s
 
 export NAMESPACE=nextgen-eam
 
+../scripts/sync-k8s-asset-configmaps.sh \
+	--namespace "$NAMESPACE" \
+	--release nextgen-eam \
+	--values values.yaml
+
 cat > my-values.yaml <<EOF
 global:
 	baseDomain: eam.example.com
@@ -134,15 +139,35 @@ EOF
 helm install nextgen-eam . -f my-values.yaml -n "$NAMESPACE" --create-namespace
 ```
 
+To enable the scheduled analytics refresh in Temporal, add the analytics runtime schedule settings to your Helm values:
+
+```yaml
+analytics:
+	runtime:
+		enabled: true
+		scheduleEnabled: 'true'
+		scheduleId: analytics-projection-refresh
+		scheduleInterval: 1 hour
+		auth:
+			bootstrapClientId: eam-server
+			bootstrapClientSecret: change-me
+```
+
+`analytics-scheduler` registers or reconciles the Temporal schedule, and `analytics-worker` executes the scheduled refresh workflow on the analytics task queue.
+
 For updates, run:
 
 ```bash
 yarn sync:cube-schema
+./scripts/sync-k8s-asset-configmaps.sh \
+	--namespace "$NAMESPACE" \
+	--release nextgen-eam \
+	--values k8s/my-values.yaml
 cd k8s
 helm upgrade nextgen-eam . -f my-values.yaml -n "$NAMESPACE"
 ```
 
-The Helm chart supports analytics services, optional AI workloads, ingress/TLS configuration, and branding overrides. See [k8s/README.md](./k8s/README.md) for the full values reference and production deployment details.
+The Helm chart supports analytics services, scheduled analytics refresh via Temporal, optional AI workloads, ingress/TLS configuration, and branding overrides. Theme and branding archives are applied as standalone ConfigMaps before Helm install and upgrade so they do not bloat the Helm release secret. See [k8s/README.md](./k8s/README.md) for the full values reference and production deployment details.
 
 ## 📁 Project Structure
 

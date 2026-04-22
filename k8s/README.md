@@ -19,7 +19,13 @@ cd k8s/
 # Optional: choose any target namespace
 export NAMESPACE=nextgen-eam
 
-# 2. Create a values override with your secrets
+# 2. Sync runtime asset ConfigMaps (branding/theme archives are kept outside the Helm release record)
+../scripts/sync-k8s-asset-configmaps.sh \
+  --namespace "$NAMESPACE" \
+  --release nextgen-eam \
+  --values values.yaml
+
+# 3. Create a values override with your secrets
 cat > my-values.yaml <<EOF
 global:
   baseDomain: eam.example.com
@@ -36,9 +42,11 @@ keycloak:
     password: "change-me-keycloak-db"
 EOF
 
-# 3. Install
+# 4. Install
 helm install nextgen-eam . -f my-values.yaml -n "$NAMESPACE" --create-namespace
 ```
+
+The chart no longer embeds large theme and branding archives in the Helm release payload. Sync the asset ConfigMaps before each install or upgrade.
 
 The chart does not hardcode a Kubernetes namespace. Resources are created in whichever namespace you pass to Helm via `-n/--namespace`.
 
@@ -176,10 +184,46 @@ The analytics stack now includes standalone Temporal-based runtime services:
 
 Temporal is no longer treated as AI-only. The chart deploys **temporal-db**, **temporal**, and optionally **temporal-ui** whenever `temporal.enabled=true` and either the analytics runtime or the AI stack is enabled. The `TEMPORAL_ADDRESS` is automatically set to the internal service DNS name `<release>-temporal:7233`. Set `ai.temporal.address` to override when pointing workloads at an external Temporal cluster.
 
+### Enabling Scheduled Analytics Refresh
+
+The scheduler is deployed when `analytics.runtime.enabled=true`, but the Temporal schedule is only registered when `analytics.runtime.scheduleEnabled='true'`.
+
+Example values:
+
+```yaml
+analytics:
+  runtime:
+    enabled: true
+    taskQueue: nextgen-eam-analytics
+    scheduleEnabled: 'true'
+    scheduleId: analytics-projection-refresh
+    scheduleInterval: 1 hour
+    scheduleReconcileMs: '300000'
+    maxConcurrency: '5'
+    auth:
+      bootstrapClientId: eam-server
+      bootstrapClientSecret: change-me
+```
+
+What these settings do:
+
+- `scheduleEnabled` turns the Temporal schedule registration on or off.
+- `scheduleId` controls the stable Temporal schedule identifier.
+- `scheduleInterval` defines how often the refresh workflow is started.
+- `scheduleReconcileMs` controls how often `analytics-scheduler` rechecks the schedule definition.
+- `maxConcurrency` limits how many company refreshes one scheduled workflow run processes in parallel.
+- `auth.bootstrapClientId` and `auth.bootstrapClientSecret` provide the worker with credentials so scheduled refreshes can call the protected analytics sync endpoint.
+
+If you already manage these credentials in Kubernetes Secrets, use `analytics.runtime.auth.existingSecret`, `analytics.runtime.auth.existingSecretClientIdField`, and `analytics.runtime.auth.existingSecretClientSecretField` instead of inline values.
+
 ## Upgrade
 
 ```bash
 yarn sync:cube-schema
+./scripts/sync-k8s-asset-configmaps.sh \
+  --namespace "$NAMESPACE" \
+  --release nextgen-eam \
+  --values k8s/my-values.yaml
 helm upgrade nextgen-eam . -f my-values.yaml -n "$NAMESPACE"
 ```
 
