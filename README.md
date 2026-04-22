@@ -97,6 +97,53 @@ yarn dev
 
 The application is then available at: http://localhost:3000
 
+## ☸️ Kubernetes Installation
+
+For cluster deployments, NextGen EAM ships with a Helm chart in `k8s/`.
+
+### Prerequisites
+
+- Kubernetes 1.25+
+- Helm 3.10+
+- An ingress controller
+- A storage class for persistent volumes
+
+### Quick Start
+
+```bash
+cd k8s
+
+export NAMESPACE=nextgen-eam
+
+cat > my-values.yaml <<EOF
+global:
+	baseDomain: eam.example.com
+	imageRepository: de-fue-cto-community
+
+neo4j:
+	auth:
+		password: "change-me-neo4j"
+
+keycloak:
+	admin:
+		password: "change-me-keycloak-admin"
+	db:
+		password: "change-me-keycloak-db"
+EOF
+
+helm install nextgen-eam . -f my-values.yaml -n "$NAMESPACE" --create-namespace
+```
+
+For updates, run:
+
+```bash
+yarn sync:cube-schema
+cd k8s
+helm upgrade nextgen-eam . -f my-values.yaml -n "$NAMESPACE"
+```
+
+The Helm chart supports analytics services, optional AI workloads, ingress/TLS configuration, and branding overrides. See [k8s/README.md](./k8s/README.md) for the full values reference and production deployment details.
+
 ## 📁 Project Structure
 
 ```
