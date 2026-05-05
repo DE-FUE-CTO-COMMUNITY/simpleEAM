@@ -134,24 +134,6 @@ services:
       - AI_SEARCH_SEARXNG_API_KEY=${AI_SEARCH_SEARXNG_API_KEY:-}
     networks:
       - eam-network
-      - ${TRAEFIK_NETWORK}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.rule=Host\
-        (`${AI_SERVER_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/ai-runs`) ||
-        PathPrefix(`/ai-assistant`) || PathPrefix(`/sovereignty`))"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.entrypoin\
-        ts=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.certr\
-        esolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.domai\
-        ns[0].main=${AI_SERVER_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.priority=\
-        100"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.loadbala\
-        ncer.server.port=${AI_SERVER_INTERNAL_PORT}"
-      - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   # Analytics scheduler
   analytics-scheduler:
@@ -446,22 +428,6 @@ services:
       - "${CUBEJS_EXTERNAL_PORT:-4003}:4000"
     networks:
       - eam-network
-      - ${TRAEFIK_NETWORK}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.rule=Ho\
-        st(`${CUBE_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/cubejs-api`) ||
-        PathPrefix(`/cubejs-system`))"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.entrypo\
-        ints=websecure"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls=true"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls.cer\
-        tresolver=${TRAEFIK_CERTRESOLVER}"
-      - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls.dom\
-        ains[0].main=${CUBE_SUBDOMAIN}.${BASE_DOMAIN}"
-      - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.loadba\
-        lancer.server.port=4000"
-      - "traefik.docker.network=${TRAEFIK_NETWORK}"
 
   cubestore:
     image: cubejs/cubestore:latest

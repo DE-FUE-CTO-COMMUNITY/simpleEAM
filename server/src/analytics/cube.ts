@@ -20,8 +20,7 @@ interface CubeLoadResult {
   readonly rows: Array<Record<string, string | number | null>>
 }
 
-const cubeApiUrl =
-  process.env.ANALYTICS_CUBE_INTERNAL_URL || 'http://cube:4000/cubejs-api/v1'
+const cubeApiUrl = process.env.ANALYTICS_CUBE_INTERNAL_URL || 'http://cube:4000/cubejs-api/v1'
 const cubeApiSecret = process.env.CUBEJS_API_SECRET || 'nextgen-eam-analytics-dev'
 
 function normalizeMonthLabel(rawValue: string): string {
