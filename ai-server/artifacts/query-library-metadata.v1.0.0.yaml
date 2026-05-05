@@ -1,179 +1,125 @@
-{
-  'artifact': 'query-library-metadata',
-  'version': '1.0.0',
-  'selectionMode': 'query-id-only',
-  'dynamicQueryGenerationAllowed': false,
-  'queries':
-    [
-      {
-        'queryId': 'listApplications',
-        'kind': 'list',
-        'description': 'List applications through the predefined GraphQL tool.',
-        'rootQueries': ['applications'],
-        'entityTypes': ['Application'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listBusinessCapabilities',
-        'kind': 'list',
-        'description': 'List business capabilities through the predefined GraphQL tool.',
-        'rootQueries': ['businessCapabilities'],
-        'entityTypes': ['BusinessCapability'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listApplicationInterfaces',
-        'kind': 'list',
-        'description': 'List application interfaces through the predefined GraphQL tool.',
-        'rootQueries': ['applicationInterfaces'],
-        'entityTypes': ['ApplicationInterface'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listDataObjects',
-        'kind': 'list',
-        'description': 'List data objects through the predefined GraphQL tool.',
-        'rootQueries': ['dataObjects'],
-        'entityTypes': ['DataObject'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listInfrastructures',
-        'kind': 'list',
-        'description': 'List infrastructures through the predefined GraphQL tool.',
-        'rootQueries': ['infrastructures'],
-        'entityTypes': ['Infrastructure'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listBusinessProcesses',
-        'kind': 'list',
-        'description': 'List business processes through the predefined GraphQL tool.',
-        'rootQueries': ['businessProcesses'],
-        'entityTypes': ['BusinessProcess'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listAIComponents',
-        'kind': 'list',
-        'description': 'List AI components through the predefined GraphQL tool.',
-        'rootQueries': ['aiComponents'],
-        'entityTypes': ['AIComponent'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listSuppliers',
-        'kind': 'list',
-        'description': 'List suppliers through the predefined GraphQL tool.',
-        'rootQueries': ['suppliers'],
-        'entityTypes': ['Supplier'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listOrganisations',
-        'kind': 'list',
-        'description': 'List organisations through the predefined GraphQL tool.',
-        'rootQueries': ['organisations'],
-        'entityTypes': ['Organisation'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-scope-company'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'listPeople',
-        'kind': 'list',
-        'description': 'List people through the predefined GraphQL tool.',
-        'rootQueries': ['people'],
-        'entityTypes': ['Person'],
-        'allowedIntents':
-          ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION', 'ENTITY_IDENTIFICATION'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['people-company-scope'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'countEntities',
-        'kind': 'count',
-        'description': 'Count supported entity collections through the predefined connection-query family.',
-        'rootQueries':
-          [
-            'applicationsConnection',
-            'businessCapabilitiesConnection',
-            'applicationInterfacesConnection',
-            'dataObjectsConnection',
-            'infrastructuresConnection',
-            'businessProcessesConnection',
-            'aiComponentsConnection',
-            'suppliersConnection',
-            'organisationsConnection',
-            'peopleConnection',
-            'architecturesConnection',
-            'softwareProductsConnection',
-          ],
-        'entityTypes':
-          [
-            'Application',
-            'BusinessCapability',
-            'ApplicationInterface',
-            'DataObject',
-            'Infrastructure',
-            'BusinessProcess',
-            'AIComponent',
-            'Supplier',
-            'Organisation',
-            'Person',
-            'Architecture',
-            'SoftwareProduct',
-          ],
-        'allowedIntents': ['FACT_LOOKUP', 'IMPACT_ANALYSIS', 'DEPENDENCY_EXPLORATION'],
-        'parameterMode': 'enumerated-config',
-        'companyScopeRuleIds': ['company-scope-company', 'people-company-scope'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-      {
-        'queryId': 'getCompanyOverview',
-        'kind': 'overview',
-        'description': 'Retrieve the scoped company overview through the predefined GraphQL tool.',
-        'rootQueries': ['companies'],
-        'entityTypes': ['Company'],
-        'allowedIntents': ['FACT_LOOKUP', 'STRATEGIC_ENRICHMENT'],
-        'parameterMode': 'structured-args',
-        'companyScopeRuleIds': ['company-root-id-scope'],
-        'sourceModules': ['agents/data-lookup/tools.ts'],
-      },
-    ],
-}
+artifact: query-library-metadata
+version: '1.0.0'
+selectionMode: query-id-only
+dynamicQueryGenerationAllowed: false
+queries:
+  - queryId: entity.searchByName
+    kind: list
+    description: Generic governed entity search by name.
+    rootQueries:
+      - applications
+      - businessCapabilities
+      - applicationInterfaces
+      - dataObjects
+      - infrastructures
+      - businessProcesses
+      - softwareProducts
+    entityTypes:
+      - Application
+      - BusinessCapability
+      - ApplicationInterface
+      - DataObject
+      - Infrastructure
+      - BusinessProcess
+      - SoftwareProduct
+    allowedIntents:
+      - ENTITY_SEARCH
+    parameterMode: structured-args
+    companyScopeRuleIds:
+      - company-scope-company
+    sourceModules:
+      - artifacts/query-library.json
+  - queryId: entity.detailsById
+    kind: list
+    description: Generic governed entity detail lookup by id.
+    rootQueries:
+      - applications
+      - businessCapabilities
+      - applicationInterfaces
+      - dataObjects
+      - infrastructures
+      - businessProcesses
+      - softwareProducts
+    entityTypes:
+      - Application
+      - BusinessCapability
+      - ApplicationInterface
+      - DataObject
+      - Infrastructure
+      - BusinessProcess
+      - SoftwareProduct
+    allowedIntents:
+      - ENTITY_DETAILS
+    parameterMode: structured-args
+    companyScopeRuleIds:
+      - company-scope-company
+    sourceModules:
+      - artifacts/query-library.json
+  - queryId: entity.gap.byRelation
+    kind: list
+    description: Generic governed gap analysis using relation none-filters.
+    rootQueries:
+      - applications
+      - businessCapabilities
+      - applicationInterfaces
+      - dataObjects
+      - businessProcesses
+    entityTypes:
+      - Application
+      - BusinessCapability
+      - ApplicationInterface
+      - DataObject
+      - BusinessProcess
+    allowedIntents:
+      - ENTITY_GAP_ANALYSIS
+    parameterMode: structured-args
+    companyScopeRuleIds:
+      - company-scope-company
+    sourceModules:
+      - artifacts/query-library.json
+  - queryId: entity.relation.someByNameContains
+    kind: list
+    description: Generic governed relation traversal with name filters.
+    rootQueries:
+      - applications
+      - businessCapabilities
+      - applicationInterfaces
+      - dataObjects
+      - infrastructures
+      - businessProcesses
+    entityTypes:
+      - Application
+      - BusinessCapability
+      - ApplicationInterface
+      - DataObject
+      - Infrastructure
+      - BusinessProcess
+    allowedIntents:
+      - ENTITY_RELATION_FILTER
+    parameterMode: structured-args
+    companyScopeRuleIds:
+      - company-scope-company
+    sourceModules:
+      - artifacts/query-library.json
+  - queryId: entity.countByStatus
+    kind: count
+    description: Generic governed entity counts by status.
+    rootQueries:
+      - applicationsConnection
+      - businessCapabilitiesConnection
+      - applicationInterfacesConnection
+      - infrastructuresConnection
+      - businessProcessesConnection
+    entityTypes:
+      - Application
+      - BusinessCapability
+      - ApplicationInterface
+      - Infrastructure
+      - BusinessProcess
+    allowedIntents:
+      - COUNT_ENTITIES
+    parameterMode: structured-args
+    companyScopeRuleIds:
+      - company-scope-company
+    sourceModules:
+      - artifacts/query-library.json

@@ -62,7 +62,7 @@ services:
       - CLICKHOUSE_DB=${CLICKHOUSE_DB:-nextgen_analytics}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
       - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
-      - ANALYTICS_CUBE_API_URL=${ANALYTICS_CUBE_API_URL:-http://cube:4000/cubejs-api/v1}
+      - ANALYTICS_CUBE_INTERNAL_URL=${ANALYTICS_CUBE_INTERNAL_URL:-http://cube:4000/cubejs-api/v1}
       - CUBEJS_API_SECRET=${CUBEJS_API_SECRET:-nextgen-eam-analytics-dev}
     # No bind mounts for src, prisma, tests - everything comes from the image
     networks:
@@ -138,7 +138,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.rule=Host\
-        (`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/ai-runs`) ||
+        (`${AI_SERVER_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/ai-runs`) ||
         PathPrefix(`/ai-assistant`) || PathPrefix(`/sovereignty`))"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.entrypoin\
         ts=websecure"
@@ -146,7 +146,7 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.certr\
         esolver=${TRAEFIK_CERTRESOLVER}"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.tls.domai\
-        ns[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+        ns[0].main=${AI_SERVER_SUBDOMAIN}.${BASE_DOMAIN}"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.priority=\
         100"
       - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-ai.loadbala\
@@ -450,7 +450,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.rule=Ho\
-        st(`${API_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/cubejs-api`) ||
+        st(`${CUBE_SUBDOMAIN}.${BASE_DOMAIN}`) && (PathPrefix(`/cubejs-api`) ||
         PathPrefix(`/cubejs-system`))"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.entrypo\
         ints=websecure"
@@ -458,7 +458,7 @@ services:
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls.cer\
         tresolver=${TRAEFIK_CERTRESOLVER}"
       - "traefik.http.routers.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.tls.dom\
-        ains[0].main=${API_SUBDOMAIN}.${BASE_DOMAIN}"
+        ains[0].main=${CUBE_SUBDOMAIN}.${BASE_DOMAIN}"
       - "traefik.http.services.${COMPOSE_PROJECT_NAME:-nextgen-eam}-cube.loadba\
         lancer.server.port=4000"
       - "traefik.docker.network=${TRAEFIK_NETWORK}"
@@ -502,11 +502,10 @@ services:
       - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN}
       - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
       - EXCALIDRAW_WS_SERVER_URL=https://${EXCALIDRAW_ROOM_SUBDOMAIN}.${BASE_DOMAIN}
+      - AI_API_INTERNAL_URL=http://ai-server:${AI_SERVER_INTERNAL_PORT}
       - AI_LLM_URL=${AI_LLM_URL:-}
-      - AI_API_URL=${AI_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}}
       - ANALYTICS_ENABLED=${ANALYTICS_ENABLED:-true}
       - ANALYTICS_API_URL=${ANALYTICS_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}/analytics}
-      - ANALYTICS_CUBE_API_URL=${ANALYTICS_CUBE_API_URL:-https://${API_SUBDOMAIN}.${BASE_DOMAIN}/cubejs-api/v1}
       - BRAND_NAME_LONG=${BRAND_NAME_LONG:-NextGen Enterprise Architecture
         Management}
       - BRAND_NAME_SHORT=${BRAND_NAME_SHORT:-NextGen EAM}

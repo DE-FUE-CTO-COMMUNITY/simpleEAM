@@ -5,7 +5,7 @@ import type { LoadedArtifacts, SupportedLocale } from '../artifacts/types'
 import { createPlan, type CoordinatorArtifactExcerpt } from '../agents/coordinatorAdapter'
 import { executeQuery, type ExecutedQueryResult } from '../agents/dataLookupAdapter'
 import { ASK_CLARIFICATION, enforceCoordinatorPlan } from '../policy/enforce'
-import { selectAllowedQueryIds, type QueryId } from '../policy/querySelect'
+import type { QueryId, QuerySelection } from '../policy/querySelect'
 import type { AiState, AnswerState, NormalizedState, SelectedQueryState } from '../state/aiState'
 import type { Clarification, Plan } from '../state/plan'
 import { appendStateStep } from '../state/trajectory'
@@ -28,9 +28,7 @@ interface GraphRuntimeContext {
 
 interface GraphExecutionEnvelope {
   readonly runtime?: GraphRuntimeContext
-  readonly querySelection?: {
-    readonly queryIds: readonly QueryId[]
-  }
+  readonly querySelection?: QuerySelection
   readonly lookupResult?: ExecutedQueryResult
 }
 
@@ -110,55 +108,6 @@ function summarizeLookupResult(result: ExecutedQueryResult): string {
 
   const parts = topLevelEntries.map(([key, value]) => `${key}: ${summarizeValue(value)}`)
   return `Lookup completed. ${parts.join('; ')}`
-}
-
-function buildSelectedQuery(plan: Plan, queryIds: readonly QueryId[]): SelectedQueryState {
-  const queryId = queryIds[0]
-  if (!queryId) {
-    throw new Error('No governed QueryId was selected.')
-  }
-
-  const entityType = plan.entityHint?.entityType
-  const args: Record<string, unknown> = {}
-
-  if (plan.entityHint && 'filters' in plan.entityHint) {
-    Object.assign(args, plan.entityHint.filters)
-  }
-
-  if (plan.entityHint && 'name' in plan.entityHint && typeof plan.entityHint.name === 'string') {
-    args.nameContains = plan.entityHint.name
-  }
-
-  if (queryId === 'countEntities') {
-    const countEntityTypeByCanonicalType: Partial<Record<NonNullable<typeof entityType>, string>> =
-      {
-        Application: 'applications',
-        BusinessCapability: 'businessCapabilities',
-        ApplicationInterface: 'applicationInterfaces',
-        DataObject: 'dataObjects',
-        Infrastructure: 'infrastructures',
-        BusinessProcess: 'businessProcesses',
-        AIComponent: 'aiComponents',
-        Supplier: 'suppliers',
-        Organisation: 'organisations',
-        Person: 'people',
-        Architecture: 'architectures',
-        SoftwareProduct: 'softwareProducts',
-      }
-
-    if (!entityType || !countEntityTypeByCanonicalType[entityType]) {
-      throw new Error(
-        `No countEntities mapping exists for entity type "${entityType ?? 'unknown'}".`
-      )
-    }
-
-    args.entityType = countEntityTypeByCanonicalType[entityType]
-  }
-
-  return {
-    queryId,
-    args,
-  }
 }
 
 async function planNode(state: AiState): Promise<Partial<AiState>> {
@@ -325,32 +274,31 @@ async function enforceNode(state: AiState): Promise<Partial<AiState>> {
     ),
     data: withEnvelope(state, {
       runtime: { ...asEnvelope(state.data).runtime, artifacts },
-      querySelection: { queryIds: decision.querySelection.queryIds },
+      querySelection: decision.querySelection,
     }),
   }
 }
 
 async function querySelectNode(state: AiState): Promise<Partial<AiState>> {
+  const envelope = asEnvelope(state.data)
+  const selection = envelope.querySelection
   const artifacts = getArtifacts(state)
 
-  if (!state.plan?.entityHint) {
-    throw new Error('querySelectNode requires a validated plan with entityHint.')
+  if (!selection?.selected) {
+    throw new Error(selection?.reason ?? 'querySelectNode requires a deterministic selected query.')
   }
 
-  const selection = selectAllowedQueryIds({
-    intent: state.plan.intent,
-    entityType: state.plan.entityHint.entityType,
-    artifacts,
-  })
-
-  const selectedQuery = buildSelectedQuery(state.plan, selection.queryIds)
+  const selectedQuery: SelectedQueryState = {
+    queryId: selection.selected.queryId,
+    args: selection.selected.args,
+  }
 
   return {
     selectedQuery,
     steps: appendStateStep(
       state.steps,
       'QUERY_SELECTED',
-      'querySelectNode selected the first governed QueryId.',
+      'querySelectNode accepted the deterministic governed query selection.',
       {
         node: 'querySelectNode',
         queryId: selectedQuery.queryId,
@@ -358,8 +306,8 @@ async function querySelectNode(state: AiState): Promise<Partial<AiState>> {
       }
     ),
     data: withEnvelope(state, {
-      runtime: { ...asEnvelope(state.data).runtime, artifacts },
-      querySelection: { queryIds: selection.queryIds },
+      runtime: { ...envelope.runtime, artifacts },
+      querySelection: selection,
     }),
   }
 }

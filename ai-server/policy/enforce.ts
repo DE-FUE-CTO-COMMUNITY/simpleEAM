@@ -60,7 +60,18 @@ export interface AskClarificationPolicyDecision {
 export type PolicyDecision = AllowedPolicyDecision | AskClarificationPolicyDecision
 
 const INTENT_KEYWORDS: Readonly<Record<AllowedIntent, readonly string[]>> = {
-  FACT_LOOKUP: ['list', 'show', 'what is', 'what are', 'which', 'count', 'how many', 'overview'],
+  FACT_LOOKUP: [
+    'list',
+    'show',
+    'what is',
+    'what are',
+    'which',
+    'count',
+    'how many',
+    'overview',
+    'detail',
+    'details',
+  ],
   IMPACT_ANALYSIS: [
     'impact',
     'impacts',
@@ -109,6 +120,34 @@ const STRONG_INTENT_PRIORITY: readonly AllowedIntent[] = [
   'STRATEGIC_ENRICHMENT',
 ]
 
+const ENTITY_SUBJECT_PATTERNS: ReadonlyArray<{
+  readonly entityType: CanonicalConceptType
+  readonly patterns: readonly RegExp[]
+}> = [
+  {
+    entityType: 'BusinessCapability',
+    patterns: [
+      /\bbusiness capabilities?\b.*\b(?:not supported by|supported by|without)\b/,
+      /\bcapabilities?\b.*\b(?:not supported by|supported by|without)\b/,
+    ],
+  },
+  {
+    entityType: 'Application',
+    patterns: [
+      /\bapplications?\b.*\b(?:support|supports|use|uses|host|hosts)\b/,
+      /\bhow many\b.*\bapplications?\b/,
+    ],
+  },
+  {
+    entityType: 'ApplicationInterface',
+    patterns: [/\binterfaces?\b.*\b(?:data|applications?)\b/],
+  },
+  {
+    entityType: 'DataObject',
+    patterns: [/\bdata objects?\b.*\b(?:used by|related to)\b/],
+  },
+] as const
+
 function uniqueValues<T>(values: readonly T[]): readonly T[] {
   return Array.from(new Set(values))
 }
@@ -122,6 +161,48 @@ function isCanonicalConceptType(
   artifacts: LoadedArtifacts
 ): value is CanonicalConceptType {
   return value in artifacts.conceptDictionary.concepts
+}
+
+function canonicalizeForMatching(value: string): string {
+  return value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function getEntityTypeMentionPosition(
+  entityType: CanonicalConceptType,
+  normalized: NormalizedUserInput,
+  artifacts: LoadedArtifacts
+): number {
+  const concept = artifacts.conceptDictionary.concepts[entityType]
+  const aliases = new Set<string>([
+    entityType,
+    concept.graphLabel,
+    ...concept.synonyms.de,
+    ...concept.synonyms.en,
+    ...concept.synonyms.fr,
+  ])
+
+  const normalizedText = ` ${normalized.normalizedText} `
+  let earliestIndex = Number.POSITIVE_INFINITY
+
+  for (const alias of aliases) {
+    const normalizedAlias = canonicalizeForMatching(alias)
+    if (!normalizedAlias) {
+      continue
+    }
+
+    const index = normalizedText.indexOf(` ${normalizedAlias} `)
+    if (index >= 0 && index < earliestIndex) {
+      earliestIndex = index
+    }
+  }
+
+  return earliestIndex
 }
 
 function buildClarification(question: string, reason: string): Clarification {
@@ -215,6 +296,19 @@ function validateFilterOperators(filterSyntax: FilterSyntaxContract, key: string
   )
 }
 
+function resolveEntityTypeFromSubjectCue(
+  normalized: NormalizedUserInput,
+  artifacts: LoadedArtifacts
+): CanonicalConceptType | null {
+  for (const candidate of ENTITY_SUBJECT_PATTERNS) {
+    if (candidate.patterns.some(pattern => pattern.test(normalized.normalizedText))) {
+      return isCanonicalConceptType(candidate.entityType, artifacts) ? candidate.entityType : null
+    }
+  }
+
+  return null
+}
+
 function validateFilterShape(
   value: unknown,
   allowedKeys: ReadonlySet<string>,
@@ -305,10 +399,38 @@ function resolveEntityType(
     return { value: entityType, candidates: [entityType] }
   }
 
+  const subjectCueEntityType = resolveEntityTypeFromSubjectCue(normalized, artifacts)
+  if (subjectCueEntityType) {
+    return {
+      value: subjectCueEntityType,
+      candidates: normalized.candidateEntityTypes,
+    }
+  }
+
   if (normalized.preferredEntityType) {
     return {
       value: normalized.preferredEntityType,
       candidates: [normalized.preferredEntityType],
+    }
+  }
+
+  if (normalized.candidateEntityTypes.length > 1) {
+    const rankedCandidates = [...normalized.candidateEntityTypes].sort(
+      (left, right) =>
+        getEntityTypeMentionPosition(left, normalized, artifacts) -
+        getEntityTypeMentionPosition(right, normalized, artifacts)
+    )
+    const firstCandidate = rankedCandidates[0]
+    const secondCandidate = rankedCandidates[1]
+    if (
+      firstCandidate &&
+      getEntityTypeMentionPosition(firstCandidate, normalized, artifacts) !==
+        getEntityTypeMentionPosition(secondCandidate ?? firstCandidate, normalized, artifacts)
+    ) {
+      return {
+        value: firstCandidate,
+        candidates: rankedCandidates,
+      }
     }
   }
 
@@ -428,13 +550,19 @@ export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): Policy
   const querySelection = selectAllowedQueryIds({
     intent: resolvedIntent.value,
     entityType: resolvedEntityType.value,
+    text: args.text,
+    normalizedText: normalized.canonicalText,
+    entityHint,
     artifacts: args.artifacts,
   })
 
-  if (querySelection.queryIds.length === 0) {
+  if (querySelection.queryIds.length === 0 || !querySelection.selected) {
     return buildAskClarificationDecision(
       normalized,
-      ['No governed QueryId is available for the resolved intent and entity type.'],
+      [
+        querySelection.reason ??
+          'No governed QueryId is available for the resolved intent and entity type.',
+      ],
       [resolvedIntent.value],
       [resolvedEntityType.value]
     )
@@ -461,12 +589,6 @@ export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): Policy
     action: 'ALLOW',
     plan: resolvedPlan,
     normalized,
-    querySelection: {
-      ...querySelection,
-      parameterPolicies: querySelection.queryIds.map(queryId => ({
-        queryId,
-        requiredParameters: getRequiredParametersForQueryId(queryId),
-      })),
-    },
+    querySelection,
   }
 }

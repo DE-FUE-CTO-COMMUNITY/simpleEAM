@@ -54,7 +54,12 @@ function parseWithGraphql(
     return null
   }
 
-  const documentNode = parse(sanitizeForParsing(template))
+  let documentNode: GraphqlAstNode
+  try {
+    documentNode = parse(sanitizeForParsing(template))
+  } catch {
+    return null
+  }
   const operationDefinition = documentNode.definitions?.find(
     definition => definition.kind === 'OperationDefinition'
   )
@@ -67,7 +72,7 @@ function parseWithGraphql(
     rootSelection?.selectionSet?.selections
       ?.filter(selection => selection.kind === 'Field')
       .map(selection => selection.name?.value ?? '')
-      .filter(Boolean) ?? []
+      .filter(selection => Boolean(selection) && selection !== 'PLACEHOLDER') ?? []
 
   return { rootField, selections }
 }
@@ -109,6 +114,53 @@ function findMatchingBrace(source: string, startIndex: number): number {
     }
 
     if (character === '}') {
+      depth -= 1
+      if (depth === 0) {
+        return index
+      }
+    }
+  }
+
+  return -1
+}
+
+function findMatchingParenthesis(source: string, startIndex: number): number {
+  let depth = 0
+  let inString = false
+  let escaped = false
+
+  for (let index = startIndex; index < source.length; index += 1) {
+    const character = source[index]
+
+    if (inString) {
+      if (escaped) {
+        escaped = false
+        continue
+      }
+
+      if (character === '\\') {
+        escaped = true
+        continue
+      }
+
+      if (character === '"') {
+        inString = false
+      }
+
+      continue
+    }
+
+    if (character === '"') {
+      inString = true
+      continue
+    }
+
+    if (character === '(') {
+      depth += 1
+      continue
+    }
+
+    if (character === ')') {
       depth -= 1
       if (depth === 0) {
         return index
@@ -165,7 +217,10 @@ function parseSelectionsFallback(selectionBlock: string): readonly string[] {
       while (index < selectionBlock.length && /[A-Za-z0-9_]/.test(selectionBlock[index] ?? '')) {
         index += 1
       }
-      selections.push(selectionBlock.slice(startIndex, index))
+      const selection = selectionBlock.slice(startIndex, index)
+      if (selection !== 'PLACEHOLDER') {
+        selections.push(selection)
+      }
       continue
     }
 
@@ -188,7 +243,21 @@ function parseTemplateFallback(template: string): {
   }
 
   const rootFieldIndex = sanitized.indexOf(rootField)
-  const rootSelectionStart = sanitized.indexOf('{', rootFieldIndex)
+  let cursor = rootFieldIndex + rootField.length
+
+  while (cursor < sanitized.length && /\s/.test(sanitized[cursor] ?? '')) {
+    cursor += 1
+  }
+
+  if (sanitized[cursor] === '(') {
+    const argsEndIndex = findMatchingParenthesis(sanitized, cursor)
+    if (argsEndIndex === -1) {
+      return { rootField, selections: [] }
+    }
+    cursor = argsEndIndex + 1
+  }
+
+  const rootSelectionStart = sanitized.indexOf('{', cursor)
   if (rootSelectionStart === -1) {
     return { rootField, selections: [] }
   }

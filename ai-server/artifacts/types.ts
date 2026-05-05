@@ -8,6 +8,14 @@ export const ALLOWED_INTENTS = [
   'ENTITY_IDENTIFICATION',
 ] as const
 
+export const QUERY_FORMS = [
+  'ENTITY_SEARCH',
+  'ENTITY_DETAILS',
+  'ENTITY_RELATION_FILTER',
+  'ENTITY_GAP_ANALYSIS',
+  'COUNT_ENTITIES',
+] as const
+
 export const CANONICAL_CONCEPT_TYPES = [
   'BusinessCapability',
   'BusinessProcess',
@@ -44,6 +52,7 @@ export const CANONICAL_CONCEPT_TYPES = [
 
 export type SupportedLocale = (typeof SUPPORTED_LOCALES)[number]
 export type AllowedIntent = (typeof ALLOWED_INTENTS)[number]
+export type QueryForm = (typeof QUERY_FORMS)[number]
 export type CanonicalConceptType = (typeof CANONICAL_CONCEPT_TYPES)[number]
 
 export type ArtifactKind =
@@ -83,7 +92,7 @@ export interface QueryLibraryEntry {
   readonly description: string
   readonly rootQueries: readonly string[]
   readonly entityTypes: readonly CanonicalConceptType[]
-  readonly allowedIntents: readonly AllowedIntent[]
+  readonly allowedIntents: readonly QueryForm[]
   readonly parameterMode: 'structured-args' | 'enumerated-config'
   readonly companyScopeRuleIds: readonly string[]
   readonly sourceModules: readonly string[]
@@ -91,17 +100,18 @@ export interface QueryLibraryEntry {
 
 export interface GraphqlQueryLibraryParam {
   readonly name: string
-  readonly kind: 'string' | 'id' | 'enum' | 'int'
+  readonly kind: 'string' | 'id' | 'enum' | 'int' | 'identifier' | 'selectionSet' | 'whereClause'
   readonly required: boolean
   readonly placeholder: string
   readonly description: string
   readonly enumType?: string
+  readonly enumTypeParam?: string
   readonly defaultValue?: string | number
 }
 
 export interface GraphqlQueryLibraryEntry {
   readonly queryId: string
-  readonly intents: readonly AllowedIntent[]
+  readonly intents: readonly QueryForm[]
   readonly rootField: string
   readonly entityTypes: readonly CanonicalConceptType[]
   readonly companyScopeRuleId: string

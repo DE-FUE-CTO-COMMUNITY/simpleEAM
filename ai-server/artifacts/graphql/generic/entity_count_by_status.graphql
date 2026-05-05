@@ -1,0 +1,15 @@
+# statusEnumType={{statusEnumType}}
+query {
+  {{entityRoot}}Connection(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      status: { eq: {{statusEnum}} }
+    }
+  ) {
+    aggregate {
+      count {
+        nodes
+      }
+    }
+  }
+}

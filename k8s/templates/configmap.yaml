@@ -26,12 +26,11 @@ data:
   GRAPHQL_INTERNAL_PORT: {{ .Values.server.port | quote }}
   GRAPHQL_INTERNAL_URL: {{ printf "http://%s-server:%d/graphql" (include "nextgen-eam.fullname" .) (int .Values.server.port) | quote }}
 
-  AI_API_URL: {{ printf "https://%s.%s" .Values.ingress.subdomains.api .Values.global.baseDomain | quote }}
+  AI_API_INTERNAL_URL: {{ printf "http://%s-ai-server:%d" (include "nextgen-eam.fullname" .) (int .Values.ai.server.port) | quote }}
 
   # Analytics
   ANALYTICS_ENABLED: {{ .Values.analytics.enabled | quote }}
   ANALYTICS_API_URL: {{ default (printf "https://%s.%s/analytics" .Values.ingress.subdomains.api .Values.global.baseDomain) .Values.analytics.apiUrl | quote }}
-  ANALYTICS_CUBE_API_URL: {{ default (printf "https://%s.%s/cubejs-api/v1" .Values.ingress.subdomains.api .Values.global.baseDomain) .Values.analytics.cubeApiUrl | quote }}
   ANALYTICS_CUBE_INTERNAL_URL: {{ printf "http://%s-cube:%d/cubejs-api/v1" (include "nextgen-eam.fullname" .) (int .Values.analytics.cube.port) | quote }}
   ANALYTICS_PROJECTION_TASK_QUEUE: {{ .Values.analytics.runtime.taskQueue | quote }}
   ANALYTICS_PROJECTION_MAX_CONCURRENCY: {{ .Values.analytics.runtime.maxConcurrency | quote }}

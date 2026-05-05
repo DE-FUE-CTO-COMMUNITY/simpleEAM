@@ -61,7 +61,6 @@ branding:
 analytics:
   enabled: true
   apiUrl: ''
-  cubeApiUrl: ''
   runtime:
     enabled: true
     image:

@@ -2,6 +2,7 @@ import { resolve } from 'node:path'
 
 import { loadArtifacts, resolveArtifactsDirectory } from '../loader'
 import type { GraphqlQueryLibraryEntry, GraphqlQueryLibraryParam } from '../types'
+import { buildPolicyCapabilities, getEntityCapability } from '../../policy/capabilities'
 import { parseSchemaDigest } from './digestParser'
 import { parseTemplateFile } from './templateParser'
 
@@ -11,6 +12,13 @@ export interface QueryLibraryValidationReport {
 }
 
 const COMPANY_ID_EXCEPTIONS = new Set<string>()
+const EXPECTED_QUERY_IDS = [
+  'entity.searchByName',
+  'entity.detailsById',
+  'entity.gap.byRelation',
+  'entity.relation.someByNameContains',
+  'entity.countByStatus',
+] as const
 
 function normalizeWhitespace(value: string): string {
   return value.replace(/\s+/g, ' ').trim()
@@ -29,6 +37,10 @@ function buildExpectedCompanyScopeSnippets(whereClauseShape: string): readonly s
     normalizeWhitespace(whereClauseShape.replace(/\$companyId/g, `"${placeholder}"`)),
     normalizeWhitespace(whereClauseShape.replace(/\$companyId/g, placeholder)),
   ]
+}
+
+function sanitizeRootField(value: string): string {
+  return value.replace(/\{\{\s*[a-zA-Z0-9_.-]+\s*\}\}/g, 'PLACEHOLDER')
 }
 
 function validateCompanyScope(
@@ -65,9 +77,52 @@ function validateTemplateSelections(
 ): void {
   const allowedSelections = new Set([...allowedFields, ...allowedRelations])
   for (const selection of selections) {
+    if (selection === 'aggregate' || selection === 'PLACEHOLDER') {
+      continue
+    }
     if (!allowedSelections.has(selection)) {
       errors.push(
         `query-library.${queryDefinition.queryId}: selection "${selection}" is not allowed by SCHEMA_DIGEST for root field "${queryDefinition.rootField}".`
+      )
+    }
+  }
+}
+
+function validateEntityMappings(queryDefinition: GraphqlQueryLibraryEntry, errors: string[]): void {
+  const artifacts = loadArtifacts()
+  const capabilities = buildPolicyCapabilities(artifacts.schemaDigest)
+
+  for (const entityType of queryDefinition.entityTypes) {
+    const capability = getEntityCapability(capabilities, entityType)
+
+    if (queryDefinition.rootField.includes('Connection')) {
+      if (!capability.countRootField) {
+        errors.push(
+          `query-library.${queryDefinition.queryId}: entity type "${entityType}" does not define a governed count root.`
+        )
+      }
+      continue
+    }
+
+    if (!capability.rootField) {
+      errors.push(
+        `query-library.${queryDefinition.queryId}: entity type "${entityType}" does not define a governed root field.`
+      )
+    }
+
+    const relationParam = getParamByName(queryDefinition, 'relationField')
+    if (!relationParam) {
+      continue
+    }
+
+    const allowedRelations =
+      queryDefinition.queryId === 'entity.gap.byRelation'
+        ? capability.gapRelations
+        : capability.relationFilterRelations
+
+    if (allowedRelations.length === 0) {
+      errors.push(
+        `query-library.${queryDefinition.queryId}: entity type "${entityType}" has no governed relation allow-list.`
       )
     }
   }
@@ -117,6 +172,7 @@ export function validateQueryLibrary(artifactsDir?: string): QueryLibraryValidat
   const resolvedArtifactsDir = resolveArtifactsDirectory(artifactsDir)
   const artifacts = loadArtifacts({ artifactsDir: resolvedArtifactsDir })
   const digestIndex = parseSchemaDigest(artifacts.schemaDigest)
+  const capabilities = buildPolicyCapabilities(artifacts.schemaDigest)
   const errors: string[] = []
   const warnings: string[] = []
 
@@ -125,15 +181,12 @@ export function validateQueryLibrary(artifactsDir?: string): QueryLibraryValidat
     errors.push('query-library: duplicate queryId values detected.')
   }
 
-  for (const queryDefinition of artifacts.queryLibrary.queries) {
-    const digestCollection = digestIndex.collections[queryDefinition.rootField]
-    if (!digestCollection) {
-      errors.push(
-        `query-library.${queryDefinition.queryId}: rootField "${queryDefinition.rootField}" is not declared by SCHEMA_DIGEST.`
-      )
-      continue
-    }
+  const missingQueryIds = EXPECTED_QUERY_IDS.filter(queryId => !queryIds.includes(queryId))
+  if (missingQueryIds.length > 0) {
+    errors.push(`query-library: missing required generic queryIds: ${missingQueryIds.join(', ')}`)
+  }
 
+  for (const queryDefinition of artifacts.queryLibrary.queries) {
     const templatePath = resolve(resolvedArtifactsDir, queryDefinition.templateFile)
     const parsedTemplate = parseTemplateFile(templatePath)
 
@@ -144,19 +197,43 @@ export function validateQueryLibrary(artifactsDir?: string): QueryLibraryValidat
       continue
     }
 
-    if (parsedTemplate.rootField !== queryDefinition.rootField) {
+    if (parsedTemplate.rootField !== sanitizeRootField(queryDefinition.rootField)) {
       errors.push(
         `query-library.${queryDefinition.queryId}: template root field "${parsedTemplate.rootField}" does not match metadata rootField "${queryDefinition.rootField}".`
       )
     }
 
-    validateTemplateSelections(
-      queryDefinition,
-      parsedTemplate.selections,
-      digestCollection.fields,
-      digestCollection.relations,
-      errors
-    )
+    for (const entityType of queryDefinition.entityTypes) {
+      const capability = getEntityCapability(capabilities, entityType)
+      const resolvedRootField = queryDefinition.rootField.includes('Connection')
+        ? capability.countRootField
+        : capability.rootField
+
+      if (!resolvedRootField) {
+        errors.push(
+          `query-library.${queryDefinition.queryId}: entity type "${entityType}" does not resolve a root field.`
+        )
+        continue
+      }
+
+      const digestCollection = digestIndex.collections[resolvedRootField]
+      if (!digestCollection && !resolvedRootField.endsWith('Connection')) {
+        errors.push(
+          `query-library.${queryDefinition.queryId}: rootField "${resolvedRootField}" is not declared by SCHEMA_DIGEST.`
+        )
+        continue
+      }
+
+      if (digestCollection) {
+        validateTemplateSelections(
+          queryDefinition,
+          parsedTemplate.selections,
+          digestCollection.fields,
+          digestCollection.relations,
+          errors
+        )
+      }
+    }
 
     const companyScopeRule = digestIndex.companyScopeRules[queryDefinition.companyScopeRuleId]
     if (!companyScopeRule) {
@@ -174,6 +251,7 @@ export function validateQueryLibrary(artifactsDir?: string): QueryLibraryValidat
 
     validatePlaceholders(queryDefinition, parsedTemplate.placeholders, errors, warnings)
     validateEnumLiterals(queryDefinition, parsedTemplate.enumLiterals, digestIndex.enums, errors)
+    validateEntityMappings(queryDefinition, errors)
   }
 
   return { errors, warnings }

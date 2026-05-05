@@ -1,33 +1,65 @@
 # GraphQL Query Library
 
-The initial GraphQL Query Library lives in [ai-server/artifacts/query-library.json](ai-server/artifacts/query-library.json) and its inline templates live under [ai-server/artifacts/graphql](ai-server/artifacts/graphql).
+The governed query library lives in [ai-server/artifacts/query-library.json](ai-server/artifacts/query-library.json). Inline GraphQL templates live under [ai-server/artifacts/graphql](ai-server/artifacts/graphql).
 
-Rules for this library:
+This library is intentionally small. It does not create one `queryId` per business question. Instead, it exposes a stable set of generic query forms that the policy layer parameterizes deterministically from the user request and `SCHEMA_DIGEST`.
 
-- Every query must map to a stable `queryId`.
-- Every template must stay GraphQL-only and read-only.
-- Do not use GraphQL `$variables`; all values are rendered inline.
-- Do not generate or store Cypher here.
-- Every template must include `__COMPANY_SCOPE__` so the renderer can enforce tenant scoping from `SCHEMA_DIGEST`.
-- Every enum parameter must declare `enumType`, and the value must exist in `schema-digest.v1.0.0.ts`.
+## Hard Rules
 
-## Add A New QueryId
+- GraphQL only. No Cypher, no dynamic query generation, no tool-side query synthesis.
+- `SCHEMA_DIGEST` is the safety contract for root collections, relations, enum values, and company scoping.
+- Every template is inline-only. GraphQL `$variables` are forbidden.
+- Every rendered query must include mandatory company scoping through the declared scope rule.
+- Root collections and relation fields are selected by deterministic policy only, never by the LLM.
 
-1. Confirm the target root field, relation filters, and company scope rule already exist in `SCHEMA_DIGEST`.
-2. If the query needs enum filters, add the enum values to `schema-digest.v1.0.0.ts` first.
-3. Create a new `.graphql` template under `ai-server/artifacts/graphql/`.
-4. Use inline placeholders such as `__SEARCH_TEXT__`, `__LIMIT__`, and always include `__COMPANY_SCOPE__`.
-5. Add a new entry to `ai-server/artifacts/query-library.json` with `queryId`, `intents`, `rootField`, `entityType`, `companyScopeRuleId`, `templateFile`, and `params`.
-6. Keep placeholders deterministic: strings must be quoted in the template, enums must not be quoted, and integers must render as bare numbers.
-7. Run `cd ai-server && yarn build` after the change.
+## Stable Query Forms
 
-## Renderer
+The current governed `queryId` set is:
 
-Use `renderGraphqlQuery(...)` from [ai-server/artifacts/graphql/render.ts](ai-server/artifacts/graphql/render.ts) to render inline GraphQL safely.
+- `entity.searchByName`
+- `entity.detailsById`
+- `entity.gap.byRelation`
+- `entity.relation.someByNameContains`
+- `entity.countByStatus`
 
-It guarantees:
+Each entry in [ai-server/artifacts/query-library.json](ai-server/artifacts/query-library.json) defines:
 
-- escaped inline GraphQL strings
-- enum validation against `SCHEMA_DIGEST`
-- enforced company scoping from the declared scope rule
-- rejection of any template that tries to use GraphQL variables
+- `queryId`
+- `intents`: stable generic query forms such as `ENTITY_SEARCH` or `COUNT_ENTITIES`
+- `rootField`: a concrete root query or a governed placeholder pattern such as `{{entityRoot}}`
+- `entityTypes`: the supported canonical concept types
+- `companyScopeRuleId`: the mandatory scope rule from `SCHEMA_DIGEST`
+- `templateFile`: the inline GraphQL template
+- `params`: placeholder definitions and runtime validation rules
+
+## Placeholder Types
+
+The renderer supports a small, explicit set of placeholder kinds:
+
+- `id` and `string`: rendered as escaped GraphQL string literals
+- `int`: rendered as a positive integer literal
+- `enum`: validated against a static enum type or a governed `enumTypeParam`
+- `identifier`: rendered as a bare GraphQL identifier for governed root or relation names
+- `whereClause` and `selectionSet`: deterministic raw fragments produced only by policy code
+
+These raw fragment placeholders exist so the policy layer can compose safe generic forms like relation filters or optional detail relations without introducing freeform query generation.
+
+## Extending The Library
+
+To support a new entity type or relation, do not add a brand-new business-specific query id first. Extend the governed capability map and only widen the library if the existing generic forms cannot express the request.
+
+Recommended order:
+
+1. Add or confirm the root collection, relations, and enum values in `SCHEMA_DIGEST`.
+2. Update [ai-server/policy/capabilities.ts](ai-server/policy/capabilities.ts) with the new root mapping, relation allow-list, and optional status or detail selections.
+3. Reuse an existing generic template whenever possible.
+4. Only add a new `queryId` if the query shape itself is genuinely new.
+5. Run `cd ai-server && yarn validate-query-library`.
+6. Run `cd ai-server && yarn verify-flexible-queries`.
+
+## Verification
+
+Two checks matter after changes:
+
+- `yarn validate-query-library`: offline validation of templates, placeholders, root-field governance, relation allow-lists, enum references, and company scoping.
+- `yarn verify-flexible-queries`: deterministic prompt-to-query verification for the current generic forms.

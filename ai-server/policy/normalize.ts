@@ -50,6 +50,25 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
+function expandAliasVariants(alias: string): readonly string[] {
+  const trimmedAlias = alias.trim()
+  if (!trimmedAlias) {
+    return []
+  }
+
+  const variants = new Set<string>([trimmedAlias])
+
+  if (/y$/i.test(trimmedAlias)) {
+    variants.add(`${trimmedAlias.slice(0, -1)}ies`)
+  } else if (/(s|x|z|ch|sh)$/i.test(trimmedAlias)) {
+    variants.add(`${trimmedAlias}es`)
+  } else if (!/s$/i.test(trimmedAlias)) {
+    variants.add(`${trimmedAlias}s`)
+  }
+
+  return Array.from(variants)
+}
+
 function buildCanonicalAliases(
   entityType: CanonicalConceptType,
   conceptDictionary: ConceptDictionaryArtifact,
@@ -68,12 +87,14 @@ function buildCanonicalAliases(
       ])
 
   return allAliases
-    .map(alias => ({
-      locale: (locale && localizedAliases.includes(alias) ? locale : 'any') as
-        | SupportedLocale
-        | 'any',
-      alias,
-    }))
+    .flatMap(alias =>
+      expandAliasVariants(alias).map(variant => ({
+        locale: (locale && localizedAliases.includes(alias) ? locale : 'any') as
+          | SupportedLocale
+          | 'any',
+        alias: variant,
+      }))
+    )
     .filter(entry => canonicalizeText(entry.alias).length > 0)
 }
 

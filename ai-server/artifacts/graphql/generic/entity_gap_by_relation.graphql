@@ -1,0 +1,14 @@
+query {
+  {{entityRoot}}(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      {{statusFilterClause}}
+      {{relationField}}: { none: {} }
+    }
+    limit: {{limit}}
+  ) {
+    id
+    name
+    {{statusFieldSelection}}
+  }
+}

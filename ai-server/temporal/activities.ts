@@ -3,7 +3,7 @@ import type { SupportedLocale } from '../artifacts/types'
 import { createPlan } from '../agents/coordinatorAdapter'
 import { executeQuery } from '../agents/dataLookupAdapter'
 import { ASK_CLARIFICATION, enforceCoordinatorPlan } from '../policy/enforce'
-import { selectAllowedQueryIds, type QueryId } from '../policy/querySelect'
+import type { QueryId } from '../policy/querySelect'
 import type { AiState, AnswerState, SelectedQueryState } from '../state/aiState'
 import type { Clarification, Plan } from '../state/plan'
 import { appendStateStep } from '../state/trajectory'
@@ -70,57 +70,6 @@ function summarizeLookupResult(data: unknown): string {
   return `Lookup completed. ${entries.map(([key, value]) => `${key}: ${summarizeValue(value)}`).join('; ')}`
 }
 
-function buildSelectedQuery(plan: Plan, queryIds: readonly QueryId[]): SelectedQueryState {
-  const queryId = queryIds[0]
-  if (!queryId) {
-    throw new Error('No governed QueryId is available for the current plan.')
-  }
-
-  if (!plan.entityHint) {
-    throw new Error('buildSelectedQuery requires a plan with entityHint.')
-  }
-
-  const args: Record<string, unknown> = {}
-  if (plan.entityHint && 'filters' in plan.entityHint) {
-    Object.assign(args, plan.entityHint.filters)
-  }
-
-  if (plan.entityHint && 'name' in plan.entityHint && typeof plan.entityHint.name === 'string') {
-    args.nameContains = plan.entityHint.name
-  }
-
-  if (queryId === 'countEntities') {
-    const countEntityTypes: Partial<Record<typeof plan.entityHint.entityType, string>> = {
-      Application: 'applications',
-      BusinessCapability: 'businessCapabilities',
-      ApplicationInterface: 'applicationInterfaces',
-      DataObject: 'dataObjects',
-      Infrastructure: 'infrastructures',
-      BusinessProcess: 'businessProcesses',
-      AIComponent: 'aiComponents',
-      Supplier: 'suppliers',
-      Organisation: 'organisations',
-      Person: 'people',
-      Architecture: 'architectures',
-      SoftwareProduct: 'softwareProducts',
-    }
-
-    const mappedEntityType = countEntityTypes[plan.entityHint.entityType]
-    if (!mappedEntityType) {
-      throw new Error(
-        `No countEntities mapping exists for entity type "${plan.entityHint.entityType}".`
-      )
-    }
-
-    args.entityType = mappedEntityType
-  }
-
-  return {
-    queryId,
-    args,
-  }
-}
-
 export async function coordinatorPlanActivity(
   input: CoordinatorPlanActivityInput
 ): Promise<AiState> {
@@ -181,12 +130,26 @@ export async function coordinatorPlanActivity(
     }
   }
 
-  const selection = selectAllowedQueryIds({
-    intent: policyDecision.plan.intent,
-    entityType: policyDecision.plan.entityHint!.entityType,
-    artifacts,
-  })
-  const selectedQuery = buildSelectedQuery(policyDecision.plan, selection.queryIds)
+  if (!policyDecision.querySelection.selected) {
+    return {
+      ...input.state,
+      clarification: buildClarification(
+        'Please restate the request with enough detail for a governed query selection.',
+        policyDecision.querySelection.reason ?? 'No deterministic governed query could be selected.'
+      ),
+      steps: appendStateStep(
+        input.state.steps,
+        'CLARIFICATION_REQUESTED',
+        'coordinatorPlanActivity could not derive a deterministic governed query.',
+        { activity: 'coordinatorPlanActivity', reason: policyDecision.querySelection.reason }
+      ),
+    }
+  }
+
+  const selectedQuery: SelectedQueryState = {
+    queryId: policyDecision.querySelection.selected.queryId,
+    args: policyDecision.querySelection.selected.args,
+  }
 
   return {
     ...input.state,
@@ -223,11 +186,11 @@ export async function coordinatorPlanActivity(
         }
       ),
       'QUERY_SELECTED',
-      'coordinatorPlanActivity selected the first governed QueryId.',
+      'coordinatorPlanActivity accepted the deterministic governed query selection.',
       {
         activity: 'coordinatorPlanActivity',
         queryId: selectedQuery.queryId,
-        candidates: selection.queryIds,
+        candidates: policyDecision.querySelection.queryIds,
       }
     ),
   }

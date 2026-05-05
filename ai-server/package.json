@@ -14,7 +14,8 @@
     "worker:dev": "ts-node-dev --respawn --transpile-only temporal/worker.ts",
     "generate-schema-digest": "node scripts/generate-schema-digest.mjs",
     "codegen": "graphql-codegen --config codegen.ts",
-    "validate-query-library": "yarn build && node dist/artifacts/validation/runQueryLibraryValidation.js"
+    "validate-query-library": "yarn build && node dist/artifacts/validation/runQueryLibraryValidation.js",
+    "verify-flexible-queries": "yarn build && node dist/scripts/verify-flexible-queries.js"
   },
   "packageManager": "yarn@4.9.1",
   "dependencies": {

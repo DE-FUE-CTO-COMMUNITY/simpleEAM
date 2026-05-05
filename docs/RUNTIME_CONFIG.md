@@ -78,7 +78,7 @@ These values are maintained in the application data model and are edited through
 
 - `ANALYTICS_ENABLED` - Enables analytics UI runtime features in the client
 - `ANALYTICS_API_URL` - Public analytics API base URL used by the frontend
-- `ANALYTICS_CUBE_API_URL` - Public Cube API base URL used by the analytics workspace
+- `ANALYTICS_CUBE_INTERNAL_URL` - Internal Cube API base URL used by the server analytics backend
 - `ANALYTICS_SYNC_URL` - Internal sync endpoint used by the analytics worker
 - `ANALYTICS_PROJECTION_TASK_QUEUE` - Temporal queue for analytics projection refresh workflows
 - `ANALYTICS_PROJECTION_SCHEDULE_ENABLED` - Enables scheduled analytics refresh registration
@@ -94,9 +94,9 @@ These values are maintained in the application data model and are edited through
 ### Client Runtime (`client`)
 
 - `GRAPHQL_URL` - Public GraphQL URL for browser/API routes
-- `AI_API_URL` - Public AI API base URL (used for `/ai-runs` calls)
+- `AI_API_INTERNAL_URL` - Internal AI server URL used by the Next.js `/api/ai` proxy routes
 - `ANALYTICS_ENABLED` - Enables analytics navigation and workspace runtime features
-- `ANALYTICS_API_URL`, `ANALYTICS_CUBE_API_URL` - Analytics endpoints used by the analytics workspace
+- `ANALYTICS_API_URL` - Analytics backend endpoint used by the analytics workspace
 - `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID_CLIENT` - Client auth setup
 - `EXCALIDRAW_WS_SERVER_URL` - Collaboration endpoint
 - `THEME_PRIMARY_COLOR`, `THEME_SECONDARY_COLOR`, `THEME_FONT_FAMILY` - Runtime branding
@@ -109,6 +109,8 @@ The frontend consumes runtime values via:
 - `GET /api/runtime-config`
 
 This endpoint returns the effective runtime config object used by hooks such as runtime GraphQL and AI API configuration.
+
+The AI runtime config now exposes the fixed same-origin client API base `/api/ai`, while the Next.js backend forwards those requests to `AI_API_INTERNAL_URL`.
 
 ## Related Components
 

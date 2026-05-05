@@ -21,9 +21,7 @@ interface CubeLoadResult {
 }
 
 const cubeApiUrl =
-  process.env.ANALYTICS_CUBE_INTERNAL_URL ||
-  process.env.ANALYTICS_CUBE_API_URL ||
-  'http://cube:4000/cubejs-api/v1'
+  process.env.ANALYTICS_CUBE_INTERNAL_URL || 'http://cube:4000/cubejs-api/v1'
 const cubeApiSecret = process.env.CUBEJS_API_SECRET || 'nextgen-eam-analytics-dev'
 
 function normalizeMonthLabel(rawValue: string): string {

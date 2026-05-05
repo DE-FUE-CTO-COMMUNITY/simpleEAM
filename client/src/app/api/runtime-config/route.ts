@@ -30,14 +30,13 @@ export async function GET() {
 
     // AI support configuration
     ai: {
-      apiUrl: process.env.AI_API_URL || '',
+      apiUrl: '/api/ai',
       llmUrl: process.env.AI_LLM_URL || '',
     },
 
     analytics: {
       enabled: process.env.ANALYTICS_ENABLED !== 'false',
       apiUrl: process.env.ANALYTICS_API_URL || '',
-      cubeApiUrl: process.env.ANALYTICS_CUBE_API_URL || '',
     },
 
     // Excalidraw Collaboration

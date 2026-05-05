@@ -18,7 +18,6 @@ export interface RuntimeConfig {
   analytics: {
     enabled: boolean
     apiUrl: string
-    cubeApiUrl: string
   }
   excalidraw: {
     wsServerUrl: string
@@ -59,13 +58,12 @@ export const defaultConfig: RuntimeConfig = {
     url: 'http://localhost:4000/graphql',
   },
   ai: {
-    apiUrl: '',
+    apiUrl: '/api/ai',
     llmUrl: '',
   },
   analytics: {
     enabled: true,
     apiUrl: '',
-    cubeApiUrl: '',
   },
   excalidraw: {
     wsServerUrl: 'http://localhost:3002',

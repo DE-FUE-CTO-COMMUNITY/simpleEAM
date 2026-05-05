@@ -31,7 +31,7 @@ import DownloadIcon from '@mui/icons-material/Download'
 import { useTranslations } from 'next-intl'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { keycloak } from '@/lib/auth'
-import { useAiConfig, useGraphQLConfig } from '@/lib/runtime-config'
+import { useAiConfig } from '@/lib/runtime-config'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -344,7 +344,6 @@ export default function AgenticArchitectChat() {
   const t = useTranslations('admin.aiSupport')
   const { selectedCompanyId, selectedCompany } = useCompanyContext()
   const { apiUrl: aiApiUrl } = useAiConfig()
-  const { url: graphQlUrl } = useGraphQLConfig()
 
   const [runs, setRuns] = React.useState<AiRun[]>([])
   const [prompt, setPrompt] = React.useState('')
@@ -358,11 +357,7 @@ export default function AgenticArchitectChat() {
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const chatEndRef = React.useRef<HTMLDivElement>(null)
 
-  const apiBaseUrl = React.useMemo(() => {
-    if (aiApiUrl) return aiApiUrl
-    if (!graphQlUrl) return ''
-    return graphQlUrl.endsWith('/graphql') ? graphQlUrl.slice(0, -8) : graphQlUrl
-  }, [aiApiUrl, graphQlUrl])
+  const apiBaseUrl = aiApiUrl
 
   const canClearHistory = React.useMemo(() => {
     const tokenParsed = keycloak?.tokenParsed as { realm_access?: { roles?: string[] } } | undefined

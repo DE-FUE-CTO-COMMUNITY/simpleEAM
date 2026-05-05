@@ -1,24 +1,10 @@
-import type { LoadedArtifacts, QueryLibraryEntry } from '../artifacts/types'
+import { renderGraphqlQuery } from '../artifacts/graphql/render'
+import type { GraphqlQueryLibraryEntry, LoadedArtifacts } from '../artifacts/types'
+import { graphqlRequest } from '../graph/client/graphql-client'
 import type { QueryId } from '../policy/querySelect'
 import { getRequiredParametersForQueryId } from '../policy/querySelect'
-import { TOOLS, type ToolCallResult } from '../graph/query-registry'
 
-const COUNT_ENTITY_ROOT_QUERY_BY_PARAM = {
-  applications: 'applicationsConnection',
-  businessCapabilities: 'businessCapabilitiesConnection',
-  applicationInterfaces: 'applicationInterfacesConnection',
-  dataObjects: 'dataObjectsConnection',
-  infrastructures: 'infrastructuresConnection',
-  businessProcesses: 'businessProcessesConnection',
-  aiComponents: 'aiComponentsConnection',
-  suppliers: 'suppliersConnection',
-  organisations: 'organisationsConnection',
-  people: 'peopleConnection',
-  architectures: 'architecturesConnection',
-  softwareProducts: 'softwareProductsConnection',
-} as const
-
-type CountEntityParam = keyof typeof COUNT_ENTITY_ROOT_QUERY_BY_PARAM
+const PLACEHOLDER_PATTERN = /\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g
 
 export interface ExecuteQueryParams {
   readonly companyId: string
@@ -27,9 +13,13 @@ export interface ExecuteQueryParams {
   readonly artifacts: LoadedArtifacts
 }
 
-export interface ExecutedQueryResult extends ToolCallResult {
+export interface ExecutedQueryResult {
+  readonly data: unknown
+  readonly toolName: string
+  readonly argsUsed: Record<string, unknown>
   readonly queryId: QueryId
   readonly rootQueries: readonly string[]
+  readonly renderedQuery: string
 }
 
 function assertSchemaDigestGovernance(artifacts: LoadedArtifacts): void {
@@ -42,16 +32,10 @@ function assertSchemaDigestGovernance(artifacts: LoadedArtifacts): void {
   }
 }
 
-function assertKnownQueryId(queryId: QueryId): void {
-  if (!(queryId in TOOLS)) {
-    throw new Error(`QueryId "${queryId}" is not a predefined GraphQL query.`)
-  }
-}
-
-function getQueryEntry(queryId: QueryId, artifacts: LoadedArtifacts): QueryLibraryEntry {
-  const queryEntry = artifacts.queryLibraryMetadata.queries.find(entry => entry.queryId === queryId)
+function getQueryEntry(queryId: QueryId, artifacts: LoadedArtifacts): GraphqlQueryLibraryEntry {
+  const queryEntry = artifacts.queryLibrary.queries.find(entry => entry.queryId === queryId)
   if (!queryEntry) {
-    throw new Error(`QueryId "${queryId}" is missing from query library metadata.`)
+    throw new Error(`QueryId "${queryId}" is missing from the GraphQL query library.`)
   }
 
   return queryEntry
@@ -73,74 +57,6 @@ function assertRequiredParameters(queryId: QueryId, args: Readonly<Record<string
   }
 }
 
-function assertScopeCoverage(queryEntry: QueryLibraryEntry, artifacts: LoadedArtifacts): void {
-  const scopeRules = artifacts.schemaDigest.mandatoryCompanyScoping
-
-  for (const rootQuery of queryEntry.rootQueries) {
-    const hasCoverage = queryEntry.companyScopeRuleIds.some(ruleId => {
-      const rule = scopeRules.find(candidate => candidate.id === ruleId)
-      return Boolean(rule?.appliesToRootQueries.includes(rootQuery))
-    })
-
-    if (!hasCoverage) {
-      throw new Error(
-        `QueryId "${queryEntry.queryId}" is not covered by a mandatory SCHEMA_DIGEST company scope rule for root query "${rootQuery}".`
-      )
-    }
-  }
-}
-
-function assertRootQueriesDeclared(
-  queryEntry: QueryLibraryEntry,
-  artifacts: LoadedArtifacts
-): void {
-  const declaredRootQueries = new Set<string>([
-    ...artifacts.schemaDigest.allowedRootQueries.map(entry => entry.rootQuery),
-    ...artifacts.schemaDigest.countQueries.map(entry => entry.rootQuery),
-  ])
-
-  for (const rootQuery of queryEntry.rootQueries) {
-    if (!declaredRootQueries.has(rootQuery)) {
-      throw new Error(
-        `QueryId "${queryEntry.queryId}" references root query "${rootQuery}" not declared by SCHEMA_DIGEST.`
-      )
-    }
-  }
-}
-
-function assertCountQueryCompatibility(
-  queryEntry: QueryLibraryEntry,
-  args: Readonly<Record<string, unknown>>,
-  artifacts: LoadedArtifacts
-): void {
-  if (queryEntry.queryId !== 'countEntities') {
-    return
-  }
-
-  const entityType = args.entityType
-  if (typeof entityType !== 'string' || !(entityType in COUNT_ENTITY_ROOT_QUERY_BY_PARAM)) {
-    throw new Error(
-      `QueryId "countEntities" requires a supported entityType: ${Object.keys(COUNT_ENTITY_ROOT_QUERY_BY_PARAM).join(', ')}`
-    )
-  }
-
-  const expectedRootQuery = COUNT_ENTITY_ROOT_QUERY_BY_PARAM[entityType as CountEntityParam]
-  if (!queryEntry.rootQueries.includes(expectedRootQuery)) {
-    throw new Error(
-      `QueryId "countEntities" is not compatible with SCHEMA_DIGEST root query "${expectedRootQuery}".`
-    )
-  }
-
-  const declaredCountQuery = artifacts.schemaDigest.countQueries.find(
-    entry => entry.rootQuery === expectedRootQuery
-  )
-  if (!declaredCountQuery) {
-    throw new Error(
-      `SCHEMA_DIGEST does not declare count root query "${expectedRootQuery}" for countEntities.`
-    )
-  }
-}
-
 function sanitizeArgs(args: Readonly<Record<string, unknown>>): Record<string, unknown> {
   const sanitizedArgs = { ...args }
   delete sanitizedArgs.companyId
@@ -149,34 +65,96 @@ function sanitizeArgs(args: Readonly<Record<string, unknown>>): Record<string, u
   return sanitizedArgs
 }
 
+function assertGraphqlIdentifier(value: string, label: string): string {
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) {
+    throw new Error(`${label} must be a valid GraphQL identifier.`)
+  }
+
+  return value
+}
+
+function resolveRootField(
+  queryEntry: GraphqlQueryLibraryEntry,
+  args: Readonly<Record<string, unknown>>
+): string {
+  const resolved = queryEntry.rootField.replace(PLACEHOLDER_PATTERN, (_, placeholder: string) => {
+    const value = args[placeholder]
+    if (typeof value !== 'string' || !value.trim()) {
+      throw new Error(
+        `QueryId "${queryEntry.queryId}" requires identifier placeholder "${placeholder}" for root field resolution.`
+      )
+    }
+
+    return value.trim()
+  })
+
+  return assertGraphqlIdentifier(resolved, `${queryEntry.queryId}.rootField`)
+}
+
+function assertRootQueryDeclared(rootQuery: string, artifacts: LoadedArtifacts): void {
+  const declaredRootQueries = new Set<string>([
+    ...artifacts.schemaDigest.allowedRootQueries.map(entry => entry.rootQuery),
+    ...artifacts.schemaDigest.countQueries.map(entry => entry.rootQuery),
+  ])
+
+  if (!declaredRootQueries.has(rootQuery)) {
+    throw new Error(`Root query "${rootQuery}" is not declared by SCHEMA_DIGEST.`)
+  }
+}
+
+function assertScopeCoverage(
+  queryEntry: GraphqlQueryLibraryEntry,
+  rootQuery: string,
+  artifacts: LoadedArtifacts
+): void {
+  const scopeRule = artifacts.schemaDigest.mandatoryCompanyScoping.find(
+    rule => rule.id === queryEntry.companyScopeRuleId
+  )
+
+  if (!scopeRule || !scopeRule.appliesToRootQueries.includes(rootQuery)) {
+    throw new Error(
+      `QueryId "${queryEntry.queryId}" is not covered by mandatory company scope rule "${queryEntry.companyScopeRuleId}" for root query "${rootQuery}".`
+    )
+  }
+}
+
 export async function executeQuery(
   queryId: QueryId,
   params: ExecuteQueryParams
 ): Promise<ExecutedQueryResult> {
   assertSchemaDigestGovernance(params.artifacts)
-  assertKnownQueryId(queryId)
-
-  const queryEntry = getQueryEntry(queryId, params.artifacts)
-  const args = sanitizeArgs(params.args ?? {})
 
   if (!params.companyId.trim()) {
     throw new Error('executeQuery requires a non-empty companyId.')
   }
 
-  assertRequiredParameters(queryId, args)
-  assertRootQueriesDeclared(queryEntry, params.artifacts)
-  assertScopeCoverage(queryEntry, params.artifacts)
-  assertCountQueryCompatibility(queryEntry, args, params.artifacts)
+  const queryEntry = getQueryEntry(queryId, params.artifacts)
+  const args = sanitizeArgs(params.args ?? {})
+  const argsWithCompanyId = { ...args, companyId: params.companyId }
 
-  const executionResult = await TOOLS[queryId].execute(
-    args,
-    params.companyId,
-    params.accessToken ?? ''
-  )
+  assertRequiredParameters(queryId, argsWithCompanyId)
+
+  const rootQuery = resolveRootField(queryEntry, args)
+  assertRootQueryDeclared(rootQuery, params.artifacts)
+  assertScopeCoverage(queryEntry, rootQuery, params.artifacts)
+
+  const renderedQuery = renderGraphqlQuery({
+    queryId,
+    companyId: params.companyId,
+    params: args,
+  })
+
+  const data = await graphqlRequest({
+    query: renderedQuery,
+    accessToken: params.accessToken ?? null,
+  })
 
   return {
-    ...executionResult,
+    data,
+    toolName: queryId,
+    argsUsed: args,
     queryId,
-    rootQueries: queryEntry.rootQueries,
+    rootQueries: [rootQuery],
+    renderedQuery,
   }
 }

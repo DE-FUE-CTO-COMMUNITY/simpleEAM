@@ -3,6 +3,7 @@ import { z } from 'zod'
 import {
   ALLOWED_INTENTS,
   CANONICAL_CONCEPT_TYPES,
+  QUERY_FORMS,
   SUPPORTED_LOCALES,
   type AllowedIntent,
   type CanonicalConceptType,
@@ -10,6 +11,7 @@ import {
   type ConceptDictionaryArtifact,
   type IntentSchemaArtifact,
   type LoadedArtifacts,
+  type QueryForm,
   type QueryLibraryArtifact,
   type QueryLibraryMetadataArtifact,
   type SchemaDigestArtifact,
@@ -20,6 +22,7 @@ const nonEmptyStringSchema = z.string().trim().min(1)
 
 const supportedLocaleSchema = z.enum(SUPPORTED_LOCALES)
 const allowedIntentSchema = z.enum(ALLOWED_INTENTS)
+const queryFormSchema = z.enum(QUERY_FORMS)
 const canonicalConceptTypeSchema = z.enum(CANONICAL_CONCEPT_TYPES)
 
 const intentDefinitionSchema = z
@@ -60,7 +63,7 @@ const queryLibraryEntrySchema = z
     description: nonEmptyStringSchema,
     rootQueries: z.array(nonEmptyStringSchema).min(1),
     entityTypes: z.array(canonicalConceptTypeSchema).min(1),
-    allowedIntents: z.array(allowedIntentSchema).min(1),
+    allowedIntents: z.array(queryFormSchema).min(1),
     parameterMode: z.enum(['structured-args', 'enumerated-config']),
     companyScopeRuleIds: z.array(nonEmptyStringSchema).min(1),
     sourceModules: z.array(nonEmptyStringSchema).min(1),
@@ -70,11 +73,12 @@ const queryLibraryEntrySchema = z
 const graphqlQueryLibraryParamSchema = z
   .object({
     name: nonEmptyStringSchema,
-    kind: z.enum(['string', 'id', 'enum', 'int']),
+    kind: z.enum(['string', 'id', 'enum', 'int', 'identifier', 'selectionSet', 'whereClause']),
     required: z.boolean(),
     placeholder: z.string().regex(/^\{\{[a-zA-Z0-9_.-]+\}\}$/),
     description: nonEmptyStringSchema,
     enumType: nonEmptyStringSchema.optional(),
+    enumTypeParam: nonEmptyStringSchema.optional(),
     defaultValue: z.union([z.string(), z.number()]).optional(),
   })
   .strict()
@@ -82,11 +86,11 @@ const graphqlQueryLibraryParamSchema = z
 const queryLibraryArtifactEntrySchema = z
   .object({
     queryId: nonEmptyStringSchema,
-    intents: z.array(allowedIntentSchema).min(1),
+    intents: z.array(queryFormSchema).min(1),
     rootField: nonEmptyStringSchema,
     entityTypes: z.array(canonicalConceptTypeSchema).min(1),
     companyScopeRuleId: nonEmptyStringSchema,
-    templateFile: z.string().regex(/^graphql\/[A-Za-z0-9._-]+\.graphql$/),
+    templateFile: z.string().regex(/^graphql\/[A-Za-z0-9._/-]+\.graphql$/),
     params: z.array(graphqlQueryLibraryParamSchema),
   })
   .strict()
@@ -315,14 +319,6 @@ export function validateQueryLibraryMetadataArtifact(input: unknown): QueryLibra
       query.companyScopeRuleIds
     )
     assertUnique(`query-library-metadata.${query.queryId}.sourceModules`, query.sourceModules)
-
-    if (query.kind === 'count' && query.parameterMode !== 'enumerated-config') {
-      throw new Error(`query-library-metadata entry "${query.queryId}" must use enumerated-config`)
-    }
-
-    if (query.kind !== 'count' && query.parameterMode !== 'structured-args') {
-      throw new Error(`query-library-metadata entry "${query.queryId}" must use structured-args`)
-    }
   }
 
   return parsed
@@ -348,13 +344,21 @@ export function validateQueryLibraryArtifact(input: unknown): QueryLibraryArtifa
     )
 
     for (const param of query.params) {
-      if (param.kind === 'enum' && !param.enumType) {
-        throw new Error(`query-library.${query.queryId}.${param.name} must declare enumType`)
+      if (param.kind === 'enum' && !param.enumType && !param.enumTypeParam) {
+        throw new Error(
+          `query-library.${query.queryId}.${param.name} must declare enumType or enumTypeParam`
+        )
       }
 
-      if (param.kind !== 'enum' && param.enumType) {
+      if (param.kind === 'enum' && param.enumType && param.enumTypeParam) {
         throw new Error(
-          `query-library.${query.queryId}.${param.name} must not declare enumType for non-enum params`
+          `query-library.${query.queryId}.${param.name} must not declare both enumType and enumTypeParam`
+        )
+      }
+
+      if (param.kind !== 'enum' && (param.enumType || param.enumTypeParam)) {
+        throw new Error(
+          `query-library.${query.queryId}.${param.name} must not declare enumType metadata for non-enum params`
         )
       }
 
@@ -414,6 +418,7 @@ export function validateLoadedArtifacts(artifacts: LoadedArtifacts): LoadedArtif
   const intentKeys = new Set<AllowedIntent>(
     Object.keys(artifacts.intentSchema.intents) as AllowedIntent[]
   )
+  const queryForms = new Set<QueryForm>(QUERY_FORMS)
   const conceptKeys = new Set<CanonicalConceptType>(
     Object.keys(artifacts.conceptDictionary.concepts) as CanonicalConceptType[]
   )
@@ -435,7 +440,7 @@ export function validateLoadedArtifacts(artifacts: LoadedArtifacts): LoadedArtif
 
   for (const query of artifacts.queryLibrary.queries) {
     for (const intent of query.intents) {
-      if (!intentKeys.has(intent)) {
+      if (!queryForms.has(intent)) {
         throw new Error(
           `query-library entry "${query.queryId}" references unknown intent "${intent}"`
         )
@@ -450,23 +455,25 @@ export function validateLoadedArtifacts(artifacts: LoadedArtifacts): LoadedArtif
       }
     }
 
-    const digestRootQuery = digestRootQueries.get(query.rootField)
-    if (!digestRootQuery) {
-      throw new Error(
-        `query-library entry "${query.queryId}" references root field "${query.rootField}" that is not declared in schema-digest`
-      )
-    }
-
     if (!scopeRuleIds.has(query.companyScopeRuleId)) {
       throw new Error(
         `query-library entry "${query.queryId}" references unknown company scope rule "${query.companyScopeRuleId}"`
       )
     }
 
-    if (digestRootQuery.companyScopeRuleId !== query.companyScopeRuleId) {
-      throw new Error(
-        `query-library entry "${query.queryId}" must use scope rule "${digestRootQuery.companyScopeRuleId}" for root field "${query.rootField}"`
-      )
+    if (!query.rootField.includes('{{')) {
+      const digestRootQuery = digestRootQueries.get(query.rootField)
+      if (!digestRootQuery) {
+        throw new Error(
+          `query-library entry "${query.queryId}" references root field "${query.rootField}" that is not declared in schema-digest`
+        )
+      }
+
+      if (digestRootQuery.companyScopeRuleId !== query.companyScopeRuleId) {
+        throw new Error(
+          `query-library entry "${query.queryId}" must use scope rule "${digestRootQuery.companyScopeRuleId}" for root field "${query.rootField}"`
+        )
+      }
     }
 
     for (const param of query.params) {
@@ -479,12 +486,22 @@ export function validateLoadedArtifacts(artifacts: LoadedArtifacts): LoadedArtif
           `query-library entry "${query.queryId}" references unknown enum type "${param.enumType}"`
         )
       }
+
+      if (
+        param.kind === 'enum' &&
+        param.enumTypeParam &&
+        !query.params.some(candidate => candidate.name === param.enumTypeParam)
+      ) {
+        throw new Error(
+          `query-library entry "${query.queryId}" references unknown enumTypeParam "${param.enumTypeParam}"`
+        )
+      }
     }
   }
 
   for (const query of artifacts.queryLibraryMetadata.queries) {
     for (const intent of query.allowedIntents) {
-      if (!intentKeys.has(intent)) {
+      if (!queryForms.has(intent)) {
         throw new Error(
           `query-library entry "${query.queryId}" references unknown intent "${intent}"`
         )

@@ -21,6 +21,7 @@
     "artifacts/**/*.ts",
     "graph/**/*.ts",
     "policy/**/*.ts",
+    "scripts/**/*.ts",
     "state/**/*.ts",
     "temporal/**/*.ts",
     "src/**/*.ts"

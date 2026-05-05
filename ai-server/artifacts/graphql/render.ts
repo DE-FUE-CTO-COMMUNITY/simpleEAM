@@ -30,6 +30,36 @@ function assertNonEmptyString(value: unknown, label: string): string {
   return value.trim()
 }
 
+function assertGraphqlIdentifier(value: unknown, label: string): string {
+  const identifier = typeof value === 'string' ? value.trim() : ''
+  if (!identifier) {
+    throw new Error(`${label} must be a non-empty GraphQL identifier.`)
+  }
+
+  if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(identifier)) {
+    throw new Error(`${label} must be a valid GraphQL identifier.`)
+  }
+
+  return identifier
+}
+
+function assertInlineClause(value: unknown, label: string): string {
+  if (typeof value !== 'string') {
+    throw new Error(`${label} must be a string.`)
+  }
+
+  const clause = value.trim()
+  if (!clause) {
+    return ''
+  }
+
+  if (/\$[A-Za-z_][A-Za-z0-9_]*/.test(clause)) {
+    throw new Error(`${label} must not contain GraphQL variables.`)
+  }
+
+  return clause
+}
+
 function assertGraphqlTemplateIsInlineOnly(template: string, queryId: string): void {
   if (/\$[A-Za-z_][A-Za-z0-9_]*/.test(template)) {
     throw new Error(`Query template "${queryId}" must not use GraphQL variables.`)
@@ -67,7 +97,8 @@ function getRootFieldScopeRule(
 function renderInlineParam(
   paramDefinition: GraphqlQueryLibraryParam,
   rawValue: unknown,
-  schemaDigest: SchemaDigestArtifact
+  schemaDigest: SchemaDigestArtifact,
+  params: Readonly<Record<string, unknown>> | undefined
 ): string {
   const resolvedValue = rawValue ?? paramDefinition.defaultValue
 
@@ -95,12 +126,22 @@ function renderInlineParam(
 
       return String(numericValue)
     }
+    case 'identifier':
+      if (!paramDefinition.required && typeof resolvedValue === 'string' && !resolvedValue.trim()) {
+        return ''
+      }
+      return assertGraphqlIdentifier(resolvedValue, paramDefinition.name)
+    case 'selectionSet':
+    case 'whereClause':
+      return assertInlineClause(resolvedValue, paramDefinition.name)
     case 'enum': {
       const enumValue = assertNonEmptyString(resolvedValue, paramDefinition.name)
-      const enumType = assertNonEmptyString(
-        paramDefinition.enumType,
-        `${paramDefinition.name}.enumType`
-      )
+      const enumType = paramDefinition.enumType
+        ? assertNonEmptyString(paramDefinition.enumType, `${paramDefinition.name}.enumType`)
+        : assertGraphqlIdentifier(
+            params?.[paramDefinition.enumTypeParam ?? ''],
+            `${paramDefinition.name}.enumTypeParam`
+          )
       const allowedEnumValues = schemaDigest.enumValues[enumType]
 
       if (!allowedEnumValues) {
@@ -139,6 +180,18 @@ function renderTemplate(template: string, replacements: Readonly<Record<string, 
   return renderedTemplate.trim()
 }
 
+function resolveRootField(
+  queryDefinition: GraphqlQueryLibraryEntry,
+  replacements: Readonly<Record<string, string>>
+): string {
+  let rootField = queryDefinition.rootField
+  for (const [placeholder, replacement] of Object.entries(replacements)) {
+    rootField = rootField.split(placeholder).join(replacement)
+  }
+
+  return assertGraphqlIdentifier(rootField, `${queryDefinition.queryId}.rootField`)
+}
+
 function resolveTemplateFilePath(artifactsDir: string, templateFile: string): string {
   const resolvedPath = resolve(artifactsDir, templateFile)
   const rootPath = resolve(artifactsDir)
@@ -158,16 +211,6 @@ export function renderGraphqlQuery(args: RenderGraphqlQueryArgs): string {
   const companyId = assertNonEmptyString(args.companyId, 'companyId')
   const artifacts = loadArtifacts({ artifactsDir: args.artifactsDir })
   const queryDefinition = getQueryDefinition(artifacts, args.queryId)
-  const rootFieldScopeRule = getRootFieldScopeRule(
-    artifacts.schemaDigest,
-    queryDefinition.rootField
-  )
-
-  if (rootFieldScopeRule.companyScopeRuleId !== queryDefinition.companyScopeRuleId) {
-    throw new Error(
-      `Query "${queryDefinition.queryId}" must use scope rule "${rootFieldScopeRule.companyScopeRuleId}" for root field "${queryDefinition.rootField}".`
-    )
-  }
 
   const artifactsDir = resolveArtifactsDirectory(args.artifactsDir)
   const template = readFileSync(
@@ -188,6 +231,8 @@ export function renderGraphqlQuery(args: RenderGraphqlQueryArgs): string {
     [companyIdParam.placeholder]: toGraphqlStringLiteral(companyId),
   }
 
+  const params = args.params ?? {}
+
   for (const paramDefinition of queryDefinition.params) {
     if (paramDefinition.name === 'companyId') {
       continue
@@ -195,8 +240,20 @@ export function renderGraphqlQuery(args: RenderGraphqlQueryArgs): string {
 
     replacements[paramDefinition.placeholder] = renderInlineParam(
       paramDefinition,
-      args.params?.[paramDefinition.name],
-      artifacts.schemaDigest
+      params[paramDefinition.name],
+      artifacts.schemaDigest,
+      params
+    )
+  }
+
+  const rootFieldScopeRule = getRootFieldScopeRule(
+    artifacts.schemaDigest,
+    resolveRootField(queryDefinition, replacements)
+  )
+
+  if (rootFieldScopeRule.companyScopeRuleId !== queryDefinition.companyScopeRuleId) {
+    throw new Error(
+      `Query "${queryDefinition.queryId}" must use scope rule "${rootFieldScopeRule.companyScopeRuleId}" for root field "${queryDefinition.rootField}".`
     )
   }
 

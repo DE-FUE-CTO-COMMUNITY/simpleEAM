@@ -4,12 +4,20 @@
   "dynamicQueryGenerationAllowed": false,
   "queries": [
     {
-      "queryId": "applications.searchByName",
-      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
-      "rootField": "applications",
-      "entityTypes": ["Application"],
+      "queryId": "entity.searchByName",
+      "intents": ["ENTITY_SEARCH"],
+      "rootField": "{{entityRoot}}",
+      "entityTypes": [
+        "Application",
+        "BusinessCapability",
+        "ApplicationInterface",
+        "DataObject",
+        "Infrastructure",
+        "BusinessProcess",
+        "SoftwareProduct"
+      ],
       "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/applications.searchByName.graphql",
+      "templateFile": "graphql/generic/entity_search_by_name.graphql",
       "params": [
         {
           "name": "companyId",
@@ -19,11 +27,18 @@
           "description": "Selected company identifier used for mandatory tenant scoping."
         },
         {
-          "name": "searchText",
+          "name": "entityRoot",
+          "kind": "identifier",
+          "required": true,
+          "placeholder": "{{entityRoot}}",
+          "description": "Governed root collection selected by policy from SCHEMA_DIGEST."
+        },
+        {
+          "name": "nameContains",
           "kind": "string",
           "required": true,
-          "placeholder": "{{searchText}}",
-          "description": "Case-insensitive application name contains filter."
+          "placeholder": "{{nameContains}}",
+          "description": "User-provided text applied against the entity name."
         },
         {
           "name": "limit",
@@ -32,16 +47,48 @@
           "placeholder": "{{limit}}",
           "description": "Maximum number of rows to return.",
           "defaultValue": 50
+        },
+        {
+          "name": "statusFieldSelection",
+          "kind": "identifier",
+          "required": false,
+          "placeholder": "{{statusFieldSelection}}",
+          "description": "Optional governed status field selection.",
+          "defaultValue": ""
+        },
+        {
+          "name": "lifecycleFieldSelection",
+          "kind": "identifier",
+          "required": false,
+          "placeholder": "{{lifecycleFieldSelection}}",
+          "description": "Optional governed lifecycle field selection.",
+          "defaultValue": ""
+        },
+        {
+          "name": "statusFilterClause",
+          "kind": "whereClause",
+          "required": false,
+          "placeholder": "{{statusFilterClause}}",
+          "description": "Optional governed status filter clause.",
+          "defaultValue": ""
         }
       ]
     },
     {
-      "queryId": "applications.byId",
-      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
-      "rootField": "applications",
-      "entityTypes": ["Application"],
+      "queryId": "entity.detailsById",
+      "intents": ["ENTITY_DETAILS"],
+      "rootField": "{{entityRoot}}",
+      "entityTypes": [
+        "Application",
+        "BusinessCapability",
+        "ApplicationInterface",
+        "DataObject",
+        "Infrastructure",
+        "BusinessProcess",
+        "SoftwareProduct"
+      ],
       "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/applications.byId.graphql",
+      "templateFile": "graphql/generic/entity_details_by_id.graphql",
       "params": [
         {
           "name": "companyId",
@@ -51,21 +98,58 @@
           "description": "Selected company identifier used for mandatory tenant scoping."
         },
         {
-          "name": "applicationId",
+          "name": "entityRoot",
+          "kind": "identifier",
+          "required": true,
+          "placeholder": "{{entityRoot}}",
+          "description": "Governed root collection selected by policy from SCHEMA_DIGEST."
+        },
+        {
+          "name": "entityId",
           "kind": "id",
           "required": true,
-          "placeholder": "{{applicationId}}",
-          "description": "Exact application identifier."
+          "placeholder": "{{entityId}}",
+          "description": "Entity identifier used for the scoped lookup."
+        },
+        {
+          "name": "statusFieldSelection",
+          "kind": "identifier",
+          "required": false,
+          "placeholder": "{{statusFieldSelection}}",
+          "description": "Optional governed status field selection.",
+          "defaultValue": ""
+        },
+        {
+          "name": "lifecycleFieldSelection",
+          "kind": "identifier",
+          "required": false,
+          "placeholder": "{{lifecycleFieldSelection}}",
+          "description": "Optional governed lifecycle field selection.",
+          "defaultValue": ""
+        },
+        {
+          "name": "detailRelationSelections",
+          "kind": "selectionSet",
+          "required": false,
+          "placeholder": "{{detailRelationSelections}}",
+          "description": "Optional governed relation selections for detail lookups.",
+          "defaultValue": ""
         }
       ]
     },
     {
-      "queryId": "applications.byCapabilityNameContains",
-      "intents": ["FACT_LOOKUP", "IMPACT_ANALYSIS", "DEPENDENCY_EXPLORATION"],
-      "rootField": "applications",
-      "entityTypes": ["Application"],
+      "queryId": "entity.gap.byRelation",
+      "intents": ["ENTITY_GAP_ANALYSIS"],
+      "rootField": "{{entityRoot}}",
+      "entityTypes": [
+        "Application",
+        "BusinessCapability",
+        "ApplicationInterface",
+        "DataObject",
+        "BusinessProcess"
+      ],
       "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/applications.byCapabilityNameContains.graphql",
+      "templateFile": "graphql/generic/entity_gap_by_relation.graphql",
       "params": [
         {
           "name": "companyId",
@@ -75,11 +159,87 @@
           "description": "Selected company identifier used for mandatory tenant scoping."
         },
         {
-          "name": "capabilityNameContains",
+          "name": "entityRoot",
+          "kind": "identifier",
+          "required": true,
+          "placeholder": "{{entityRoot}}",
+          "description": "Governed root collection selected by policy from SCHEMA_DIGEST."
+        },
+        {
+          "name": "relationField",
+          "kind": "identifier",
+          "required": true,
+          "placeholder": "{{relationField}}",
+          "description": "Governed relation field validated against SCHEMA_DIGEST."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        },
+        {
+          "name": "statusFieldSelection",
+          "kind": "identifier",
+          "required": false,
+          "placeholder": "{{statusFieldSelection}}",
+          "description": "Optional governed status field selection.",
+          "defaultValue": ""
+        },
+        {
+          "name": "statusFilterClause",
+          "kind": "whereClause",
+          "required": false,
+          "placeholder": "{{statusFilterClause}}",
+          "description": "Optional governed status filter clause.",
+          "defaultValue": ""
+        }
+      ]
+    },
+    {
+      "queryId": "entity.relation.someByNameContains",
+      "intents": ["ENTITY_RELATION_FILTER"],
+      "rootField": "{{entityRoot}}",
+      "entityTypes": [
+        "Application",
+        "BusinessCapability",
+        "ApplicationInterface",
+        "DataObject",
+        "Infrastructure",
+        "BusinessProcess"
+      ],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/generic/entity_relation_some_by_name_contains.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "entityRoot",
+          "kind": "identifier",
+          "required": true,
+          "placeholder": "{{entityRoot}}",
+          "description": "Governed root collection selected by policy from SCHEMA_DIGEST."
+        },
+        {
+          "name": "relationField",
+          "kind": "identifier",
+          "required": true,
+          "placeholder": "{{relationField}}",
+          "description": "Governed relation field validated against SCHEMA_DIGEST."
+        },
+        {
+          "name": "relatedNameContains",
           "kind": "string",
           "required": true,
-          "placeholder": "{{capabilityNameContains}}",
-          "description": "Business capability name contains filter."
+          "placeholder": "{{relatedNameContains}}",
+          "description": "User-provided text applied to the related entity name."
         },
         {
           "name": "limit",
@@ -88,16 +248,38 @@
           "placeholder": "{{limit}}",
           "description": "Maximum number of rows to return.",
           "defaultValue": 50
+        },
+        {
+          "name": "statusFieldSelection",
+          "kind": "identifier",
+          "required": false,
+          "placeholder": "{{statusFieldSelection}}",
+          "description": "Optional governed status field selection.",
+          "defaultValue": ""
+        },
+        {
+          "name": "statusFilterClause",
+          "kind": "whereClause",
+          "required": false,
+          "placeholder": "{{statusFilterClause}}",
+          "description": "Optional governed status filter clause.",
+          "defaultValue": ""
         }
       ]
     },
     {
-      "queryId": "softwareProducts.searchByName",
-      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
-      "rootField": "softwareProducts",
-      "entityTypes": ["SoftwareProduct"],
+      "queryId": "entity.countByStatus",
+      "intents": ["COUNT_ENTITIES"],
+      "rootField": "{{entityRoot}}Connection",
+      "entityTypes": [
+        "Application",
+        "BusinessCapability",
+        "ApplicationInterface",
+        "Infrastructure",
+        "BusinessProcess"
+      ],
       "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/softwareProducts.searchByName.graphql",
+      "templateFile": "graphql/generic/entity_count_by_status.graphql",
       "params": [
         {
           "name": "companyId",
@@ -107,200 +289,26 @@
           "description": "Selected company identifier used for mandatory tenant scoping."
         },
         {
-          "name": "searchText",
-          "kind": "string",
+          "name": "entityRoot",
+          "kind": "identifier",
           "required": true,
-          "placeholder": "{{searchText}}",
-          "description": "Case-insensitive software product name contains filter."
+          "placeholder": "{{entityRoot}}",
+          "description": "Governed root collection selected by policy from SCHEMA_DIGEST."
         },
         {
-          "name": "limit",
-          "kind": "int",
-          "required": false,
-          "placeholder": "{{limit}}",
-          "description": "Maximum number of rows to return.",
-          "defaultValue": 50
-        }
-      ]
-    },
-    {
-      "queryId": "softwareVersions.byProductId",
-      "intents": ["FACT_LOOKUP", "DEPENDENCY_EXPLORATION"],
-      "rootField": "softwareVersions",
-      "entityTypes": ["SoftwareVersion"],
-      "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/softwareVersions.byProductId.graphql",
-      "params": [
-        {
-          "name": "companyId",
-          "kind": "id",
-          "required": true,
-          "placeholder": "{{companyId}}",
-          "description": "Selected company identifier used for mandatory tenant scoping."
-        },
-        {
-          "name": "softwareProductId",
-          "kind": "id",
-          "required": true,
-          "placeholder": "{{softwareProductId}}",
-          "description": "Exact parent software product identifier."
-        },
-        {
-          "name": "limit",
-          "kind": "int",
-          "required": false,
-          "placeholder": "{{limit}}",
-          "description": "Maximum number of rows to return.",
-          "defaultValue": 50
-        }
-      ]
-    },
-    {
-      "queryId": "hardwareProducts.searchByName",
-      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
-      "rootField": "hardwareProducts",
-      "entityTypes": ["HardwareProduct"],
-      "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/hardwareProducts.searchByName.graphql",
-      "params": [
-        {
-          "name": "companyId",
-          "kind": "id",
-          "required": true,
-          "placeholder": "{{companyId}}",
-          "description": "Selected company identifier used for mandatory tenant scoping."
-        },
-        {
-          "name": "searchText",
-          "kind": "string",
-          "required": true,
-          "placeholder": "{{searchText}}",
-          "description": "Case-insensitive hardware product name contains filter."
-        },
-        {
-          "name": "limit",
-          "kind": "int",
-          "required": false,
-          "placeholder": "{{limit}}",
-          "description": "Maximum number of rows to return.",
-          "defaultValue": 50
-        }
-      ]
-    },
-    {
-      "queryId": "interfaces.byApplicationNameContains",
-      "intents": ["FACT_LOOKUP", "DEPENDENCY_EXPLORATION"],
-      "rootField": "applicationInterfaces",
-      "entityTypes": ["ApplicationInterface"],
-      "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/interfaces.byApplicationNameContains.graphql",
-      "params": [
-        {
-          "name": "companyId",
-          "kind": "id",
-          "required": true,
-          "placeholder": "{{companyId}}",
-          "description": "Selected company identifier used for mandatory tenant scoping."
-        },
-        {
-          "name": "applicationNameContains",
-          "kind": "string",
-          "required": true,
-          "placeholder": "{{applicationNameContains}}",
-          "description": "Case-insensitive source or target application name contains filter."
-        },
-        {
-          "name": "limit",
-          "kind": "int",
-          "required": false,
-          "placeholder": "{{limit}}",
-          "description": "Maximum number of rows to return.",
-          "defaultValue": 50
-        }
-      ]
-    },
-    {
-      "queryId": "interfaces.confidentialData",
-      "intents": ["FACT_LOOKUP", "DEPENDENCY_EXPLORATION", "IMPACT_ANALYSIS"],
-      "rootField": "applicationInterfaces",
-      "entityTypes": ["ApplicationInterface"],
-      "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/interfaces.confidentialData.graphql",
-      "params": [
-        {
-          "name": "companyId",
-          "kind": "id",
-          "required": true,
-          "placeholder": "{{companyId}}",
-          "description": "Selected company identifier used for mandatory tenant scoping."
-        },
-        {
-          "name": "classification",
+          "name": "statusEnum",
           "kind": "enum",
-          "required": false,
-          "placeholder": "{{classification}}",
-          "description": "Inline DataClassification enum value.",
-          "enumType": "DataClassification",
-          "defaultValue": "CONFIDENTIAL"
-        },
-        {
-          "name": "limit",
-          "kind": "int",
-          "required": false,
-          "placeholder": "{{limit}}",
-          "description": "Maximum number of rows to return.",
-          "defaultValue": 50
-        }
-      ]
-    },
-    {
-      "queryId": "capabilities.gap.noSupportingApplications",
-      "intents": ["FACT_LOOKUP", "IMPACT_ANALYSIS", "DEPENDENCY_EXPLORATION"],
-      "rootField": "businessCapabilities",
-      "entityTypes": ["BusinessCapability"],
-      "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/capabilities.gap.noSupportingApplications.graphql",
-      "params": [
-        {
-          "name": "companyId",
-          "kind": "id",
           "required": true,
-          "placeholder": "{{companyId}}",
-          "description": "Selected company identifier used for mandatory tenant scoping."
+          "placeholder": "{{statusEnum}}",
+          "description": "Inline status enum value validated against SCHEMA_DIGEST.",
+          "enumTypeParam": "statusEnumType"
         },
         {
-          "name": "limit",
-          "kind": "int",
-          "required": false,
-          "placeholder": "{{limit}}",
-          "description": "Maximum number of rows to return.",
-          "defaultValue": 50
-        }
-      ]
-    },
-    {
-      "queryId": "applications.countActive",
-      "intents": ["FACT_LOOKUP"],
-      "rootField": "applicationsConnection",
-      "entityTypes": ["Application"],
-      "companyScopeRuleId": "company-scope-company",
-      "templateFile": "graphql/applications.countActive.graphql",
-      "params": [
-        {
-          "name": "companyId",
-          "kind": "id",
+          "name": "statusEnumType",
+          "kind": "identifier",
           "required": true,
-          "placeholder": "{{companyId}}",
-          "description": "Selected company identifier used for mandatory tenant scoping."
-        },
-        {
-          "name": "status",
-          "kind": "enum",
-          "required": false,
-          "placeholder": "{{status}}",
-          "description": "Inline ApplicationStatus enum value.",
-          "enumType": "ApplicationStatus",
-          "defaultValue": "ACTIVE"
+          "placeholder": "{{statusEnumType}}",
+          "description": "Enum type selected by deterministic policy for runtime validation."
         }
       ]
     }
