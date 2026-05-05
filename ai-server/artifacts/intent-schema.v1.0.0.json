@@ -1,0 +1,26 @@
+{
+  "artifact": "intent-schema",
+  "version": "1.0.0",
+  "intents": {
+    "FACT_LOOKUP": {
+      "description": "Direct query of structured facts",
+      "requiresTraversal": false
+    },
+    "IMPACT_ANALYSIS": {
+      "description": "What happens if X fails or changes",
+      "requiresTraversal": true
+    },
+    "DEPENDENCY_EXPLORATION": {
+      "description": "Explore dependencies and relationships between entities",
+      "requiresTraversal": true
+    },
+    "STRATEGIC_ENRICHMENT": {
+      "description": "Create a strategic enrichment draft based on company information and supporting research",
+      "requiresTraversal": false
+    },
+    "ENTITY_IDENTIFICATION": {
+      "description": "Which entity the user is describing",
+      "requiresTraversal": true
+    }
+  }
+}

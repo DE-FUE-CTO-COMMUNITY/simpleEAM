@@ -1,0 +1,14 @@
+query {
+  applicationsConnection(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      status: { eq: {{status}} }
+    }
+  ) {
+    aggregate {
+      count {
+        nodes
+      }
+    }
+  }
+}

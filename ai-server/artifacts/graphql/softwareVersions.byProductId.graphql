@@ -1,0 +1,21 @@
+query {
+  softwareVersions(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      softwareProduct: { id: { eq: {{softwareProductId}} } }
+    }
+    limit: {{limit}}
+    sort: [{ version: ASC }]
+  ) {
+    id
+    name
+    version
+    releaseChannel
+    isLts
+    supportTier
+    softwareProduct {
+      id
+      name
+    }
+  }
+}

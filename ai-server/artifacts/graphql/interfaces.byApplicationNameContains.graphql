@@ -1,0 +1,26 @@
+query {
+  applicationInterfaces(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      OR: [
+        { sourceApplications: { some: { name: { contains: {{applicationNameContains}} } } } }
+        { targetApplications: { some: { name: { contains: {{applicationNameContains}} } } } }
+      ]
+    }
+    limit: {{limit}}
+    sort: [{ name: ASC }]
+  ) {
+    id
+    name
+    description
+    status
+    sourceApplications {
+      id
+      name
+    }
+    targetApplications {
+      id
+      name
+    }
+  }
+}

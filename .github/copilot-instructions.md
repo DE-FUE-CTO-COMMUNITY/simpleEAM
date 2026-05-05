@@ -1,3 +1,11 @@
+# Project-specific Copilot Instructions
+
+This repository contains additional, high-priority Copilot rules for agent-based Neo4j reasoning.
+
+Copilot MUST follow:
+
+- .github/copilot-instructions.agent-based-reasoning.md
+
 # NextGen EAM AI Coding Instructions
 
 ## Critical Rules

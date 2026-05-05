@@ -3,7 +3,7 @@
  * generate-schema-digest.mjs
  *
  * Introspects the live GraphQL server and generates:
- *   src/agents/data-lookup/generated-schema-digest.ts
+ *   agents/data-lookup/generated-schema-digest.ts
  *
  * This file is used by the data-lookup agent as the schema reference for
  * LLM-generated GraphQL queries. Re-run this script after any schema change.
@@ -22,7 +22,7 @@ import { fileURLToPath } from 'url'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
-const OUTPUT_PATH = resolve(__dirname, '../src/agents/data-lookup/generated-schema-digest.ts')
+const OUTPUT_PATH = resolve(__dirname, '../agents/data-lookup/generated-schema-digest.ts')
 
 const GRAPHQL_URL =
   process.env.GRAPHQL_URL || process.env.GRAPHQL_INTERNAL_URL || 'http://localhost:4500/graphql'

@@ -1,0 +1,395 @@
+{
+  "version": "1.0.0",
+  "principles": {
+    "resolutionStrategy": "graph-filter",
+    "returnMode": "candidate-list",
+    "allowEntityNameMatch": false,
+    "allowFreeTextNameLookup": false
+  },
+  "rules": {
+    "BusinessCapability": {
+      "entityType": "BusinessCapability",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "owners",
+        "company",
+        "usedByOrganisations",
+        "parents",
+        "children",
+        "supportedByApplications",
+        "supportedByAIComponents",
+        "supportedByBusinessProcesses",
+        "relatedDataObjects",
+        "partOfArchitectures",
+        "depictedInDiagrams"
+      ]
+    },
+    "BusinessProcess": {
+      "entityType": "BusinessProcess",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "owners",
+        "company",
+        "usedByOrganisations",
+        "parentProcess",
+        "childProcesses",
+        "supportsCapabilities",
+        "supportedByApplications",
+        "partOfArchitectures",
+        "depictedInDiagrams"
+      ]
+    },
+    "GEA_Vision": {
+      "entityType": "GEA_Vision",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "owners",
+        "company",
+        "supportsMissions",
+        "supportedByGoals",
+        "supportedByValues",
+        "partOfArchitectures",
+        "depictedInDiagrams"
+      ]
+    },
+    "GEA_Mission": {
+      "entityType": "GEA_Mission",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "owners",
+        "company",
+        "supportedByVisions",
+        "supportedByValues",
+        "supportedByGoals",
+        "partOfArchitectures",
+        "depictedInDiagrams"
+      ]
+    },
+    "GEA_Value": {
+      "entityType": "GEA_Value",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "owners",
+        "company",
+        "supportsMissions",
+        "supportsVisions",
+        "partOfArchitectures",
+        "depictedInDiagrams"
+      ]
+    },
+    "GEA_Goal": {
+      "entityType": "GEA_Goal",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "operationalizesVisions",
+        "supportsMissions",
+        "supportsValues",
+        "achievedByStrategies"
+      ]
+    },
+    "GEA_Strategy": {
+      "entityType": "GEA_Strategy",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["achievesGoals"]
+    },
+    "AiRun": {
+      "entityType": "AiRun",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["company", "auditEvents"]
+    },
+    "AiRunAuditEvent": {
+      "entityType": "AiRunAuditEvent",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["run"]
+    },
+    "AgentConfig": {
+      "entityType": "AgentConfig",
+      "graphOnlyResolutionSupported": false,
+      "allowedCriteria": []
+    },
+    "Person": {
+      "entityType": "Person",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "companies",
+        "ownedCapabilities",
+        "ownedApplications",
+        "ownedDataObjects",
+        "ownedArchitectures",
+        "ownedDiagrams",
+        "ownedInfrastructure",
+        "ownedInterfaces",
+        "ownedAIComponents",
+        "ownedBusinessProcesses",
+        "ownedGEAVisions",
+        "ownedGEAMissions",
+        "ownedGEAValues",
+        "ownedGEAGoals",
+        "ownedGEAStrategies",
+        "createdAnalyticsReports",
+        "createdAnalyticsReportFolders"
+      ]
+    },
+    "ReportFolder": {
+      "entityType": "ReportFolder",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["createdBy", "company", "parent", "children", "reports"]
+    },
+    "AnalyticsReport": {
+      "entityType": "AnalyticsReport",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["createdBy", "company", "folder"]
+    },
+    "Supplier": {
+      "entityType": "Supplier",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "providesApplications",
+        "supportsApplications",
+        "maintainsApplications",
+        "providesAIComponents",
+        "supportsAIComponents",
+        "maintainsAIComponents",
+        "providesInfrastructure",
+        "hostsInfrastructure",
+        "maintainsInfrastructure",
+        "developsSoftwareProducts",
+        "providesSoftwareProducts",
+        "maintainsSoftwareProducts",
+        "manufacturesHardwareProducts",
+        "providesHardwareProducts",
+        "maintainsHardwareProducts"
+      ]
+    },
+    "Application": {
+      "entityType": "Application",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "usedByOrganisations",
+        "parents",
+        "components",
+        "predecessors",
+        "successors",
+        "supportsCapabilities",
+        "supportsBusinessProcesses",
+        "usesDataObjects",
+        "isDataSourceFor",
+        "sourceOfInterfaces",
+        "targetOfInterfaces",
+        "hostedOn",
+        "usesSoftwareProducts",
+        "softwareVersions",
+        "usesAIComponents",
+        "providedBy",
+        "supportedBy",
+        "maintainedBy"
+      ]
+    },
+    "ApplicationInterface": {
+      "entityType": "ApplicationInterface",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "usedByOrganisations",
+        "predecessors",
+        "successors",
+        "sourceApplications",
+        "targetApplications",
+        "dataObjects"
+      ]
+    },
+    "DataObject": {
+      "entityType": "DataObject",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "usedByOrganisations",
+        "dataSources",
+        "usedByApplications",
+        "relatedToCapabilities",
+        "transferredInInterfaces",
+        "usedForTrainingAI",
+        "relatedDataObjects",
+        "inverseRelatedDataObjects"
+      ]
+    },
+    "Infrastructure": {
+      "entityType": "Infrastructure",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "usedByOrganisations",
+        "parentInfrastructure",
+        "childInfrastructures",
+        "hostsApplications",
+        "hostsAIComponents",
+        "usesSoftwareProducts",
+        "usesHardwareProducts",
+        "softwareVersions",
+        "providedBy",
+        "hostedBy",
+        "maintainedBy"
+      ]
+    },
+    "SoftwareProduct": {
+      "entityType": "SoftwareProduct",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "usedByApplications",
+        "usedByInfrastructure",
+        "versions",
+        "developedBy",
+        "providedBy",
+        "maintainedBy"
+      ]
+    },
+    "SoftwareVersion": {
+      "entityType": "SoftwareVersion",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "company",
+        "softwareProduct",
+        "lifecycleRecords",
+        "usedByApplications",
+        "usedByInfrastructure",
+        "sbomDocuments"
+      ]
+    },
+    "HardwareProduct": {
+      "entityType": "HardwareProduct",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "productFamily",
+        "company",
+        "usedByInfrastructure",
+        "versions",
+        "manufacturedBy",
+        "providedBy",
+        "maintainedBy"
+      ]
+    },
+    "HardwareVersion": {
+      "entityType": "HardwareVersion",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["company", "hardwareProduct", "lifecycleRecords", "usedByInfrastructure"]
+    },
+    "ProductFamily": {
+      "entityType": "ProductFamily",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["softwareProducts", "hardwareProducts"]
+    },
+    "SbomDocument": {
+      "entityType": "SbomDocument",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["company", "softwareVersions"]
+    },
+    "LifecycleRecord": {
+      "entityType": "LifecycleRecord",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": ["company", "softwareVersions", "hardwareVersions"]
+    },
+    "AIComponent": {
+      "entityType": "AIComponent",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "usedByOrganisations",
+        "trainedWithDataObjects",
+        "usedByApplications",
+        "supportsCapabilities",
+        "hostedOn",
+        "providedBy",
+        "supportedBy",
+        "maintainedBy"
+      ]
+    },
+    "Company": {
+      "entityType": "Company",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "organisations",
+        "ownedCapabilities",
+        "ownedApplications",
+        "ownedDataObjects",
+        "ownedInterfaces",
+        "ownedInfrastructure",
+        "ownedAIComponents",
+        "ownedBusinessProcesses",
+        "ownedGEAVisions",
+        "ownedGEAMissions",
+        "ownedGEAValues",
+        "ownedGEAGoals",
+        "ownedGEAStrategies",
+        "employees",
+        "ownedArchitectures",
+        "ownedArchitecturePrinciples",
+        "ownedSuppliers"
+      ]
+    },
+    "Organisation": {
+      "entityType": "Organisation",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "parentOrganisation",
+        "childOrganisations",
+        "usedCapabilities",
+        "usedApplications",
+        "usedDataObjects",
+        "usedInterfaces",
+        "usedInfrastructure",
+        "usedAIComponents",
+        "usedBusinessProcesses"
+      ]
+    },
+    "Architecture": {
+      "entityType": "Architecture",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "containsCapabilities",
+        "containsBusinessProcesses",
+        "containsApplications",
+        "containsDataObjects",
+        "containsInterfaces",
+        "containsInfrastructure",
+        "containsAIComponents",
+        "containsGEAVisions",
+        "containsGEAMissions",
+        "containsGEAValues",
+        "containsGEAGoals",
+        "containsGEAStrategies",
+        "parentArchitecture",
+        "childArchitectures",
+        "diagrams",
+        "appliedPrinciples"
+      ]
+    },
+    "Diagram": {
+      "entityType": "Diagram",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "company",
+        "architecture",
+        "creator",
+        "containsCapabilities",
+        "containsBusinessProcesses",
+        "containsApplications",
+        "containsDataObjects",
+        "containsInterfaces",
+        "containsInfrastructure",
+        "containsAIComponents",
+        "containsGEAVisions",
+        "containsGEAMissions",
+        "containsGEAValues",
+        "containsGEAGoals",
+        "containsGEAStrategies"
+      ]
+    },
+    "ArchitecturePrinciple": {
+      "entityType": "ArchitecturePrinciple",
+      "graphOnlyResolutionSupported": true,
+      "allowedCriteria": [
+        "company",
+        "owners",
+        "appliedInArchitectures",
+        "implementedByApplications",
+        "implementedByAIComponents"
+      ]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+query {
+  applications(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      id: { eq: {{applicationId}} }
+    }
+    limit: 1
+  ) {
+    id
+    name
+    description
+    status
+    criticality
+    technologyStack
+    vendor
+  }
+}

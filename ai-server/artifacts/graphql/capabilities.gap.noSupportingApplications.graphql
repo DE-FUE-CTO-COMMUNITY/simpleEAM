@@ -1,0 +1,15 @@
+query {
+  businessCapabilities(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      supportedByApplications: { none: {} }
+    }
+    limit: {{limit}}
+    sort: [{ name: ASC }]
+  ) {
+    id
+    name
+    description
+    status
+  }
+}

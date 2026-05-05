@@ -1,0 +1,20 @@
+query {
+  applicationInterfaces(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      dataObjects: { some: { classification: { eq: {{classification}} } } }
+    }
+    limit: {{limit}}
+    sort: [{ name: ASC }]
+  ) {
+    id
+    name
+    description
+    status
+    dataObjects {
+      id
+      name
+      classification
+    }
+  }
+}

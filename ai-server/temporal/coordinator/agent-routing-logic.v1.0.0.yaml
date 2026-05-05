@@ -1,0 +1,128 @@
+version: 1.0.0
+agents:
+  intent-classifier:
+    responsibility: classify user question into an allowed intent
+    inputs:
+      - user-question
+      - intent-schema
+    outputs:
+      - intent
+      - confidence
+    access:
+      fullGraph: false
+      conceptDictionary: false
+      entityResolutionRules: false
+      graphQueryLibrary: false
+      queryResultsOnly: false
+
+  entity-resolver:
+    responsibility: find candidate entities using graph-based resolution rules
+    inputs:
+      - user-question
+      - concept-dictionary
+      - entity-resolution-rules
+    outputs:
+      - candidate-entities
+      - resolution-filters
+    access:
+      fullGraph: false
+      conceptDictionary: true
+      entityResolutionRules: true
+      graphQueryLibrary: false
+      queryResultsOnly: false
+
+  graph-query-agent:
+    responsibility: execute whitelisted read-only Cypher queries against the graph
+    inputs:
+      - intent
+      - candidate-entities
+      - query-id
+      - query-parameters
+      - graph-query-library
+    outputs:
+      - query-results
+    access:
+      fullGraph: true
+      conceptDictionary: false
+      entityResolutionRules: false
+      graphQueryLibrary: true
+      queryResultsOnly: false
+
+  explanation-agent:
+    responsibility: explain graph query results without adding facts
+    inputs:
+      - intent
+      - query-results
+    outputs:
+      - user-answer
+    access:
+      fullGraph: false
+      conceptDictionary: false
+      entityResolutionRules: false
+      graphQueryLibrary: false
+      queryResultsOnly: true
+
+routing:
+  FACT_LOOKUP:
+    sequence:
+      - intent-classifier
+      - entity-resolver
+      - graph-query-agent
+      - explanation-agent
+
+  IMPACT_ANALYSIS:
+    sequence:
+      - intent-classifier
+      - entity-resolver
+      - graph-query-agent
+      - explanation-agent
+
+  DEPENDENCY_EXPLORATION:
+    sequence:
+      - intent-classifier
+      - entity-resolver
+      - graph-query-agent
+      - explanation-agent
+
+  ENTITY_IDENTIFICATION:
+    sequence:
+      - intent-classifier
+      - entity-resolver
+      - graph-query-agent
+      - explanation-agent
+
+  STRATEGIC_ENRICHMENT:
+    sequence:
+      - intent-classifier
+
+runtimePlans:
+  FACT_LOOKUP:
+    steps:
+      - data-lookup
+
+  IMPACT_ANALYSIS:
+    steps:
+      - data-lookup
+
+  DEPENDENCY_EXPLORATION:
+    steps:
+      - data-lookup
+
+  ENTITY_IDENTIFICATION:
+    steps:
+      - data-lookup
+
+  STRATEGIC_ENRICHMENT:
+    withDocuments:
+      - document-research
+      - strategy-generator
+    withoutDocuments:
+      - internet-research
+      - strategy-generator
+
+constraints:
+  onlyWhitelistedCypher: true
+  readOnlyGraphQueries: true
+  explanationAgentSeesFullGraph: false
+  explanationAgentReceivesOnly:
+    - query-results

@@ -1,0 +1,308 @@
+{
+  "artifact": "query-library",
+  "version": "1.0.0",
+  "dynamicQueryGenerationAllowed": false,
+  "queries": [
+    {
+      "queryId": "applications.searchByName",
+      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
+      "rootField": "applications",
+      "entityTypes": ["Application"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/applications.searchByName.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "searchText",
+          "kind": "string",
+          "required": true,
+          "placeholder": "{{searchText}}",
+          "description": "Case-insensitive application name contains filter."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "applications.byId",
+      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
+      "rootField": "applications",
+      "entityTypes": ["Application"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/applications.byId.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "applicationId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{applicationId}}",
+          "description": "Exact application identifier."
+        }
+      ]
+    },
+    {
+      "queryId": "applications.byCapabilityNameContains",
+      "intents": ["FACT_LOOKUP", "IMPACT_ANALYSIS", "DEPENDENCY_EXPLORATION"],
+      "rootField": "applications",
+      "entityTypes": ["Application"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/applications.byCapabilityNameContains.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "capabilityNameContains",
+          "kind": "string",
+          "required": true,
+          "placeholder": "{{capabilityNameContains}}",
+          "description": "Business capability name contains filter."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "softwareProducts.searchByName",
+      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
+      "rootField": "softwareProducts",
+      "entityTypes": ["SoftwareProduct"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/softwareProducts.searchByName.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "searchText",
+          "kind": "string",
+          "required": true,
+          "placeholder": "{{searchText}}",
+          "description": "Case-insensitive software product name contains filter."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "softwareVersions.byProductId",
+      "intents": ["FACT_LOOKUP", "DEPENDENCY_EXPLORATION"],
+      "rootField": "softwareVersions",
+      "entityTypes": ["SoftwareVersion"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/softwareVersions.byProductId.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "softwareProductId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{softwareProductId}}",
+          "description": "Exact parent software product identifier."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "hardwareProducts.searchByName",
+      "intents": ["FACT_LOOKUP", "ENTITY_IDENTIFICATION"],
+      "rootField": "hardwareProducts",
+      "entityTypes": ["HardwareProduct"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/hardwareProducts.searchByName.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "searchText",
+          "kind": "string",
+          "required": true,
+          "placeholder": "{{searchText}}",
+          "description": "Case-insensitive hardware product name contains filter."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "interfaces.byApplicationNameContains",
+      "intents": ["FACT_LOOKUP", "DEPENDENCY_EXPLORATION"],
+      "rootField": "applicationInterfaces",
+      "entityTypes": ["ApplicationInterface"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/interfaces.byApplicationNameContains.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "applicationNameContains",
+          "kind": "string",
+          "required": true,
+          "placeholder": "{{applicationNameContains}}",
+          "description": "Case-insensitive source or target application name contains filter."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "interfaces.confidentialData",
+      "intents": ["FACT_LOOKUP", "DEPENDENCY_EXPLORATION", "IMPACT_ANALYSIS"],
+      "rootField": "applicationInterfaces",
+      "entityTypes": ["ApplicationInterface"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/interfaces.confidentialData.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "classification",
+          "kind": "enum",
+          "required": false,
+          "placeholder": "{{classification}}",
+          "description": "Inline DataClassification enum value.",
+          "enumType": "DataClassification",
+          "defaultValue": "CONFIDENTIAL"
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "capabilities.gap.noSupportingApplications",
+      "intents": ["FACT_LOOKUP", "IMPACT_ANALYSIS", "DEPENDENCY_EXPLORATION"],
+      "rootField": "businessCapabilities",
+      "entityTypes": ["BusinessCapability"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/capabilities.gap.noSupportingApplications.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "limit",
+          "kind": "int",
+          "required": false,
+          "placeholder": "{{limit}}",
+          "description": "Maximum number of rows to return.",
+          "defaultValue": 50
+        }
+      ]
+    },
+    {
+      "queryId": "applications.countActive",
+      "intents": ["FACT_LOOKUP"],
+      "rootField": "applicationsConnection",
+      "entityTypes": ["Application"],
+      "companyScopeRuleId": "company-scope-company",
+      "templateFile": "graphql/applications.countActive.graphql",
+      "params": [
+        {
+          "name": "companyId",
+          "kind": "id",
+          "required": true,
+          "placeholder": "{{companyId}}",
+          "description": "Selected company identifier used for mandatory tenant scoping."
+        },
+        {
+          "name": "status",
+          "kind": "enum",
+          "required": false,
+          "placeholder": "{{status}}",
+          "description": "Inline ApplicationStatus enum value.",
+          "enumType": "ApplicationStatus",
+          "defaultValue": "ACTIVE"
+        }
+      ]
+    }
+  ]
+}

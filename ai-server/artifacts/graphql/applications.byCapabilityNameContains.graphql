@@ -1,0 +1,19 @@
+query {
+  applications(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      supportsCapabilities: { some: { name: { contains: {{capabilityNameContains}} } } }
+    }
+    limit: {{limit}}
+    sort: [{ name: ASC }]
+  ) {
+    id
+    name
+    description
+    status
+    supportsCapabilities {
+      id
+      name
+    }
+  }
+}

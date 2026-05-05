@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "queries": {
+    "fact_lookup_entity_by_id": {
+      "intent": "FACT_LOOKUP",
+      "parameters": ["entityId", "allowedLabels"],
+      "cypher": "MATCH (n {id: $entityId}) WHERE any(label IN labels(n) WHERE label IN $allowedLabels) RETURN n, labels(n) AS entityLabels"
+    },
+    "impact_analysis_from_entity": {
+      "intent": "IMPACT_ANALYSIS",
+      "parameters": [
+        "entityId",
+        "sourceLabels",
+        "targetLabels",
+        "allowedRelationshipTypes",
+        "maxDepth"
+      ],
+      "cypher": "MATCH (source {id: $entityId}) WHERE any(label IN labels(source) WHERE label IN $sourceLabels) MATCH path = (source)-[*1..5]-(affected) WHERE length(path) <= $maxDepth AND all(rel IN relationships(path) WHERE type(rel) IN $allowedRelationshipTypes) AND any(label IN labels(affected) WHERE label IN $targetLabels) AND source <> affected RETURN affected, labels(affected) AS entityLabels, min(length(path)) AS distance"
+    },
+    "dependency_traversal_paths": {
+      "intent": "DEPENDENCY_EXPLORATION",
+      "parameters": [
+        "entityId",
+        "sourceLabels",
+        "targetLabels",
+        "allowedRelationshipTypes",
+        "maxDepth"
+      ],
+      "cypher": "MATCH (source {id: $entityId}) WHERE any(label IN labels(source) WHERE label IN $sourceLabels) MATCH path = (source)-[*1..5]-(neighbor) WHERE length(path) <= $maxDepth AND all(rel IN relationships(path) WHERE type(rel) IN $allowedRelationshipTypes) AND any(label IN labels(neighbor) WHERE label IN $targetLabels) AND source <> neighbor RETURN DISTINCT path"
+    }
+  }
+}

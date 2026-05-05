@@ -12,9 +12,18 @@
     "noEmitOnError": false,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "rootDir": "src",
+    "rootDir": ".",
     "typeRoots": ["./src/types", "node_modules/@types"]
   },
-  "include": ["src/**/*"],
+  "include": [
+    "index.ts",
+    "agents/**/*.ts",
+    "artifacts/**/*.ts",
+    "graph/**/*.ts",
+    "policy/**/*.ts",
+    "state/**/*.ts",
+    "temporal/**/*.ts",
+    "src/**/*.ts"
+  ],
   "exclude": ["node_modules", "**/*.test.ts"]
 }

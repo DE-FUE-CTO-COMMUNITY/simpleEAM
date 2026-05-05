@@ -1,0 +1,16 @@
+query {
+  applications(
+    where: {
+      company: { some: { id: { eq: {{companyId}} } } }
+      name: { contains: {{searchText}} }
+    }
+    limit: {{limit}}
+    sort: [{ name: ASC }]
+  ) {
+    id
+    name
+    description
+    status
+    criticality
+  }
+}
