@@ -2,6 +2,7 @@ import { loadArtifacts } from '../artifacts/loader'
 import type { SupportedLocale } from '../artifacts/types'
 import { createPlan } from '../agents/coordinatorAdapter'
 import { executeQuery } from '../agents/dataLookupAdapter'
+import { summarizeLookupResult } from '../graph/summarizeLookupResult'
 import { ASK_CLARIFICATION, enforceCoordinatorPlan } from '../policy/enforce'
 import type { QueryId } from '../policy/querySelect'
 import type { AiState, AnswerState, SelectedQueryState } from '../state/aiState'
@@ -10,6 +11,7 @@ import { appendStateStep } from '../state/trajectory'
 import type { LlmConfig } from '../src/types/agents'
 
 export interface AiQueryWorkflowInput {
+  readonly runId: string
   readonly text: string
   readonly locale?: SupportedLocale | null
   readonly companyId: string
@@ -55,19 +57,6 @@ function summarizeValue(value: unknown): string {
   }
 
   return String(value)
-}
-
-function summarizeLookupResult(data: unknown): string {
-  if (!data || typeof data !== 'object' || Array.isArray(data)) {
-    return `Lookup completed with ${summarizeValue(data)}.`
-  }
-
-  const entries = Object.entries(data as Record<string, unknown>)
-  if (entries.length === 0) {
-    return 'Lookup completed with an empty result set.'
-  }
-
-  return `Lookup completed. ${entries.map(([key, value]) => `${key}: ${summarizeValue(value)}`).join('; ')}`
 }
 
 export async function coordinatorPlanActivity(
@@ -151,6 +140,17 @@ export async function coordinatorPlanActivity(
     args: policyDecision.querySelection.selected.args,
   }
 
+  console.info('[AI QUERY][PATH]', {
+    path: 'governed',
+    intent: policyDecision.plan.intent,
+    entityType: policyDecision.plan.entityHint?.entityType ?? null,
+    relation:
+      typeof policyDecision.querySelection.selected.args.relationField === 'string'
+        ? policyDecision.querySelection.selected.args.relationField
+        : null,
+    queryId: selectedQuery.queryId,
+  })
+
   return {
     ...input.state,
     plan: policyDecision.plan,
@@ -215,6 +215,17 @@ export async function dataLookupActivity(input: DataLookupActivityInput): Promis
     artifacts,
   })
 
+  console.info('[AI QUERY][EXECUTION]', {
+    path: 'governed',
+    intent: input.state.plan?.intent ?? null,
+    entityType: input.state.plan?.entityHint?.entityType ?? null,
+    relation:
+      typeof input.state.selectedQuery.args?.relationField === 'string'
+        ? input.state.selectedQuery.args.relationField
+        : null,
+    queryId: lookupResult.queryId,
+  })
+
   return {
     ...input.state,
     data: lookupResult.data,
@@ -233,7 +244,12 @@ export async function dataLookupActivity(input: DataLookupActivityInput): Promis
 
 export async function explainActivity(input: ExplainActivityInput): Promise<AiState> {
   const answer: AnswerState = {
-    text: summarizeLookupResult(input.state.data),
+    text: summarizeLookupResult({
+      data: input.state.data,
+      text: input.state.userInput.text,
+      locale: input.state.userInput.locale ?? null,
+      selectedQueryArgs: input.state.selectedQuery?.args ?? null,
+    }),
     confidence: 1,
     citations: input.state.selectedQuery
       ? [

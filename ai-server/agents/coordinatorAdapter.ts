@@ -33,6 +33,35 @@ export interface ClarificationCoordinatorPlanResult {
 
 export type CoordinatorPlanResult = ValidCoordinatorPlanResult | ClarificationCoordinatorPlanResult
 
+function tryDeterministicFallback(
+  userInput: CoordinatorUserInput,
+  artifacts: LoadedArtifacts,
+  rawOutput: string,
+  fallbackPlan: Partial<Plan> = {}
+): CoordinatorPlanResult | null {
+  const policyDecision = enforceCoordinatorPlan({
+    text: userInput.text,
+    locale: userInput.locale ?? null,
+    plan: fallbackPlan,
+    artifacts,
+  })
+
+  if (policyDecision.action === ASK_CLARIFICATION) {
+    return null
+  }
+
+  console.info('[AI QUERY][PLAN_FALLBACK]', {
+    intent: policyDecision.plan.intent,
+    entityType: policyDecision.plan.entityHint?.entityType ?? null,
+  })
+
+  return {
+    action: 'ALLOW',
+    plan: policyDecision.plan,
+    rawOutput,
+  }
+}
+
 function buildArtifactExcerptPrompt(excerpt: CoordinatorArtifactExcerpt): string {
   if (excerpt.promptText?.trim()) {
     return excerpt.promptText.trim()
@@ -44,6 +73,8 @@ function buildArtifactExcerptPrompt(excerpt: CoordinatorArtifactExcerpt): string
   return [
     `Allowed intents: ${intents.join(', ')}`,
     `Known entity types: ${entityTypes.join(', ')}`,
+    'Map German, English, and French user wording to the canonical entity types and intents.',
+    'Example mappings: Schnittstelle/interface -> ApplicationInterface, Datenobjekt/data object -> DataObject, Anwendung/application -> Application, Fähigkeit/capability -> BusinessCapability.',
     'If the request is ambiguous, incomplete, or does not map cleanly to one intent and one entity type, prefer a narrow draft plan and let policy request clarification.',
   ].join('\n')
 }
@@ -73,6 +104,7 @@ function buildPlanPrompt(
     'Do not generate GraphQL.',
     'Do not generate Cypher.',
     'Do not invent new intents or entity types.',
+    'Infer the canonical entity type from the user language when the request clearly names one subject.',
     '',
     `Company: ${userInput.companyName?.trim() || 'not specified'}`,
     `Objective: ${userInput.objective?.trim() || 'not specified'}`,
@@ -112,6 +144,11 @@ export async function createPlan(
 
   const parsed = parseJsonObject(rawOutput)
   if (!parsed) {
+    const fallback = tryDeterministicFallback(userInput, artifactExcerpt.artifacts, rawOutput)
+    if (fallback) {
+      return fallback
+    }
+
     return buildClarificationResult(rawOutput, 'Coordinator output was not valid JSON.')
   }
 
@@ -120,6 +157,11 @@ export async function createPlan(
     const issueSummary = schemaResult.error.issues
       .map(issue => `${issue.path.join('.') || 'root'}: ${issue.message}`)
       .join('; ')
+
+    const fallback = tryDeterministicFallback(userInput, artifactExcerpt.artifacts, rawOutput)
+    if (fallback) {
+      return fallback
+    }
 
     return buildClarificationResult(
       rawOutput,
@@ -135,6 +177,11 @@ export async function createPlan(
   })
 
   if (policyDecision.action === ASK_CLARIFICATION) {
+    const fallback = tryDeterministicFallback(userInput, artifactExcerpt.artifacts, rawOutput)
+    if (fallback) {
+      return fallback
+    }
+
     return {
       action: ASK_CLARIFICATION,
       clarification: policyDecision.clarification,

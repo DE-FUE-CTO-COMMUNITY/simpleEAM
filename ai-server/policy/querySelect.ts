@@ -19,8 +19,8 @@ export const QUERY_PARAMETER_RULES = {
   'entity.gap.byRelation': ['entityRoot', 'relationField', 'companyId'] as const,
   'entity.relation.someByNameContains': [
     'entityRoot',
-    'relationField',
-    'relatedNameContains',
+    'entityWhereClause',
+    'detailSelectionSet',
     'companyId',
   ] as const,
   'entity.countByStatus': ['entityRoot', 'statusEnum', 'statusEnumType', 'companyId'] as const,
@@ -56,13 +56,20 @@ const COUNT_STATUS_ENUM_TYPES: Readonly<Partial<Record<StartPolicyMatrixEntityTy
 }
 
 const RELATION_PATTERNS: Readonly<Partial<Record<string, readonly RegExp[]>>> = {
-  dataObjects: [/\bdata objects?\b/i],
+  dataObjects: [
+    /\b(?:data|data objects?|daten(?:objekte?)?|donnees?|données?)\b/i,
+    /\b(?:transfer(?:s|red)?|flow(?:s)?|carried|ubertragen|uebertragen|transportent)\b.*\b(?:data|daten|donnees?|données?)\b/i,
+  ],
   hostsApplications: [/\bhost(?:s|ed|ing)?\b.*\bapplications?\b/i],
   providedBy: [/\bprovided by\b/i],
   softwareProduct: [/\bsoftware products?\b/i],
   sourceApplications: [/\bsource applications?\b/i],
-  sourceOfInterfaces: [/\bsource of interfaces?\b/i],
-  supportedByApplications: [/\b(?:supported by|not supported by|without)\b.*\bapplications?\b/i],
+  sourceOfInterfaces: [/\bsource of interfaces?\b/i, /\binterfaces?\b/i],
+  supportedByApplications: [
+    /\b(?:supported by|not supported by|without)\b.*\bapplications?\b/i,
+    /\b(?:capabilities?|fahigkeiten|faehigkeiten)\b.*\b(?:durch|von)\b.*\b(?:unterstutzt|unterstützt)\b/i,
+    /\b(?:supported by|unterstutzt durch|unterstützt durch)\b/i,
+  ],
   supportedByBusinessProcesses: [
     /\b(?:supported by|not supported by|without)\b.*\b(?:business )?process(?:es)?\b/i,
   ],
@@ -86,6 +93,38 @@ const STATUS_KEYWORDS: ReadonlyArray<{ enumValue: string; keywords: readonly str
   { enumValue: 'RETIRED', keywords: ['retired', 'ausgemustert'] },
   { enumValue: 'DEPRECATED', keywords: ['deprecated'] },
   { enumValue: 'OUT_OF_SERVICE', keywords: ['out of service'] },
+] as const
+
+const DATA_CLASSIFICATION_KEYWORDS: ReadonlyArray<{
+  enumValue: string
+  keywords: readonly string[]
+}> = [
+  {
+    enumValue: 'STRICTLY_CONFIDENTIAL',
+    keywords: ['strictly confidential', 'streng vertraulich', 'hautement confidentiel'],
+  },
+  {
+    enumValue: 'CONFIDENTIAL',
+    keywords: ['confidential', 'vertraulich', 'confidentiel'],
+  },
+  {
+    enumValue: 'INTERNAL',
+    keywords: ['internal', 'intern', 'interne'],
+  },
+  {
+    enumValue: 'PUBLIC',
+    keywords: ['public', 'oeffentlich', 'offentlich', 'publique'],
+  },
+] as const
+
+const CLOUD_ENVIRONMENT_KEYWORDS: ReadonlyArray<{
+  value: string
+  keywords: readonly string[]
+}> = [
+  { value: 'AWS', keywords: ['aws', 'amazon web services'] },
+  { value: 'AZURE', keywords: ['azure', 'microsoft azure'] },
+  { value: 'GCP', keywords: ['gcp', 'google cloud', 'google cloud platform'] },
+  { value: 'CLOUD', keywords: ['cloud', 'cloud-based'] },
 ] as const
 
 export type QueryId = keyof typeof QUERY_PARAMETER_RULES
@@ -271,7 +310,23 @@ function extractRelatedName(
   const relationMatch = text.match(
     /\b(?:support|supports|supported by|use|uses|using|host|hosts|hosted by|provided by)\s+(.+?)\s+(?:capabilities?|applications?|process(?:es)?|data objects?|software products?|hardware products?|interfaces?|infrastructure)\b/i
   )
-  return relationMatch?.[1]?.trim() || null
+  if (relationMatch?.[1]?.trim()) {
+    return relationMatch[1].trim()
+  }
+
+  const passiveGermanMatch = text.match(/\bdurch\s+(.+?)\s+(?:unterstutzt|unterstützt)\b/i)
+  if (passiveGermanMatch?.[1]?.trim()) {
+    return passiveGermanMatch[1].trim()
+  }
+
+  const passiveEnglishMatch = text.match(
+    /\b(?:supported by|used by|hosted by|provided by)\s+(.+?)(?:[?.!,]|$)/i
+  )
+  return passiveEnglishMatch?.[1]?.trim() || null
+}
+
+function toGraphqlStringLiteral(value: string): string {
+  return JSON.stringify(value)
 }
 
 function resolveStatusEnum(normalizedText: string): string | null {
@@ -282,6 +337,125 @@ function resolveStatusEnum(normalizedText: string): string | null {
   }
 
   return null
+}
+
+function resolveDataClassification(
+  normalizedText: string,
+  artifacts: Pick<LoadedArtifacts, 'schemaDigest'>
+): string | null {
+  const allowedValues = artifacts.schemaDigest.enumValues.DataClassification
+  if (!allowedValues) {
+    return null
+  }
+
+  for (const candidate of DATA_CLASSIFICATION_KEYWORDS) {
+    if (
+      allowedValues.includes(candidate.enumValue) &&
+      candidate.keywords.some(keyword => normalizedText.includes(normalizeText(keyword)))
+    ) {
+      return candidate.enumValue
+    }
+  }
+
+  return null
+}
+
+function resolveHostingEnvironmentContains(normalizedText: string): string | null {
+  for (const candidate of CLOUD_ENVIRONMENT_KEYWORDS) {
+    if (candidate.keywords.some(keyword => normalizedText.includes(normalizeText(keyword)))) {
+      return candidate.value
+    }
+  }
+
+  return null
+}
+
+function resolveRelationFilterClause(
+  entityType: CanonicalConceptType,
+  relationField: string,
+  args: SelectAllowedQueryIdsArgs,
+  normalizedText: string
+): { value?: string; reason?: string } {
+  if (
+    entityType === 'Application' &&
+    (relationField === 'sourceOfInterfaces' || relationField === 'targetOfInterfaces') &&
+    hasInterfaceMention(normalizedText)
+  ) {
+    const dataClassification = resolveDataClassification(normalizedText, args.artifacts)
+    if (dataClassification) {
+      return { value: `classification: { eq: ${dataClassification} }` }
+    }
+  }
+
+  if (entityType === 'ApplicationInterface' && relationField === 'dataObjects') {
+    const dataClassification = resolveDataClassification(normalizedText, args.artifacts)
+    if (dataClassification) {
+      return { value: `classification: { eq: ${dataClassification} }` }
+    }
+  }
+
+  const relatedNameContains = extractRelatedName(args.text, args.entityHint)
+  if (!relatedNameContains) {
+    return {
+      reason: `ENTITY_RELATION_FILTER for ${entityType} requires a deterministic related-name fragment or governed enum filter.`,
+    }
+  }
+
+  return {
+    value: `name: { contains: ${toGraphqlStringLiteral(relatedNameContains)} }`,
+  }
+}
+
+function hasInterfaceMention(normalizedText: string): boolean {
+  return /\b(?:interfaces?|schnittstellen?)\b/i.test(normalizedText)
+}
+
+function buildDetailSelectionSet(relationField: string, relationDetailSelection: string): string {
+  return `${relationField} {\n      ${relationDetailSelection}\n    }`
+}
+
+function buildApplicationInterfaceWhereClause(relatedFilterClause: string): string {
+  return [
+    'OR: [',
+    `        { sourceOfInterfaces: { some: { dataObjects: { some: { ${relatedFilterClause} } } } } }`,
+    `        { targetOfInterfaces: { some: { dataObjects: { some: { ${relatedFilterClause} } } } } }`,
+    '      ]',
+  ].join('\n')
+}
+
+function buildApplicationInterfaceDetailSelectionSet(): string {
+  const interfaceSelection = [
+    'id',
+    'name',
+    'dataObjects {',
+    '          id',
+    '          name',
+    '          classification',
+    '        }',
+  ].join('\n        ')
+
+  return [
+    buildDetailSelectionSet('sourceOfInterfaces', interfaceSelection),
+    buildDetailSelectionSet('targetOfInterfaces', interfaceSelection),
+  ].join('\n    ')
+}
+
+function buildApplicationHostingEnvironmentDetailSelectionSet(relationField: string): string {
+  return buildDetailSelectionSet(
+    relationField,
+    ['id', 'name', 'hostingEnvironment'].join('\n        ')
+  )
+}
+
+function resolveRelationDetailSelection(
+  entityType: CanonicalConceptType,
+  relationField: string
+): string {
+  if (entityType === 'ApplicationInterface' && relationField === 'dataObjects') {
+    return ['id', 'name', 'classification'].join('\n        ')
+  }
+
+  return ['id', 'name'].join('\n        ')
 }
 
 function resolveSearchTerm(text: string, entityHint: EntityHint | null | undefined): string | null {
@@ -603,20 +777,69 @@ function buildSelectedArgs(
       }
     }
     case 'ENTITY_RELATION_FILTER': {
-      const relatedNameContains = extractRelatedName(args.text, args.entityHint)
-      if (!relatedNameContains) {
+      if (!detectedRelationField) {
         return {
-          reason: `ENTITY_RELATION_FILTER for ${args.entityType} requires a deterministic related-name fragment.`,
+          reason: `ENTITY_RELATION_FILTER for ${args.entityType} requires one allowed relation.`,
         }
       }
 
+      const relationFilterClause = resolveRelationFilterClause(
+        args.entityType,
+        detectedRelationField,
+        args,
+        normalizedText
+      )
+      if (!relationFilterClause.value) {
+        return { reason: relationFilterClause.reason }
+      }
+
+      const isApplicationInterfaceRelation =
+        args.entityType === 'Application' &&
+        hasInterfaceMention(normalizedText) &&
+        (detectedRelationField === 'sourceOfInterfaces' ||
+          detectedRelationField === 'targetOfInterfaces')
+
+      const hostingEnvironmentContains =
+        args.entityType === 'BusinessCapability' &&
+        detectedRelationField === 'supportedByApplications'
+          ? resolveHostingEnvironmentContains(normalizedText)
+          : null
+
+      const isApplicationHostingEnvironmentRelation = Boolean(hostingEnvironmentContains)
+      const resolvedHostingEnvironmentContains = hostingEnvironmentContains ?? ''
+
+      const queryArgs = {
+        ...commonArgs,
+        limit: 50,
+        entityWhereClause: isApplicationInterfaceRelation
+          ? buildApplicationInterfaceWhereClause(relationFilterClause.value)
+          : isApplicationHostingEnvironmentRelation
+            ? `${detectedRelationField}: { some: { hostingEnvironment: { contains: ${toGraphqlStringLiteral(
+                resolvedHostingEnvironmentContains
+              )} } } }`
+            : `${detectedRelationField}: { some: { ${relationFilterClause.value} } }`,
+        detailSelectionSet: isApplicationInterfaceRelation
+          ? buildApplicationInterfaceDetailSelectionSet()
+          : isApplicationHostingEnvironmentRelation
+            ? buildApplicationHostingEnvironmentDetailSelectionSet(detectedRelationField)
+            : buildDetailSelectionSet(
+                detectedRelationField,
+                resolveRelationDetailSelection(args.entityType, detectedRelationField)
+              ),
+        relationField: detectedRelationField,
+        relatedFilterClause: isApplicationHostingEnvironmentRelation
+          ? `hostingEnvironment: { contains: ${toGraphqlStringLiteral(
+              resolvedHostingEnvironmentContains
+            )} }`
+          : relationFilterClause.value,
+      }
+
       return {
-        args: filterArgsToSchema(graphqlEntry, {
-          ...commonArgs,
-          limit: 50,
-          relatedNameContains,
-          relationField: detectedRelationField,
-        }),
+        args: {
+          ...filterArgsToSchema(graphqlEntry, queryArgs),
+          relationField: queryArgs.relationField,
+          relatedFilterClause: queryArgs.relatedFilterClause,
+        },
       }
     }
     case 'COUNT_ENTITIES': {

@@ -63,11 +63,26 @@ const INTENT_KEYWORDS: Readonly<Record<AllowedIntent, readonly string[]>> = {
   FACT_LOOKUP: [
     'list',
     'show',
+    'zeige',
+    'zeig',
+    'liste',
+    'welche',
+    'welcher',
+    'welches',
+    'quels',
+    'quel',
+    'quelle',
+    'quelles',
+    'montre',
+    'affiche',
+    'combien',
     'what is',
     'what are',
     'which',
     'count',
     'how many',
+    'wieviele',
+    'wie viele',
     'overview',
     'detail',
     'details',
@@ -120,6 +135,42 @@ const STRONG_INTENT_PRIORITY: readonly AllowedIntent[] = [
   'STRATEGIC_ENRICHMENT',
 ]
 
+const FACT_LOOKUP_RELATION_CUES: readonly string[] = [
+  'support',
+  'supports',
+  'supported by',
+  'use',
+  'uses',
+  'using',
+  'host',
+  'hosts',
+  'provided by',
+  'source',
+  'target',
+  'without',
+  'transfer',
+  'transfers',
+  'transferred',
+  'ubetragen',
+  'ubertragen',
+  'uebertragen',
+  'flow',
+  'flows',
+  'carried',
+  'data',
+  'daten',
+  'donnees',
+  'données',
+  'confidential',
+  'vertraulich',
+  'confidentiel',
+  'internal',
+  'intern',
+  'public',
+  'oeffentlich',
+  'offentlich',
+]
+
 const ENTITY_SUBJECT_PATTERNS: ReadonlyArray<{
   readonly entityType: CanonicalConceptType
   readonly patterns: readonly RegExp[]
@@ -129,18 +180,28 @@ const ENTITY_SUBJECT_PATTERNS: ReadonlyArray<{
     patterns: [
       /\bbusiness capabilities?\b.*\b(?:not supported by|supported by|without)\b/,
       /\bcapabilities?\b.*\b(?:not supported by|supported by|without)\b/,
+      /\b(?:capabilities?|fahigkeiten|faehigkeiten)\b.*\b(?:durch|von)\b.*\b(?:unterstutzt|unterstützt)\b/,
+      /\b(?:welche|welcher|welches)\b.*\b(?:capabilities?|fahigkeiten|faehigkeiten)\b.*\b(?:unterstutzt|unterstützt)\b/,
     ],
   },
   {
     entityType: 'Application',
     patterns: [
+      /\b(?:which|what)\b.*\bapplications?\b.*\binterfaces?\b/,
+      /\b(?:welche|welcher|welches)\b.*\banwendungen?\b.*\b(?:schnittstellen?)\b/,
+      /\b(?:quels?|quelle|quelles?)\b.*\bapplications?\b.*\binterfaces?\b/,
       /\bapplications?\b.*\b(?:support|supports|use|uses|host|hosts)\b/,
       /\bhow many\b.*\bapplications?\b/,
     ],
   },
   {
     entityType: 'ApplicationInterface',
-    patterns: [/\binterfaces?\b.*\b(?:data|applications?)\b/],
+    patterns: [
+      /\b(?:interfaces?|schnittstellen?)\b.*\b(?:data|daten|applications?|anwendungen)\b/,
+      /\b(?:welche|welcher|welches|quels?|quelle|quelles?)\b.*\b(?:interfaces?|schnittstellen?)\b/,
+      /\b(?:interfaces?|schnittstellen?)\b.*\b(?:vertraulich|confidential|confidentiel)\b/,
+      /\b(?:ubertragen|uebertragen|transfer(?:s|red)?|transportent)\b.*\b(?:daten|data|donnees?)\b.*\b(?:interfaces?|schnittstellen?)\b/,
+    ],
   },
   {
     entityType: 'DataObject',
@@ -241,6 +302,14 @@ function buildAskClarificationDecision(
 }
 
 function inferIntentCandidates(normalized: NormalizedUserInput): readonly AllowedIntent[] {
+  const hasFactLookupRelationCue = FACT_LOOKUP_RELATION_CUES.some(keyword =>
+    normalized.canonicalText.includes(keyword)
+  )
+
+  if (hasFactLookupRelationCue) {
+    return ['FACT_LOOKUP']
+  }
+
   const matches = STRONG_INTENT_PRIORITY.filter(intent =>
     INTENT_KEYWORDS[intent].some(keyword => normalized.canonicalText.includes(keyword))
   )

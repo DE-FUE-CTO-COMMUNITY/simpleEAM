@@ -40,7 +40,13 @@ export const START_POLICY_MATRIX = {
   },
   ENTITY_RELATION_FILTER: {
     BusinessCapability: ['supportedByApplications'],
-    Application: ['supportsCapabilities', 'usesDataObjects', 'usesSoftwareProducts'],
+    Application: [
+      'supportsCapabilities',
+      'usesDataObjects',
+      'usesSoftwareProducts',
+      'sourceOfInterfaces',
+      'targetOfInterfaces',
+    ],
     ApplicationInterface: ['sourceApplications', 'targetApplications', 'dataObjects'],
     DataObject: ['usedByApplications', 'transferredInInterfaces'],
     Infrastructure: ['hostsApplications', 'usesSoftwareProducts', 'usesHardwareProducts'],

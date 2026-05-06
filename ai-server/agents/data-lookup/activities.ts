@@ -197,22 +197,62 @@ const hasCompanyScope = (query: string): boolean => {
   )
 }
 
+const normalizeQuestion = (value: string): string =>
+  value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+const inferDataClassification = (question: string): string | null => {
+  const q = normalizeQuestion(question)
+
+  if (/\b(strictly confidential|streng vertraulich|hoch vertraulich)\b/.test(q)) {
+    return 'STRICTLY_CONFIDENTIAL'
+  }
+
+  if (/\b(confidential|vertraulich)\b/.test(q)) {
+    return 'CONFIDENTIAL'
+  }
+
+  if (/\b(internal|intern)\b/.test(q)) {
+    return 'INTERNAL'
+  }
+
+  if (/\b(public|oeffentlich|offentlich)\b/.test(q)) {
+    return 'PUBLIC'
+  }
+
+  return null
+}
+
 function inferPreferredTool(question: string): string | null {
-  const q = question.toLowerCase()
+  const q = normalizeQuestion(question)
   if (
-    /(which|what|list|show).*business capabilities|business capabilities.*(which|what|list|show)/.test(
+    /(?:which|what|list|show|welche|welcher|welches|zeige|liste).*(?:business capabilities|capabilities|fahigkeiten|faehigkeiten)|(?:business capabilities|capabilities|fahigkeiten|faehigkeiten).*(?:which|what|list|show|welche|welcher|welches|zeige|liste)/.test(
       q
     )
   ) {
     return 'listBusinessCapabilities'
   }
-  if (/(which|what|list|show).*applications|applications.*(which|what|list|show)/.test(q)) {
+  if (
+    /(?:which|what|list|show|welche|welcher|welches|zeige|liste).*(?:applications|anwendungen)|(?:applications|anwendungen).*(?:which|what|list|show|welche|welcher|welches|zeige|liste)/.test(
+      q
+    )
+  ) {
     return 'listApplications'
   }
-  if (/(which|what|list|show).*interfaces|interfaces.*(which|what|list|show)/.test(q)) {
+  if (
+    /(?:which|what|list|show|welche|welcher|welches|zeige|liste).*(?:interfaces|schnittstellen)|(?:interfaces|schnittstellen).*(?:which|what|list|show|welche|welcher|welches|zeige|liste)/.test(
+      q
+    )
+  ) {
     return 'listApplicationInterfaces'
   }
-  if (/(which|what|list|show).*data objects|data objects.*(which|what|list|show)/.test(q)) {
+  if (
+    /(?:which|what|list|show|welche|welcher|welches|zeige|liste).*(?:data objects|datenobjekte|daten)|(?:data objects|datenobjekte|daten).*(?:which|what|list|show|welche|welcher|welches|zeige|liste)/.test(
+      q
+    )
+  ) {
     return 'listDataObjects'
   }
   return null
@@ -245,11 +285,12 @@ function enrichArgsFromQuestion(
   args: Record<string, unknown>,
   question: string
 ): Record<string, unknown> {
-  const q = question.toLowerCase()
+  const q = normalizeQuestion(question)
   const nextArgs: Record<string, unknown> = { ...args }
+  const dataClassification = inferDataClassification(question)
 
   if (toolName === 'listApplications') {
-    if (q.includes('interface') && q.includes('data')) {
+    if ((q.includes('interface') || q.includes('schnittstelle')) && q.includes('data')) {
       if (!nextArgs.interfaceDataObjectNameContains) {
         const m = q.match(/([a-z][a-z0-9_-]*)\s+data/)
         if (m && m[1] !== 'interface' && m[1] !== 'interfaces') {
@@ -257,6 +298,18 @@ function enrichArgsFromQuestion(
         }
       }
     }
+
+    if (dataClassification && !nextArgs.interfaceDataClassification) {
+      nextArgs.interfaceDataClassification = dataClassification
+    }
+  }
+
+  if (
+    toolName === 'listApplicationInterfaces' &&
+    dataClassification &&
+    !nextArgs.dataClassification
+  ) {
+    nextArgs.dataClassification = dataClassification
   }
 
   return nextArgs
@@ -361,6 +414,9 @@ const countResults = (data: unknown): number => {
 // Activity
 // ─────────────────────────────────────────────
 
+/**
+ * @deprecated Legacy lookup system replaced by governed query architecture.
+ */
 export async function performDataLookup(input: DataLookupInput): Promise<DataLookupOutput> {
   const companyName = input.companyName || 'the company'
   const context = input.context || ''
@@ -374,6 +430,13 @@ export async function performDataLookup(input: DataLookupInput): Promise<DataLoo
     stepId: input.stepId,
     task: limitText(input.task, 120),
     companyName,
+  })
+  console.warn('[AI QUERY][PATH]', {
+    path: 'legacy',
+    intent: null,
+    entityType: null,
+    relation: null,
+    queryId: null,
   })
 
   // ── Step 1: Select tool ───────────────────────────────────────────────────

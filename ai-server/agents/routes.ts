@@ -3,10 +3,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { verifyToken } from '../src/auth/auth-jwks'
 import { graphqlRequest } from '../src/graphql/client'
 import {
+  startAiQueryWorkflow,
   startCoordinatorWorkflow,
   startSovereigntyScoreWorkflow,
   getWorkflowStatus,
 } from '../temporal/client/temporal-client'
+import type { SupportedLocale } from '../artifacts/types'
 import {
   AiRunUseCase,
   CreateAiAuditEventInput,
@@ -167,6 +169,89 @@ const getBearerToken = (authorizationHeader?: string): string | null => {
   if (!authorizationHeader) return null
   if (!authorizationHeader.startsWith('Bearer ')) return null
   return authorizationHeader.slice(7)
+}
+
+const parseAiRunUseCase = (value: unknown): AiRunUseCase =>
+  value === 'CONVERSATIONAL_ASSISTANT' ? 'CONVERSATIONAL_ASSISTANT' : 'STRATEGIC_ENRICHMENT'
+
+const detectPromptLocale = (value: string): SupportedLocale | null => {
+  const normalized = value
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  if (
+    /\b(welche|welcher|welches|wieviele|wie viele|zeige|schnittstellen|vertraulich|daten)\b/.test(
+      normalized
+    )
+  ) {
+    return 'de'
+  }
+
+  if (/\b(which|what|show|list|how many|confidential|data)\b/.test(normalized)) {
+    return 'en'
+  }
+
+  if (/\b(quel|quels|quelle|quelles|montre|affiche|confidentiel|donnees)\b/.test(normalized)) {
+    return 'fr'
+  }
+
+  return null
+}
+
+const runGovernedQueryWorkflow = async (input: {
+  workflowId: string
+  runId: string
+  companyId: string
+  companyName: string
+  prompt: string
+  accessToken: string
+  llmConfig: { llmUrl: string; llmModel: string; llmKey: string }
+}) => {
+  console.info('[AI RUN][PATH_SELECTION]', {
+    path: 'governed',
+    intent: null,
+    entityType: null,
+    relation: null,
+    queryId: null,
+  })
+
+  await startAiQueryWorkflow({
+    workflowId: input.workflowId,
+    runId: input.runId,
+    text: input.prompt,
+    locale: detectPromptLocale(input.prompt),
+    companyId: input.companyId,
+    companyName: input.companyName,
+    accessToken: input.accessToken,
+    llmConfig: input.llmConfig,
+  })
+}
+
+const runNonQueryWorkflow = async (input: {
+  workflowId: string
+  runId: string
+  companyId: string
+  companyName: string
+  prompt: string
+  objective: string | null
+  useCase: AiRunUseCase
+  accessToken: string
+  llmConfig: { llmUrl: string; llmModel: string; llmKey: string }
+  documents: readonly DocumentInput[]
+}) => {
+  await startCoordinatorWorkflow({
+    workflowId: input.workflowId,
+    runId: input.runId,
+    companyId: input.companyId,
+    companyName: input.companyName,
+    prompt: input.prompt,
+    objective: input.objective,
+    useCase: input.useCase,
+    accessToken: input.accessToken,
+    llmConfig: input.llmConfig,
+    documents: input.documents,
+  })
 }
 
 const createApiError = (status: number, code: ApiErrorCode, message: string): ApiError => {
@@ -2462,7 +2547,7 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
   const companyId = typeof req.body?.companyId === 'string' ? req.body.companyId : ''
   const prompt = typeof req.body?.prompt === 'string' ? req.body.prompt : ''
   const objective = typeof req.body?.objective === 'string' ? req.body.objective : null
-  const useCase: AiRunUseCase = 'STRATEGIC_ENRICHMENT'
+  const useCase = parseAiRunUseCase(req.body?.useCase)
   const documents: DocumentInput[] = Array.isArray(req.body?.documents)
     ? (req.body.documents as unknown[]).filter(
         (d): d is DocumentInput =>
@@ -2576,22 +2661,36 @@ aiRunRouter.post('/ai-runs', async (req, res) => {
     })
 
     try {
-      await startCoordinatorWorkflow({
-        workflowId,
-        runId,
-        companyId,
-        companyName: company.name,
-        prompt: effectivePrompt,
-        objective,
-        useCase,
-        accessToken: token,
-        llmConfig: {
-          llmUrl: company.llmUrl!,
-          llmModel: company.llmModel!,
-          llmKey: company.llmKey!,
-        },
-        documents,
-      })
+      const llmConfig = {
+        llmUrl: company.llmUrl!,
+        llmModel: company.llmModel!,
+        llmKey: company.llmKey!,
+      }
+
+      if (useCase === 'CONVERSATIONAL_ASSISTANT') {
+        await runGovernedQueryWorkflow({
+          workflowId,
+          runId,
+          companyId,
+          companyName: company.name,
+          prompt: effectivePrompt,
+          accessToken: token,
+          llmConfig,
+        })
+      } else {
+        await runNonQueryWorkflow({
+          workflowId,
+          runId,
+          companyId,
+          companyName: company.name,
+          prompt: effectivePrompt,
+          objective,
+          useCase,
+          accessToken: token,
+          llmConfig,
+          documents,
+        })
+      }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to start workflow'
       const completedAt = new Date().toISOString()

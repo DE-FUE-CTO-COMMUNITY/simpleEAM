@@ -228,18 +228,18 @@
           "description": "Governed root collection selected by policy from SCHEMA_DIGEST."
         },
         {
-          "name": "relationField",
-          "kind": "identifier",
+          "name": "entityWhereClause",
+          "kind": "whereClause",
           "required": true,
-          "placeholder": "{{relationField}}",
-          "description": "Governed relation field validated against SCHEMA_DIGEST."
+          "placeholder": "{{entityWhereClause}}",
+          "description": "Governed root where-clause fragment built deterministically from the policy matrix and SCHEMA_DIGEST."
         },
         {
-          "name": "relatedNameContains",
-          "kind": "string",
+          "name": "detailSelectionSet",
+          "kind": "selectionSet",
           "required": true,
-          "placeholder": "{{relatedNameContains}}",
-          "description": "User-provided text applied to the related entity name."
+          "placeholder": "{{detailSelectionSet}}",
+          "description": "Governed nested selection set for the relation details needed in the response."
         },
         {
           "name": "limit",

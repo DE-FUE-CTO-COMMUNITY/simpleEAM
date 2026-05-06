@@ -4,6 +4,7 @@ import { loadArtifacts } from '../artifacts/loader'
 import type { LoadedArtifacts, SupportedLocale } from '../artifacts/types'
 import { createPlan, type CoordinatorArtifactExcerpt } from '../agents/coordinatorAdapter'
 import { executeQuery, type ExecutedQueryResult } from '../agents/dataLookupAdapter'
+import { summarizeLookupResult } from './summarizeLookupResult'
 import { ASK_CLARIFICATION, enforceCoordinatorPlan } from '../policy/enforce'
 import type { QueryId, QuerySelection } from '../policy/querySelect'
 import type { AiState, AnswerState, NormalizedState, SelectedQueryState } from '../state/aiState'
@@ -93,21 +94,6 @@ function summarizeValue(value: unknown): string {
   }
 
   return String(value)
-}
-
-function summarizeLookupResult(result: ExecutedQueryResult): string {
-  const payload = result.data
-  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
-    return `Lookup completed with ${summarizeValue(payload)}.`
-  }
-
-  const topLevelEntries = Object.entries(payload as Record<string, unknown>)
-  if (topLevelEntries.length === 0) {
-    return 'Lookup completed with an empty result set.'
-  }
-
-  const parts = topLevelEntries.map(([key, value]) => `${key}: ${summarizeValue(value)}`)
-  return `Lookup completed. ${parts.join('; ')}`
 }
 
 async function planNode(state: AiState): Promise<Partial<AiState>> {
@@ -357,7 +343,12 @@ async function explainNode(state: AiState): Promise<Partial<AiState>> {
   }
 
   const answer: AnswerState = {
-    text: summarizeLookupResult(lookupResult),
+    text: summarizeLookupResult({
+      data: lookupResult.data,
+      text: state.userInput.text,
+      locale: state.userInput.locale ?? null,
+      selectedQueryArgs: state.selectedQuery?.args ?? null,
+    }),
     confidence: 1,
     citations: [
       {

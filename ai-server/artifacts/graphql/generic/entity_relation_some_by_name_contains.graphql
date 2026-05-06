@@ -3,12 +3,13 @@ query {
     where: {
       company: { some: { id: { eq: {{companyId}} } } }
       {{statusFilterClause}}
-      {{relationField}}: { some: { name: { contains: {{relatedNameContains}} } } }
+      {{entityWhereClause}}
     }
     limit: {{limit}}
   ) {
     id
     name
     {{statusFieldSelection}}
+    {{detailSelectionSet}}
   }
 }

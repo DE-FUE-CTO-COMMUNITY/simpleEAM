@@ -143,24 +143,6 @@ interface IntentDefinition {
   requiresTraversal: boolean
 }
 
-interface RuntimePlanDefinition {
-  steps?: string[]
-  withDocuments?: string[]
-  withoutDocuments?: string[]
-}
-
-interface RoutingDefinition {
-  sequence: string[]
-}
-
-interface RoutingArtifacts {
-  routing: Record<string, RoutingDefinition>
-  runtimePlans: Record<string, RuntimePlanDefinition>
-  constraints: {
-    explanationAgentSeesFullGraph: boolean
-  }
-}
-
 type IntentSchema = Record<string, IntentDefinition>
 type ClassifiedIntent = string
 
@@ -174,10 +156,8 @@ const resolveCoordinatorArtifactPath = (fileName: string): string => {
 }
 
 const INTENT_SCHEMA_PATH = resolveCoordinatorArtifactPath('intent-schema.v1.0.0.json')
-const ROUTING_LOGIC_PATH = resolveCoordinatorArtifactPath('agent-routing-logic.v1.0.0.yaml')
 
 let intentSchemaCache: IntentSchema | null = null
-let routingArtifactsCache: RoutingArtifacts | null = null
 
 const loadIntentSchema = (): IntentSchema => {
   if (intentSchemaCache) return intentSchemaCache
@@ -187,107 +167,8 @@ const loadIntentSchema = (): IntentSchema => {
   return parsed
 }
 
-const parseRoutingArtifacts = (rawYaml: string): RoutingArtifacts => {
-  const routing: Record<string, RoutingDefinition> = {}
-  const runtimePlans: Record<string, RuntimePlanDefinition> = {}
-  let explanationAgentSeesFullGraph = false
-
-  let section = ''
-  let currentIntent = ''
-  let currentListKey = ''
-
-  for (const rawLine of rawYaml.split(/\r?\n/)) {
-    const trimmed = rawLine.trim()
-    if (!trimmed || trimmed.startsWith('#')) continue
-
-    const indent = rawLine.match(/^\s*/)?.[0].length ?? 0
-
-    if (indent === 0) {
-      currentIntent = ''
-      currentListKey = ''
-      if (trimmed === 'routing:') {
-        section = 'routing'
-      } else if (trimmed === 'runtimePlans:') {
-        section = 'runtimePlans'
-      } else if (trimmed === 'constraints:') {
-        section = 'constraints'
-      }
-      continue
-    }
-
-    if (section === 'routing') {
-      if (indent === 2 && trimmed.endsWith(':')) {
-        currentIntent = trimmed.slice(0, -1)
-        routing[currentIntent] = { sequence: [] }
-        currentListKey = ''
-        continue
-      }
-      if (indent === 4 && trimmed === 'sequence:') {
-        currentListKey = 'sequence'
-        continue
-      }
-      if (
-        indent === 6 &&
-        trimmed.startsWith('- ') &&
-        currentIntent &&
-        currentListKey === 'sequence'
-      ) {
-        routing[currentIntent].sequence = [...routing[currentIntent].sequence, trimmed.slice(2)]
-      }
-      continue
-    }
-
-    if (section === 'runtimePlans') {
-      if (indent === 2 && trimmed.endsWith(':')) {
-        currentIntent = trimmed.slice(0, -1)
-        runtimePlans[currentIntent] = {}
-        currentListKey = ''
-        continue
-      }
-      if (indent === 4 && trimmed.endsWith(':')) {
-        currentListKey = trimmed.slice(0, -1)
-        continue
-      }
-      if (indent === 6 && trimmed.startsWith('- ') && currentIntent && currentListKey) {
-        const existing = runtimePlans[currentIntent][
-          currentListKey as keyof RuntimePlanDefinition
-        ] as readonly string[] | undefined
-        runtimePlans[currentIntent] = {
-          ...runtimePlans[currentIntent],
-          [currentListKey]: [...(existing ?? []), trimmed.slice(2)],
-        }
-      }
-      continue
-    }
-
-    if (
-      section === 'constraints' &&
-      indent === 2 &&
-      trimmed.startsWith('explanationAgentSeesFullGraph:')
-    ) {
-      explanationAgentSeesFullGraph = trimmed.endsWith('true')
-    }
-  }
-
-  return {
-    routing,
-    runtimePlans,
-    constraints: {
-      explanationAgentSeesFullGraph,
-    },
-  }
-}
-
-const loadRoutingArtifacts = (): RoutingArtifacts => {
-  if (routingArtifactsCache) return routingArtifactsCache
-
-  routingArtifactsCache = parseRoutingArtifacts(readFileSync(ROUTING_LOGIC_PATH, 'utf8'))
-  return routingArtifactsCache
-}
-
 const buildIntentClassificationPrompt = (input: PlanAgentRunInput): string => {
   const intentSchema = loadIntentSchema()
-  const routingArtifacts = loadRoutingArtifacts()
 
   return [
     'You are an enterprise architecture AI intent classifier.',
@@ -304,7 +185,6 @@ const buildIntentClassificationPrompt = (input: PlanAgentRunInput): string => {
     `Available documents: ${input.documents.length > 0 ? input.documents.map(d => d.name).join(', ') : 'none'}`,
     '',
     `Intent schema (authoritative): ${JSON.stringify(intentSchema)}`,
-    `Routing intents available: ${JSON.stringify(Object.keys(routingArtifacts.routing))}`,
   ].join('\n')
 }
 
@@ -325,23 +205,12 @@ const buildClarificationPlan = (validIntents: readonly string[]): AgentPlan => (
   steps: [],
 })
 
-const buildStepTask = (
-  agentId: string,
-  prompt: string,
-  agentIds: readonly string[],
-  hasDocuments: boolean
-): string => {
+const buildStepTask = (agentId: string, prompt: string, hasDocuments: boolean): string => {
   switch (agentId) {
-    case 'data-lookup':
-      return limitText(prompt, 400)
     case 'document-research':
-      return agentIds.includes('strategy-generator')
-        ? `Extract relevant strategic information from the provided documents to support: ${limitText(prompt, 200)}`
-        : limitText(prompt, 300)
+      return `Extract relevant strategic information from the provided documents to support: ${limitText(prompt, 200)}`
     case 'internet-research':
-      return agentIds.includes('strategy-generator')
-        ? `Research current strategic context, market position, and industry context for: ${limitText(prompt, 200)}`
-        : limitText(prompt, 300)
+      return `Research current strategic context, market position, and industry context for: ${limitText(prompt, 200)}`
     case 'strategy-generator':
       return hasDocuments
         ? `Generate a comprehensive strategy proposal based on the document analysis: ${limitText(prompt, 200)}`
@@ -358,18 +227,18 @@ const buildPlanFromIntent = (intent: ClassifiedIntent, input: PlanAgentRunInput)
     return buildClarificationPlan(validIntents)
   }
 
-  const routingArtifacts = loadRoutingArtifacts()
-  const runtimePlan = routingArtifacts.runtimePlans[intent]
-  if (!runtimePlan) {
-    return buildClarificationPlan(validIntents)
+  if (intent !== 'STRATEGIC_ENRICHMENT') {
+    return {
+      reasoning:
+        'Legacy lookup system replaced by governed query architecture. Non-strategic requests must use the governed query workflow.',
+      steps: [],
+    }
   }
 
   const selectedAgentIds =
-    input.documents.length > 0 && runtimePlan.withDocuments
-      ? runtimePlan.withDocuments
-      : input.documents.length === 0 && runtimePlan.withoutDocuments
-        ? runtimePlan.withoutDocuments
-        : (runtimePlan.steps ?? [])
+    input.documents.length > 0
+      ? (['document-research', 'strategy-generator'] as const)
+      : (['internet-research', 'strategy-generator'] as const)
 
   const validAgentIds = new Set(agentRegistry.getAll().map(agent => agent.id))
   const planSteps = selectedAgentIds
@@ -377,7 +246,7 @@ const buildPlanFromIntent = (intent: ClassifiedIntent, input: PlanAgentRunInput)
     .map((agentId, index) => ({
       stepId: `${index + 1}`,
       agentId,
-      task: buildStepTask(agentId, input.prompt, selectedAgentIds, input.documents.length > 0),
+      task: buildStepTask(agentId, input.prompt, input.documents.length > 0),
       dependsOn: index === 0 ? [] : [`${index}`],
       documents:
         agentId === 'document-research' && input.documents.length > 0 ? input.documents : undefined,
@@ -388,7 +257,7 @@ const buildPlanFromIntent = (intent: ClassifiedIntent, input: PlanAgentRunInput)
   }
 
   return {
-    reasoning: `Artifact-driven routing selected intent ${intent}.`,
+    reasoning: `Policy-driven strategic routing selected intent ${intent}.`,
     steps: planSteps,
   }
 }

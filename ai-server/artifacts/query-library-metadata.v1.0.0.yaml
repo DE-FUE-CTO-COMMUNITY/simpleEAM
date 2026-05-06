@@ -79,7 +79,7 @@ queries:
       - artifacts/query-library.json
   - queryId: entity.relation.someByNameContains
     kind: list
-    description: Generic governed relation traversal with name filters.
+    description: Generic governed relation traversal with deterministic related-entity filters.
     rootQueries:
       - applications
       - businessCapabilities

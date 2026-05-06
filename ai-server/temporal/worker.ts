@@ -7,6 +7,7 @@ import * as documentResearchActivities from '../agents/document-research/activit
 import * as strategyGeneratorActivities from '../agents/strategy-generator/activities'
 import * as qualityControlActivities from '../agents/quality-control/activities'
 import * as sovereigntyActivities from './sovereignty/activities'
+// Legacy lookup system replaced by governed query architecture.
 import * as legacyDataLookupActivities from '../agents/data-lookup/activities'
 import * as temporalActivities from './activities'
 
