@@ -7,6 +7,7 @@ import type {
   QueryLibraryEntry,
 } from '../artifacts/types'
 import type { EntityHint } from '../state/plan'
+import type { SemanticAmbiguity, SemanticConstraint } from './semanticTypes'
 import {
   START_POLICY_MATRIX,
   START_POLICY_MATRIX_ENTITY_TYPES,
@@ -60,6 +61,11 @@ const RELATION_PATTERNS: Readonly<Partial<Record<string, readonly RegExp[]>>> = 
     /\b(?:data|data objects?|daten(?:objekte?)?|donnees?|données?)\b/i,
     /\b(?:transfer(?:s|red)?|flow(?:s)?|carried|ubertragen|uebertragen|transportent)\b.*\b(?:data|daten|donnees?|données?)\b/i,
   ],
+  hostedOn: [
+    /\b(?:run|runs|running|hosted)\b.*\b(?:on|in)\b.*\b(?:kubernetes|cluster|cloud|infrastructure|platform|physical|server)\b/i,
+    /\bkubernetes cluster\b/i,
+    /\bphysical server\b/i,
+  ],
   hostsApplications: [/\bhost(?:s|ed|ing)?\b.*\bapplications?\b/i],
   providedBy: [/\bprovided by\b/i],
   softwareProduct: [/\bsoftware products?\b/i],
@@ -95,38 +101,6 @@ const STATUS_KEYWORDS: ReadonlyArray<{ enumValue: string; keywords: readonly str
   { enumValue: 'OUT_OF_SERVICE', keywords: ['out of service'] },
 ] as const
 
-const DATA_CLASSIFICATION_KEYWORDS: ReadonlyArray<{
-  enumValue: string
-  keywords: readonly string[]
-}> = [
-  {
-    enumValue: 'STRICTLY_CONFIDENTIAL',
-    keywords: ['strictly confidential', 'streng vertraulich', 'hautement confidentiel'],
-  },
-  {
-    enumValue: 'CONFIDENTIAL',
-    keywords: ['confidential', 'vertraulich', 'confidentiel'],
-  },
-  {
-    enumValue: 'INTERNAL',
-    keywords: ['internal', 'intern', 'interne'],
-  },
-  {
-    enumValue: 'PUBLIC',
-    keywords: ['public', 'oeffentlich', 'offentlich', 'publique'],
-  },
-] as const
-
-const CLOUD_ENVIRONMENT_KEYWORDS: ReadonlyArray<{
-  value: string
-  keywords: readonly string[]
-}> = [
-  { value: 'AWS', keywords: ['aws', 'amazon web services'] },
-  { value: 'AZURE', keywords: ['azure', 'microsoft azure'] },
-  { value: 'GCP', keywords: ['gcp', 'google cloud', 'google cloud platform'] },
-  { value: 'CLOUD', keywords: ['cloud', 'cloud-based'] },
-] as const
-
 export type QueryId = keyof typeof QUERY_PARAMETER_RULES
 
 export interface QueryParameterPolicy {
@@ -155,6 +129,8 @@ export interface SelectAllowedQueryIdsArgs {
   readonly entityType: CanonicalConceptType
   readonly text: string
   readonly normalizedText?: string
+  readonly semanticConstraints?: readonly SemanticConstraint[]
+  readonly semanticAmbiguities?: readonly SemanticAmbiguity[]
   readonly entityHint?: EntityHint | null
   readonly artifacts: Pick<
     LoadedArtifacts,
@@ -293,38 +269,6 @@ function detectRelationField(
   return null
 }
 
-function extractRelatedName(
-  text: string,
-  entityHint: EntityHint | null | undefined
-): string | null {
-  const explicitName = extractEntityName(entityHint)
-  if (explicitName) {
-    return explicitName
-  }
-
-  const quotedTerm = extractQuotedTerm(text)
-  if (quotedTerm) {
-    return quotedTerm
-  }
-
-  const relationMatch = text.match(
-    /\b(?:support|supports|supported by|use|uses|using|host|hosts|hosted by|provided by)\s+(.+?)\s+(?:capabilities?|applications?|process(?:es)?|data objects?|software products?|hardware products?|interfaces?|infrastructure)\b/i
-  )
-  if (relationMatch?.[1]?.trim()) {
-    return relationMatch[1].trim()
-  }
-
-  const passiveGermanMatch = text.match(/\bdurch\s+(.+?)\s+(?:unterstutzt|unterstützt)\b/i)
-  if (passiveGermanMatch?.[1]?.trim()) {
-    return passiveGermanMatch[1].trim()
-  }
-
-  const passiveEnglishMatch = text.match(
-    /\b(?:supported by|used by|hosted by|provided by)\s+(.+?)(?:[?.!,]|$)/i
-  )
-  return passiveEnglishMatch?.[1]?.trim() || null
-}
-
 function toGraphqlStringLiteral(value: string): string {
   return JSON.stringify(value)
 }
@@ -339,73 +283,6 @@ function resolveStatusEnum(normalizedText: string): string | null {
   return null
 }
 
-function resolveDataClassification(
-  normalizedText: string,
-  artifacts: Pick<LoadedArtifacts, 'schemaDigest'>
-): string | null {
-  const allowedValues = artifacts.schemaDigest.enumValues.DataClassification
-  if (!allowedValues) {
-    return null
-  }
-
-  for (const candidate of DATA_CLASSIFICATION_KEYWORDS) {
-    if (
-      allowedValues.includes(candidate.enumValue) &&
-      candidate.keywords.some(keyword => normalizedText.includes(normalizeText(keyword)))
-    ) {
-      return candidate.enumValue
-    }
-  }
-
-  return null
-}
-
-function resolveHostingEnvironmentContains(normalizedText: string): string | null {
-  for (const candidate of CLOUD_ENVIRONMENT_KEYWORDS) {
-    if (candidate.keywords.some(keyword => normalizedText.includes(normalizeText(keyword)))) {
-      return candidate.value
-    }
-  }
-
-  return null
-}
-
-function resolveRelationFilterClause(
-  entityType: CanonicalConceptType,
-  relationField: string,
-  args: SelectAllowedQueryIdsArgs,
-  normalizedText: string
-): { value?: string; reason?: string } {
-  if (
-    entityType === 'Application' &&
-    (relationField === 'sourceOfInterfaces' || relationField === 'targetOfInterfaces') &&
-    hasInterfaceMention(normalizedText)
-  ) {
-    const dataClassification = resolveDataClassification(normalizedText, args.artifacts)
-    if (dataClassification) {
-      return { value: `classification: { eq: ${dataClassification} }` }
-    }
-  }
-
-  if (entityType === 'ApplicationInterface' && relationField === 'dataObjects') {
-    const dataClassification = resolveDataClassification(normalizedText, args.artifacts)
-    if (dataClassification) {
-      return { value: `classification: { eq: ${dataClassification} }` }
-    }
-  }
-
-  const relatedNameContains = extractRelatedName(args.text, args.entityHint)
-  if (!relatedNameContains) {
-    return {
-      reason: `ENTITY_RELATION_FILTER for ${entityType} requires a deterministic related-name fragment or governed enum filter.`,
-    }
-  }
-
-  return {
-    value: `name: { contains: ${toGraphqlStringLiteral(relatedNameContains)} }`,
-  }
-}
-
 function hasInterfaceMention(normalizedText: string): boolean {
   return /\b(?:interfaces?|schnittstellen?)\b/i.test(normalizedText)
 }
@@ -414,48 +291,118 @@ function buildDetailSelectionSet(relationField: string, relationDetailSelection:
   return `${relationField} {\n      ${relationDetailSelection}\n    }`
 }
 
-function buildApplicationInterfaceWhereClause(relatedFilterClause: string): string {
-  return [
-    'OR: [',
-    `        { sourceOfInterfaces: { some: { dataObjects: { some: { ${relatedFilterClause} } } } } }`,
-    `        { targetOfInterfaces: { some: { dataObjects: { some: { ${relatedFilterClause} } } } } }`,
-    '      ]',
-  ].join('\n')
-}
-
-function buildApplicationInterfaceDetailSelectionSet(): string {
-  const interfaceSelection = [
-    'id',
-    'name',
-    'dataObjects {',
-    '          id',
-    '          name',
-    '          classification',
-    '        }',
-  ].join('\n        ')
-
-  return [
-    buildDetailSelectionSet('sourceOfInterfaces', interfaceSelection),
-    buildDetailSelectionSet('targetOfInterfaces', interfaceSelection),
-  ].join('\n    ')
-}
-
-function buildApplicationHostingEnvironmentDetailSelectionSet(relationField: string): string {
-  return buildDetailSelectionSet(
-    relationField,
-    ['id', 'name', 'hostingEnvironment'].join('\n        ')
-  )
-}
-
-function resolveRelationDetailSelection(
-  entityType: CanonicalConceptType,
-  relationField: string
-): string {
-  if (entityType === 'ApplicationInterface' && relationField === 'dataObjects') {
-    return ['id', 'name', 'classification'].join('\n        ')
+function buildFilterClause(constraint: SemanticConstraint): string {
+  if (constraint.operator === 'contains') {
+    return `${constraint.path.split('.').at(-1)}: { contains: ${toGraphqlStringLiteral(constraint.value)} }`
   }
 
-  return ['id', 'name'].join('\n        ')
+  return `${constraint.path.split('.').at(-1)}: { eq: ${constraint.value} }`
+}
+
+function buildNestedWhereClause(pathSegments: readonly string[], leafClause: string): string {
+  if (pathSegments.length === 0) {
+    return leafClause
+  }
+
+  const [head, ...tail] = pathSegments
+  return `${head}: { some: { ${buildNestedWhereClause(tail, leafClause)} } }`
+}
+
+function buildEntityWhereClause(constraints: readonly SemanticConstraint[]): string {
+  const clauses = constraints.map(constraint => {
+    const segments = constraint.path.split('.')
+    if (segments.length === 1) {
+      return buildFilterClause(constraint)
+    }
+
+    return buildNestedWhereClause(segments.slice(0, -1), buildFilterClause(constraint))
+  })
+
+  if (clauses.length === 1) {
+    return clauses[0]
+  }
+
+  return `OR: [\n        ${clauses.map(clause => `{ ${clause} }`).join('\n        ')}\n      ]`
+}
+
+interface SelectionNode {
+  readonly fields: Set<string>
+  readonly children: Map<string, SelectionNode>
+}
+
+function createSelectionNode(): SelectionNode {
+  return {
+    fields: new Set<string>(),
+    children: new Map<string, SelectionNode>(),
+  }
+}
+
+function addPathToSelection(node: SelectionNode, pathSegments: readonly string[]): void {
+  if (pathSegments.length === 0) {
+    return
+  }
+
+  if (pathSegments.length === 1) {
+    node.fields.add(pathSegments[0])
+    return
+  }
+
+  const [head, ...tail] = pathSegments
+  const childNode = node.children.get(head) ?? createSelectionNode()
+  node.children.set(head, childNode)
+  addPathToSelection(childNode, tail)
+}
+
+function renderSelectionNode(node: SelectionNode, indent: string): string {
+  const fieldLines = [...node.fields].sort((left, right) => left.localeCompare(right))
+  const childLines = [...node.children.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([relationName, childNode]) => {
+      const childSelection = renderSelectionNode(childNode, `${indent}  `)
+      return `${relationName} {\n${indent}  id\n${indent}  name${childSelection ? `\n${indent}  ${childSelection.replace(/\n/g, `\n${indent}  `)}` : ''}\n${indent}}`
+    })
+
+  return [...fieldLines, ...childLines].join(`\n${indent}`)
+}
+
+function buildDetailSelectionSetFromConstraints(constraints: readonly SemanticConstraint[]): string {
+  const rootNode = createSelectionNode()
+
+  for (const constraint of constraints) {
+    addPathToSelection(rootNode, constraint.path.split('.'))
+  }
+
+  return renderSelectionNode(rootNode, '      ')
+}
+
+function getRelationFieldFromConstraints(
+  constraints: readonly SemanticConstraint[]
+): string | null {
+  const relationHeads = constraints
+    .map(constraint => constraint.path.split('.'))
+    .filter(segments => segments.length > 1)
+    .map(segments => segments[0])
+
+  if (relationHeads.length === 0) {
+    return null
+  }
+
+  return relationHeads.every(relationHead => relationHead === relationHeads[0])
+    ? relationHeads[0]
+    : null
+}
+
+function getRelatedFilterClauseFromConstraints(
+  constraints: readonly SemanticConstraint[]
+): string | null {
+  if (constraints.length === 0) {
+    return null
+  }
+
+  const firstLeafClause = buildFilterClause(constraints[0])
+  return constraints.every(constraint => buildFilterClause(constraint) === firstLeafClause)
+    ? firstLeafClause
+    : null
 }
 
 function resolveSearchTerm(text: string, entityHint: EntityHint | null | undefined): string | null {
@@ -471,6 +418,12 @@ function resolveSearchTerm(text: string, entityHint: EntityHint | null | undefin
 
   const forMatch = text.match(/\b(?:for|named)\s+([^?.!,]+)$/i)
   return forMatch?.[1]?.trim() || null
+}
+
+function getSemanticConstraintsForEntity(args: SelectAllowedQueryIdsArgs): readonly SemanticConstraint[] {
+  return (args.semanticConstraints ?? []).filter(
+    constraint => constraint.entityType === args.entityType
+  )
 }
 
 function getRootSelection(
@@ -649,6 +602,16 @@ function resolveQueryForm(
 
   const entityId = extractEntityId(args.entityHint)
   const searchTerm = resolveSearchTerm(args.text, args.entityHint)
+  const semanticConstraints = getSemanticConstraintsForEntity(args)
+
+  if (args.semanticAmbiguities?.length) {
+    return {
+      queryForm: null,
+      reason: `Semantic interpretation is ambiguous across: ${args.semanticAmbiguities
+        .map(ambiguity => ambiguity.candidatePaths.join(', '))
+        .join(' / ')}.`,
+    }
+  }
 
   if (allowedQueryForms.includes('COUNT_ENTITIES') && hasCountKeywords(normalizedText)) {
     return { queryForm: 'COUNT_ENTITIES' }
@@ -662,7 +625,7 @@ function resolveQueryForm(
     return { queryForm: 'ENTITY_GAP_ANALYSIS' }
   }
 
-  if (allowedQueryForms.includes('ENTITY_RELATION_FILTER') && detectedRelationField) {
+  if (allowedQueryForms.includes('ENTITY_RELATION_FILTER') && (detectedRelationField || semanticConstraints.length > 0)) {
     return { queryForm: 'ENTITY_RELATION_FILTER' }
   }
 
@@ -702,6 +665,7 @@ function buildSelectedArgs(
   graphqlEntry: GraphqlQueryLibraryEntry
 ): { args?: Readonly<Record<string, unknown>>; reason?: string } {
   const allowedRelations = getAllowedRelations(queryForm, args.entityType)
+  const semanticConstraints = getSemanticConstraintsForEntity(args)
   if (!allowedRelations) {
     return {
       reason: `Entity type "${args.entityType}" is not governed by the start policy matrix for ${queryForm}.`,
@@ -720,15 +684,18 @@ function buildSelectedArgs(
   }
 
   if (queryForm === 'ENTITY_RELATION_FILTER' || queryForm === 'ENTITY_GAP_ANALYSIS') {
-    if (!detectedRelationField) {
+    const semanticRelationField = getRelationFieldFromConstraints(semanticConstraints)
+    const effectiveRelationField = semanticRelationField ?? detectedRelationField
+
+    if (!effectiveRelationField && semanticConstraints.length === 0) {
       return {
         reason: `${queryForm} for ${args.entityType} requires one allowed relation. Allowed relations: ${formatAllowedRelations(allowedRelations)}.`,
       }
     }
 
-    if (!allowedRelations.includes(detectedRelationField)) {
+    if (effectiveRelationField && !allowedRelations.includes(effectiveRelationField)) {
       return {
-        reason: `Relation "${detectedRelationField}" is not allowed for ${queryForm} on ${args.entityType}. Allowed relations: ${formatAllowedRelations(allowedRelations)}.`,
+        reason: `Relation "${effectiveRelationField}" is not allowed for ${queryForm} on ${args.entityType}. Allowed relations: ${formatAllowedRelations(allowedRelations)}.`,
       }
     }
   }
@@ -777,61 +744,28 @@ function buildSelectedArgs(
       }
     }
     case 'ENTITY_RELATION_FILTER': {
-      if (!detectedRelationField) {
+      const effectiveConstraints = semanticConstraints.length > 0 ? semanticConstraints : []
+      if (effectiveConstraints.length === 0 && !detectedRelationField) {
         return {
-          reason: `ENTITY_RELATION_FILTER for ${args.entityType} requires one allowed relation.`,
+          reason: `ENTITY_RELATION_FILTER for ${args.entityType} requires a semantic constraint or one allowed relation.`,
         }
       }
 
-      const relationFilterClause = resolveRelationFilterClause(
-        args.entityType,
-        detectedRelationField,
-        args,
-        normalizedText
-      )
-      if (!relationFilterClause.value) {
-        return { reason: relationFilterClause.reason }
+      if (effectiveConstraints.length === 0) {
+        return {
+          reason: `ENTITY_RELATION_FILTER for ${args.entityType} requires semantic constraints under the generic semantic layer.`,
+        }
       }
 
-      const isApplicationInterfaceRelation =
-        args.entityType === 'Application' &&
-        hasInterfaceMention(normalizedText) &&
-        (detectedRelationField === 'sourceOfInterfaces' ||
-          detectedRelationField === 'targetOfInterfaces')
-
-      const hostingEnvironmentContains =
-        args.entityType === 'BusinessCapability' &&
-        detectedRelationField === 'supportedByApplications'
-          ? resolveHostingEnvironmentContains(normalizedText)
-          : null
-
-      const isApplicationHostingEnvironmentRelation = Boolean(hostingEnvironmentContains)
-      const resolvedHostingEnvironmentContains = hostingEnvironmentContains ?? ''
+      const effectiveRelationField = getRelationFieldFromConstraints(effectiveConstraints)
 
       const queryArgs = {
         ...commonArgs,
         limit: 50,
-        entityWhereClause: isApplicationInterfaceRelation
-          ? buildApplicationInterfaceWhereClause(relationFilterClause.value)
-          : isApplicationHostingEnvironmentRelation
-            ? `${detectedRelationField}: { some: { hostingEnvironment: { contains: ${toGraphqlStringLiteral(
-                resolvedHostingEnvironmentContains
-              )} } } }`
-            : `${detectedRelationField}: { some: { ${relationFilterClause.value} } }`,
-        detailSelectionSet: isApplicationInterfaceRelation
-          ? buildApplicationInterfaceDetailSelectionSet()
-          : isApplicationHostingEnvironmentRelation
-            ? buildApplicationHostingEnvironmentDetailSelectionSet(detectedRelationField)
-            : buildDetailSelectionSet(
-                detectedRelationField,
-                resolveRelationDetailSelection(args.entityType, detectedRelationField)
-              ),
-        relationField: detectedRelationField,
-        relatedFilterClause: isApplicationHostingEnvironmentRelation
-          ? `hostingEnvironment: { contains: ${toGraphqlStringLiteral(
-              resolvedHostingEnvironmentContains
-            )} }`
-          : relationFilterClause.value,
+        entityWhereClause: buildEntityWhereClause(effectiveConstraints),
+        detailSelectionSet: buildDetailSelectionSetFromConstraints(effectiveConstraints),
+        relationField: effectiveRelationField,
+        relatedFilterClause: getRelatedFilterClauseFromConstraints(effectiveConstraints),
       }
 
       return {
@@ -876,7 +810,9 @@ export function getRequiredParametersForQueryId(queryId: QueryId): readonly stri
 
 export function selectAllowedQueryIds(args: SelectAllowedQueryIdsArgs): QuerySelection {
   const normalizedText = args.normalizedText?.trim() || normalizeText(args.text)
-  const detectedRelationField = detectRelationField(args.entityType, normalizedText, args.artifacts)
+  const semanticRelationField = getRelationFieldFromConstraints(getSemanticConstraintsForEntity(args))
+  const detectedRelationField =
+    semanticRelationField ?? detectRelationField(args.entityType, normalizedText, args.artifacts)
   const queryFormResolution = resolveQueryForm(args, normalizedText, detectedRelationField)
 
   if (!queryFormResolution.queryForm) {

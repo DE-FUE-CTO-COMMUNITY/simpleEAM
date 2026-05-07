@@ -4,7 +4,7 @@ import { loadArtifacts } from '../artifacts/loader'
 import type { LoadedArtifacts, SupportedLocale } from '../artifacts/types'
 import { createPlan, type CoordinatorArtifactExcerpt } from '../agents/coordinatorAdapter'
 import { executeQuery, type ExecutedQueryResult } from '../agents/dataLookupAdapter'
-import { summarizeLookupResult } from './summarizeLookupResult'
+import { responseFormatter } from '../formatting/responseFormatter'
 import { ASK_CLARIFICATION, enforceCoordinatorPlan } from '../policy/enforce'
 import type { QueryId, QuerySelection } from '../policy/querySelect'
 import type { AiState, AnswerState, NormalizedState, SelectedQueryState } from '../state/aiState'
@@ -225,6 +225,8 @@ async function enforceNode(state: AiState): Promise<Partial<AiState>> {
             ? state.plan.entityHint.description
             : null,
         tokens: decision.normalized.tokens,
+        semanticConstraints: decision.normalized.semanticConstraints,
+        semanticAmbiguities: decision.normalized.semanticAmbiguities,
       },
       steps: appendStateStep(
         state.steps,
@@ -246,6 +248,8 @@ async function enforceNode(state: AiState): Promise<Partial<AiState>> {
           ? decision.plan.entityHint.description
           : null,
       tokens: decision.normalized.tokens,
+      semanticConstraints: decision.normalized.semanticConstraints,
+      semanticAmbiguities: decision.normalized.semanticAmbiguities,
     },
     clarification: null,
     steps: appendStateStep(
@@ -342,13 +346,21 @@ async function explainNode(state: AiState): Promise<Partial<AiState>> {
     throw new Error('explainNode requires lookup results from lookupNode.')
   }
 
+  const relationType =
+    typeof state.selectedQuery?.args?.relationField === 'string'
+      ? state.selectedQuery.args.relationField
+      : null
+  const formatted = responseFormatter.format(lookupResult.data, {
+    text: state.userInput.text,
+    locale: state.userInput.locale ?? null,
+    intent: state.plan?.intent ?? null,
+    entityType: state.plan?.entityHint?.entityType ?? null,
+    relationType,
+    selectedQueryArgs: state.selectedQuery?.args ?? null,
+  })
+
   const answer: AnswerState = {
-    text: summarizeLookupResult({
-      data: lookupResult.data,
-      text: state.userInput.text,
-      locale: state.userInput.locale ?? null,
-      selectedQueryArgs: state.selectedQuery?.args ?? null,
-    }),
+    text: formatted,
     confidence: 1,
     citations: [
       {

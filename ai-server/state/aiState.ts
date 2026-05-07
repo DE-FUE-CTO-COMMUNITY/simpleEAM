@@ -1,5 +1,6 @@
 import type { Clarification, Plan, SupportedLocale } from './plan'
 import type { StepEvent } from './trajectory'
+import type { SemanticAmbiguity, SemanticConstraint } from '../policy/semanticTypes'
 
 export interface UserInputState {
   readonly text: string
@@ -12,6 +13,8 @@ export interface NormalizedState {
   readonly locale?: SupportedLocale | null
   readonly requestedEntityDescription?: string | null
   readonly tokens?: readonly string[]
+  readonly semanticConstraints?: readonly SemanticConstraint[]
+  readonly semanticAmbiguities?: readonly SemanticAmbiguity[]
 }
 
 export interface SelectedQueryState {

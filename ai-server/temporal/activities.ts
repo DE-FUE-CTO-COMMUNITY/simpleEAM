@@ -2,7 +2,7 @@ import { loadArtifacts } from '../artifacts/loader'
 import type { SupportedLocale } from '../artifacts/types'
 import { createPlan } from '../agents/coordinatorAdapter'
 import { executeQuery } from '../agents/dataLookupAdapter'
-import { summarizeLookupResult } from '../graph/summarizeLookupResult'
+import { responseFormatter } from '../formatting/responseFormatter'
 import { ASK_CLARIFICATION, enforceCoordinatorPlan } from '../policy/enforce'
 import type { QueryId } from '../policy/querySelect'
 import type { AiState, AnswerState, SelectedQueryState } from '../state/aiState'
@@ -109,6 +109,8 @@ export async function coordinatorPlanActivity(
             ? planResult.plan.entityHint.description
             : null,
         tokens: policyDecision.normalized.tokens,
+        semanticConstraints: policyDecision.normalized.semanticConstraints,
+        semanticAmbiguities: policyDecision.normalized.semanticAmbiguities,
       },
       steps: appendStateStep(
         input.state.steps,
@@ -162,6 +164,8 @@ export async function coordinatorPlanActivity(
           ? policyDecision.plan.entityHint.description
           : null,
       tokens: policyDecision.normalized.tokens,
+      semanticConstraints: policyDecision.normalized.semanticConstraints,
+      semanticAmbiguities: policyDecision.normalized.semanticAmbiguities,
     },
     selectedQuery,
     clarification: null,
@@ -243,13 +247,20 @@ export async function dataLookupActivity(input: DataLookupActivityInput): Promis
 }
 
 export async function explainActivity(input: ExplainActivityInput): Promise<AiState> {
+  const relationType =
+    typeof input.state.selectedQuery?.args?.relationField === 'string'
+      ? input.state.selectedQuery.args.relationField
+      : null
+  const formatted = responseFormatter.format(input.state.data, {
+    text: input.state.userInput.text,
+    locale: input.state.userInput.locale ?? null,
+    intent: input.state.plan?.intent ?? null,
+    entityType: input.state.plan?.entityHint?.entityType ?? null,
+    relationType,
+    selectedQueryArgs: input.state.selectedQuery?.args ?? null,
+  })
   const answer: AnswerState = {
-    text: summarizeLookupResult({
-      data: input.state.data,
-      text: input.state.userInput.text,
-      locale: input.state.userInput.locale ?? null,
-      selectedQueryArgs: input.state.selectedQuery?.args ?? null,
-    }),
+    text: formatted,
     confidence: 1,
     citations: input.state.selectedQuery
       ? [

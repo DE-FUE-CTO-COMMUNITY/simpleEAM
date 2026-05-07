@@ -46,6 +46,7 @@ export const START_POLICY_MATRIX = {
       'usesSoftwareProducts',
       'sourceOfInterfaces',
       'targetOfInterfaces',
+      'hostedOn',
     ],
     ApplicationInterface: ['sourceApplications', 'targetApplications', 'dataObjects'],
     DataObject: ['usedByApplications', 'transferredInInterfaces'],

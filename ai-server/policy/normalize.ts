@@ -4,6 +4,7 @@ import type {
   LoadedArtifacts,
   SupportedLocale,
 } from '../artifacts/types'
+import type { SemanticAmbiguity, SemanticConstraint } from './semanticTypes'
 
 export interface ConceptMatch {
   readonly entityType: CanonicalConceptType
@@ -21,6 +22,8 @@ export interface NormalizedUserInput {
   readonly conceptMatches: readonly ConceptMatch[]
   readonly candidateEntityTypes: readonly CanonicalConceptType[]
   readonly preferredEntityType: CanonicalConceptType | null
+  readonly semanticConstraints: readonly SemanticConstraint[]
+  readonly semanticAmbiguities: readonly SemanticAmbiguity[]
 }
 
 export interface NormalizeUserInputArgs {
@@ -181,5 +184,7 @@ export function normalizeUserInput(args: NormalizeUserInputArgs): NormalizedUser
     conceptMatches,
     candidateEntityTypes,
     preferredEntityType: candidateEntityTypes.length === 1 ? candidateEntityTypes[0] : null,
+    semanticConstraints: [],
+    semanticAmbiguities: [],
   }
 }

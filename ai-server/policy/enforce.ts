@@ -9,6 +9,7 @@ import type { Clarification, EntityHint, Plan } from '../state/plan'
 import type { JsonValue } from '../state/plan.schema'
 import { planSchema } from '../state/plan'
 import { normalizeUserInput, type NormalizedUserInput } from './normalize'
+import { extractConstraints } from './semanticConstraintExtractor'
 import {
   getRequiredParametersForQueryId,
   selectAllowedQueryIds,
@@ -139,11 +140,18 @@ const FACT_LOOKUP_RELATION_CUES: readonly string[] = [
   'support',
   'supports',
   'supported by',
+  'run in',
+  'run on',
+  'runs in',
+  'runs on',
+  'running in',
+  'running on',
   'use',
   'uses',
   'using',
   'host',
   'hosts',
+  'hosted on',
   'provided by',
   'source',
   'target',
@@ -169,6 +177,9 @@ const FACT_LOOKUP_RELATION_CUES: readonly string[] = [
   'public',
   'oeffentlich',
   'offentlich',
+  'kubernetes',
+  'cluster',
+  'physical server',
 ]
 
 const ENTITY_SUBJECT_PATTERNS: ReadonlyArray<{
@@ -188,6 +199,7 @@ const ENTITY_SUBJECT_PATTERNS: ReadonlyArray<{
     entityType: 'Application',
     patterns: [
       /\b(?:which|what)\b.*\bapplications?\b.*\binterfaces?\b/,
+      /\b(?:which|what)\b.*\bapplications?\b.*\b(?:run|runs|running|hosted)\b.*\b(?:cluster|kubernetes|cloud)\b/,
       /\b(?:welche|welcher|welches)\b.*\banwendungen?\b.*\b(?:schnittstellen?)\b/,
       /\b(?:quels?|quelle|quelles?)\b.*\bapplications?\b.*\binterfaces?\b/,
       /\bapplications?\b.*\b(?:support|supports|use|uses|host|hosts)\b/,
@@ -302,6 +314,10 @@ function buildAskClarificationDecision(
 }
 
 function inferIntentCandidates(normalized: NormalizedUserInput): readonly AllowedIntent[] {
+  if (normalized.semanticConstraints.length > 0 || normalized.semanticAmbiguities.length > 0) {
+    return ['FACT_LOOKUP']
+  }
+
   const hasFactLookupRelationCue = FACT_LOOKUP_RELATION_CUES.some(keyword =>
     normalized.canonicalText.includes(keyword)
   )
@@ -570,13 +586,38 @@ function assertSchemaDigestGovernance(artifacts: LoadedArtifacts): void {
 export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): PolicyDecision {
   assertSchemaDigestGovernance(args.artifacts)
 
-  const normalized = normalizeUserInput({
+  const baseNormalized = normalizeUserInput({
     text: args.text,
     locale: args.locale ?? null,
     artifacts: args.artifacts,
   })
 
   const reasons: string[] = []
+
+  const resolvedEntityType = resolveEntityType(args.plan, baseNormalized, args.artifacts)
+  if (!resolvedEntityType.value) {
+    if (resolvedEntityType.reason) {
+      reasons.push(resolvedEntityType.reason)
+    }
+    return buildAskClarificationDecision(
+      baseNormalized,
+      reasons,
+      [],
+      resolvedEntityType.candidates
+    )
+  }
+
+  const semanticExtraction = extractConstraints(
+    args.text,
+    resolvedEntityType.value,
+    args.artifacts.schemaDigest
+  )
+  const normalized: NormalizedUserInput = {
+    ...baseNormalized,
+    semanticConstraints: semanticExtraction.constraints,
+    semanticAmbiguities: semanticExtraction.ambiguities,
+  }
+
   const resolvedIntent = resolveIntent(args.plan.intent, normalized, args.artifacts)
   if (!resolvedIntent.value) {
     if (resolvedIntent.reason) {
@@ -586,20 +627,19 @@ export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): Policy
       normalized,
       reasons,
       resolvedIntent.candidates,
-      normalized.candidateEntityTypes
+      [resolvedEntityType.value]
     )
   }
 
-  const resolvedEntityType = resolveEntityType(args.plan, normalized, args.artifacts)
-  if (!resolvedEntityType.value) {
-    if (resolvedEntityType.reason) {
-      reasons.push(resolvedEntityType.reason)
-    }
+  if (normalized.semanticAmbiguities.length > 0) {
+    const ambiguity = normalized.semanticAmbiguities[0]
     return buildAskClarificationDecision(
       normalized,
-      reasons,
+      [
+        `Semantic interpretation is ambiguous for value "${ambiguity.value}" across: ${ambiguity.candidatePaths.join(', ')}.`,
+      ],
       [resolvedIntent.value],
-      resolvedEntityType.candidates
+      [resolvedEntityType.value]
     )
   }
 
@@ -621,6 +661,8 @@ export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): Policy
     entityType: resolvedEntityType.value,
     text: args.text,
     normalizedText: normalized.canonicalText,
+    semanticConstraints: normalized.semanticConstraints,
+    semanticAmbiguities: normalized.semanticAmbiguities,
     entityHint,
     artifacts: args.artifacts,
   })
