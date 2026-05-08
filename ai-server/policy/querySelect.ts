@@ -291,9 +291,30 @@ function buildDetailSelectionSet(relationField: string, relationDetailSelection:
   return `${relationField} {\n      ${relationDetailSelection}\n    }`
 }
 
+function titleCaseWords(value: string): string {
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map(token => token.charAt(0).toUpperCase() + token.slice(1).toLowerCase())
+    .join(' ')
+}
+
+function buildContainsLeafClause(fieldName: string, value: string): string {
+  const variants = [...new Set([value, value.toLowerCase(), value.toUpperCase(), titleCaseWords(value)])]
+    .filter(candidate => candidate.trim().length > 0)
+
+  if (variants.length === 1) {
+    return `${fieldName}: { contains: ${toGraphqlStringLiteral(variants[0])} }`
+  }
+
+  return `OR: [${variants
+    .map(candidate => `{ ${fieldName}: { contains: ${toGraphqlStringLiteral(candidate)} } }`)
+    .join(', ')}]`
+}
+
 function buildFilterClause(constraint: SemanticConstraint): string {
   if (constraint.operator === 'contains') {
-    return `${constraint.path.split('.').at(-1)}: { contains: ${toGraphqlStringLiteral(constraint.value)} }`
+    return buildContainsLeafClause(constraint.path.split('.').at(-1) ?? 'name', constraint.value)
   }
 
   return `${constraint.path.split('.').at(-1)}: { eq: ${constraint.value} }`
@@ -365,7 +386,9 @@ function renderSelectionNode(node: SelectionNode, indent: string): string {
   return [...fieldLines, ...childLines].join(`\n${indent}`)
 }
 
-function buildDetailSelectionSetFromConstraints(constraints: readonly SemanticConstraint[]): string {
+function buildDetailSelectionSetFromConstraints(
+  constraints: readonly SemanticConstraint[]
+): string {
   const rootNode = createSelectionNode()
 
   for (const constraint of constraints) {
@@ -420,7 +443,9 @@ function resolveSearchTerm(text: string, entityHint: EntityHint | null | undefin
   return forMatch?.[1]?.trim() || null
 }
 
-function getSemanticConstraintsForEntity(args: SelectAllowedQueryIdsArgs): readonly SemanticConstraint[] {
+function getSemanticConstraintsForEntity(
+  args: SelectAllowedQueryIdsArgs
+): readonly SemanticConstraint[] {
   return (args.semanticConstraints ?? []).filter(
     constraint => constraint.entityType === args.entityType
   )
@@ -625,7 +650,10 @@ function resolveQueryForm(
     return { queryForm: 'ENTITY_GAP_ANALYSIS' }
   }
 
-  if (allowedQueryForms.includes('ENTITY_RELATION_FILTER') && (detectedRelationField || semanticConstraints.length > 0)) {
+  if (
+    allowedQueryForms.includes('ENTITY_RELATION_FILTER') &&
+    (detectedRelationField || semanticConstraints.length > 0)
+  ) {
     return { queryForm: 'ENTITY_RELATION_FILTER' }
   }
 
@@ -810,7 +838,9 @@ export function getRequiredParametersForQueryId(queryId: QueryId): readonly stri
 
 export function selectAllowedQueryIds(args: SelectAllowedQueryIdsArgs): QuerySelection {
   const normalizedText = args.normalizedText?.trim() || normalizeText(args.text)
-  const semanticRelationField = getRelationFieldFromConstraints(getSemanticConstraintsForEntity(args))
+  const semanticRelationField = getRelationFieldFromConstraints(
+    getSemanticConstraintsForEntity(args)
+  )
   const detectedRelationField =
     semanticRelationField ?? detectRelationField(args.entityType, normalizedText, args.artifacts)
   const queryFormResolution = resolveQueryForm(args, normalizedText, detectedRelationField)

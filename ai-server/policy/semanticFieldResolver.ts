@@ -102,14 +102,25 @@ function isStringFilter(filterType: string): boolean {
   return filterType === 'StringScalarFilters'
 }
 
+function dedupeCandidateFields(
+  candidateFields: readonly SemanticCandidateField[]
+): readonly SemanticCandidateField[] {
+  return candidateFields.filter(
+    (field, index, allFields) =>
+      allFields.findIndex(candidate => candidate.path === field.path) === index
+  )
+}
+
 function buildCandidateFieldsForWhereType(
   whereType: string,
-  entityType: CanonicalConceptType,
+  rootEntityType: CanonicalConceptType,
+  currentEntityType: CanonicalConceptType,
   schemaDigest: SchemaDigestArtifact,
   relationPath: readonly string[],
   depth: number,
   whereTypeEntityMap: ReadonlyMap<string, CanonicalConceptType>,
-  visited: ReadonlySet<string>
+  visited: ReadonlySet<string>,
+  visitedEntityTypes: ReadonlySet<CanonicalConceptType>
 ): readonly SemanticCandidateField[] {
   if (depth > 2) {
     return []
@@ -124,7 +135,7 @@ function buildCandidateFieldsForWhereType(
   nextVisited.add(visitKey)
 
   const rootDefinition = schemaDigest.allowedRootQueries.find(
-    rootQuery => rootQuery.entityType === entityType && rootQuery.whereType === whereType
+    rootQuery => rootQuery.entityType === currentEntityType && rootQuery.whereType === whereType
   )
   if (!rootDefinition) {
     return []
@@ -136,11 +147,10 @@ function buildCandidateFieldsForWhereType(
   for (const field of fields) {
     if (isStringFilter(field.filterType)) {
       candidateFields.push({
-        entityType,
+        entityType: rootEntityType,
         path: [...relationPath, field.fieldName].join('.'),
         relationPath,
-  visited: ReadonlySet<string>,
-  visitedEntityTypes: ReadonlySet<CanonicalConceptType>
+        leafField: field.fieldName,
         fieldKind: 'string',
       })
       continue
@@ -149,7 +159,7 @@ function buildCandidateFieldsForWhereType(
     if (isEnumFilter(field.filterType)) {
       const enumType = field.filterType.replace(/EnumScalarFilters$/, '')
       candidateFields.push({
-        entityType,
+        entityType: rootEntityType,
         path: [...relationPath, field.fieldName].join('.'),
         relationPath,
         leafField: field.fieldName,
@@ -157,31 +167,10 @@ function buildCandidateFieldsForWhereType(
         enumType,
         enumValues: schemaDigest.enumValues[enumType] ?? [],
       })
-      continue
     }
-
-
-  const fields = parseWhereFields(whereType)
-  const candidateFields: SemanticCandidateField[] = []
+  }
 
   for (const field of fields) {
-    const connectionWhereType = field.filterType.replace(/Filters$/, 'Where')
-    const targetWhereType = resolveConnectionNodeWhereType(connectionWhereType)
-    if (!targetWhereType) {
-      continue
-    }
-
-    const targetEntityType = whereTypeEntityMap.get(targetWhereType)
-    if (!targetEntityType) {
-      continue
-    }
-
-    if (visitedEntityTypes.has(targetEntityType)) {
-      continue
-    }
-
-    const nextVisitedEntityTypes = new Set(visitedEntityTypes)
-    nextVisitedEntityTypes.add(targetEntityType)
     if (!field.fieldName.endsWith('Connection') || !field.filterType.endsWith('ConnectionFilters')) {
       continue
     }
@@ -191,35 +180,36 @@ function buildCandidateFieldsForWhereType(
       continue
     }
 
-        nextVisited,
-        nextVisitedEntityTypes
+    const connectionWhereType = field.filterType.replace(/Filters$/, 'Where')
     const targetWhereType = resolveConnectionNodeWhereType(connectionWhereType)
     if (!targetWhereType) {
       continue
     }
 
     const targetEntityType = whereTypeEntityMap.get(targetWhereType)
-    if (!targetEntityType) {
+    if (!targetEntityType || visitedEntityTypes.has(targetEntityType)) {
       continue
     }
+
+    const nextVisitedEntityTypes = new Set(visitedEntityTypes)
+    nextVisitedEntityTypes.add(targetEntityType)
 
     candidateFields.push(
       ...buildCandidateFieldsForWhereType(
         targetWhereType,
+        rootEntityType,
         targetEntityType,
         schemaDigest,
         [...relationPath, relationName],
         depth + 1,
         whereTypeEntityMap,
-        nextVisited
+        nextVisited,
+        nextVisitedEntityTypes
       )
     )
   }
 
-  return candidateFields.filter(
-    (field, index, allFields) =>
-      allFields.findIndex(candidate => candidate.path === field.path) === index
-  )
+  return dedupeCandidateFields(candidateFields)
 }
 
 export function resolveCandidateFields(
@@ -229,8 +219,7 @@ export function resolveCandidateFields(
   const cacheKey = `${entityType}:${schemaDigest.version}`
   const cached = candidateFieldCache.get(cacheKey)
   if (cached) {
-    new Set(),
-    new Set([rootDefinition.entityType])
+    return cached
   }
 
   const rootDefinition = schemaDigest.allowedRootQueries.find(
@@ -245,11 +234,13 @@ export function resolveCandidateFields(
   const candidateFields = buildCandidateFieldsForWhereType(
     rootDefinition.whereType,
     entityType,
+    rootDefinition.entityType,
     schemaDigest,
     [],
     0,
     whereTypeEntityMap,
-    new Set()
+    new Set(),
+    new Set([rootDefinition.entityType])
   )
 
   candidateFieldCache.set(cacheKey, candidateFields)

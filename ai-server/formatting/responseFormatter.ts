@@ -455,6 +455,24 @@ function formatGroupedHeader(
   return `Found ${childCount} ${rootLabel}:`
 }
 
+function formatRootOnlyHeader(
+  rootKey: string,
+  childCount: number,
+  locale: SupportedLocale
+): string {
+  const rootLabel = humanizeRootKey(rootKey, locale)
+
+  if (locale === 'de') {
+    return `Gefundene ${rootLabel} (${childCount}):`
+  }
+
+  if (locale === 'fr') {
+    return `${rootLabel} trouvés (${childCount}) :`
+  }
+
+  return `Found ${rootLabel} (${childCount}):`
+}
+
 function formatRelationItemLines(
   item: Record<string, unknown>,
   relationType: string,
@@ -559,6 +577,60 @@ function tryFormatRootAnchoredRelationResult(
   return `${header}\n\n${body}`
 }
 
+function tryFormatRootAnchoredMultiRelationResult(
+  rootKey: string,
+  items: readonly unknown[],
+  relatedFilterClause: string | null,
+  locale: SupportedLocale
+): string | null {
+  const rootSections = items
+    .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
+    .map(record => {
+      const rootName = typeof record.name === 'string' ? record.name.trim() : ''
+      if (!rootName) {
+        return null
+      }
+
+      const sectionLines = getNestedRelationEntries(record)
+        .flatMap(([relationType, relationItems]) => {
+          const matchedRelatedItems = relationItems
+            .map(relatedItem => pruneRelatedItem(relatedItem, relatedFilterClause))
+            .filter((relatedItem): relatedItem is Record<string, unknown> => Boolean(relatedItem))
+            .sort((left, right) => {
+              const leftDescriptor = formatGroupDescriptor(left) ?? ''
+              const rightDescriptor = formatGroupDescriptor(right) ?? ''
+              return normalizeForSort(leftDescriptor).localeCompare(normalizeForSort(rightDescriptor))
+            })
+
+          return matchedRelatedItems.flatMap(relatedItem =>
+            formatRelationItemLines(relatedItem, relationType, locale, 1)
+          )
+        })
+
+      if (sectionLines.length === 0) {
+        return null
+      }
+
+      return {
+        sortKey: normalizeForSort(rootName),
+        text: `${humanizeRootSingularKey(rootKey, locale)}: ${rootName}\n${sectionLines.join('\n')}`,
+      }
+    })
+    .filter((section): section is { sortKey: string; text: string } => Boolean(section))
+
+  if (rootSections.length === 0) {
+    return null
+  }
+
+  const sortedSections = rootSections.sort((left, right) =>
+    left.sortKey.localeCompare(right.sortKey)
+  )
+  const header = formatRootOnlyHeader(rootKey, rootSections.length, locale)
+  const body = sortedSections.map(section => section.text).join('\n\n')
+
+  return `${header}\n\n${body}`
+}
+
 export const responseFormatter = {
   format(data: unknown, context: ResponseFormatterContext): string {
     const locale = context.locale ?? (context.text ? detectLocale(context.text) : 'en')
@@ -578,6 +650,20 @@ export const responseFormatter = {
           rootKey,
           value as readonly unknown[],
           relationType,
+          relatedFilterClause,
+          locale
+        )
+
+        if (groupedResult) {
+          return groupedResult
+        }
+      }
+
+      if (arrayEntry && !relationType) {
+        const [rootKey, value] = arrayEntry
+        const groupedResult = tryFormatRootAnchoredMultiRelationResult(
+          rootKey,
+          value as readonly unknown[],
           relatedFilterClause,
           locale
         )

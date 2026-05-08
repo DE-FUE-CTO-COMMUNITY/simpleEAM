@@ -86,6 +86,40 @@ function humanizeRootKey(rootKey: string, locale: SupportedLocale): string {
   return labels[locale][rootKey] ?? rootKey.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase()
 }
 
+function humanizeRootSingularKey(rootKey: string, locale: SupportedLocale): string {
+  const labels: Record<SupportedLocale, Record<string, string>> = {
+    de: {
+      applications: 'Anwendung',
+      applicationInterfaces: 'Schnittstelle',
+      businessCapabilities: 'Fähigkeit',
+      businessProcesses: 'Prozess',
+      dataObjects: 'Datenobjekt',
+      infrastructures: 'Infrastruktur',
+    },
+    en: {
+      applications: 'Application',
+      applicationInterfaces: 'Interface',
+      businessCapabilities: 'Capability',
+      businessProcesses: 'Process',
+      dataObjects: 'Data object',
+      infrastructures: 'Infrastructure element',
+    },
+    fr: {
+      applications: 'Application',
+      applicationInterfaces: 'Interface',
+      businessCapabilities: 'Capacité',
+      businessProcesses: 'Processus',
+      dataObjects: 'Objet de données',
+      infrastructures: 'Infrastructure',
+    },
+  }
+
+  return (
+    labels[locale][rootKey] ??
+    rootKey.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/s$/i, '')
+  )
+}
+
 function humanizeRelationKey(relationKey: string, locale: SupportedLocale): string {
   const labels: Record<SupportedLocale, Record<string, string>> = {
     de: {
@@ -410,6 +444,46 @@ function formatDetailedItemList(
   return `Found ${label} (${lines.length}):\n${lines.join('\n')}`
 }
 
+function formatRootScalarDetailedItemList(
+  rootKey: string,
+  items: readonly unknown[],
+  locale: SupportedLocale
+): string | null {
+  const sections = items
+    .filter((item): item is Record<string, unknown> => Boolean(item) && typeof item === 'object')
+    .map(record => {
+      const itemName = typeof record.name === 'string' ? record.name.trim() : ''
+      const hostingEnvironment =
+        typeof record.hostingEnvironment === 'string' ? record.hostingEnvironment.trim() : ''
+
+      if (!itemName || !hostingEnvironment) {
+        return null
+      }
+
+      const label =
+        locale === 'de' ? 'Hosting' : locale === 'fr' ? 'Hébergement' : 'Hosting'
+
+      return `${humanizeRootSingularKey(rootKey, locale)}: ${itemName}\n  - ${label}: ${hostingEnvironment}`
+    })
+    .filter((section): section is string => Boolean(section))
+
+  if (sections.length === 0) {
+    return null
+  }
+
+  const rootLabel = humanizeRootKey(rootKey, locale)
+
+  if (locale === 'de') {
+    return `Gefundene ${rootLabel} (${sections.length}):\n\n${sections.join('\n\n')}`
+  }
+
+  if (locale === 'fr') {
+    return `${rootLabel} trouvés (${sections.length}) :\n\n${sections.join('\n\n')}`
+  }
+
+  return `Found ${rootLabel} (${sections.length}):\n\n${sections.join('\n\n')}`
+}
+
 function formatGenericSummary(
   entries: readonly [string, unknown][],
   locale: SupportedLocale
@@ -494,6 +568,22 @@ export function summarizeLookupResult(args: SummarizeLookupResultArgs): string {
 
     if (hasNestedRelationDetails && (!args.text || isListIntent(args.text, locale))) {
       return formatDetailedItemList(rootKey, items, locale, relationField, relatedFilterClause)
+    }
+
+    const hasRootHostingDetails = items.some(item => {
+      if (!item || typeof item !== 'object') {
+        return false
+      }
+
+      const record = item as Record<string, unknown>
+      return typeof record.hostingEnvironment === 'string' && record.hostingEnvironment.trim()
+    })
+
+    if (hasRootHostingDetails && (!args.text || isListIntent(args.text, locale))) {
+      const detailedRootItems = formatRootScalarDetailedItemList(rootKey, items, locale)
+      if (detailedRootItems) {
+        return detailedRootItems
+      }
     }
 
     if (names.length > 0 && (!args.text || isListIntent(args.text, locale))) {

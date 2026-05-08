@@ -90,10 +90,7 @@ function singularizeToken(token: string): string {
 }
 
 function normalizeEnumValue(value: string): string {
-  return normalizeText(value.replace(/_/g, ' '))
-    .split(' ')
-    .map(singularizeToken)
-    .join(' ')
+  return normalizeText(value.replace(/_/g, ' ')).split(' ').map(singularizeToken).join(' ')
 }
 
 function stemToken(token: string): string {
@@ -114,15 +111,99 @@ function isContextualField(fieldName: string): boolean {
   )
 }
 
+function isLocativeField(fieldName: string): boolean {
+  return /(environment|type|platform|host|region|zone|infrastructure)/i.test(fieldName)
+}
+
+function isGeographicField(fieldName: string): boolean {
+  return /(location|region|zone|country|site)/i.test(fieldName)
+}
+
+function isOperatingSystemField(fieldName: string): boolean {
+  return /operatingSystem/i.test(fieldName)
+}
+
+function isProviderField(fieldName: string): boolean {
+  return /(vendor|provider|supplier|manufacturer)/i.test(fieldName)
+}
+
+function isLifecycleField(fieldName: string): boolean {
+  return /(version|release)/i.test(fieldName)
+}
+
 function hasLocativeCue(tokens: readonly string[]): boolean {
-  return tokens.some(token => ['in', 'on', 'at', 'run', 'runs', 'running', 'hosted'].includes(token))
+  return tokens.some(token =>
+    ['in', 'on', 'at', 'run', 'runs', 'running', 'hosted'].includes(token)
+  )
 }
 
 function hasAssociationCue(tokens: readonly string[]): boolean {
   return tokens.some(token =>
-    ['use', 'uses', 'using', 'support', 'supports', 'supported', 'provided', 'source', 'target'].includes(
-      token
-    )
+    [
+      'use',
+      'uses',
+      'using',
+      'support',
+      'supports',
+      'supported',
+      'provided',
+      'source',
+      'target',
+    ].includes(token)
+  )
+}
+
+function hasSupportCue(tokens: readonly string[]): boolean {
+  return tokens.some(token => ['support', 'supports', 'supported', 'supporting'].includes(token))
+}
+
+function hasApplicationCue(tokens: readonly string[]): boolean {
+  return tokens.some(token => ['application', 'applications', 'app', 'apps'].includes(token))
+}
+
+function hasInterfaceCue(tokens: readonly string[]): boolean {
+  return tokens.some(token => ['interface', 'interfaces', 'schnittstelle', 'schnittstellen'].includes(token))
+}
+
+function hasUsageCue(tokens: readonly string[]): boolean {
+  return tokens.some(token => ['use', 'uses', 'using', 'used'].includes(token))
+}
+
+function hasSourceCue(tokens: readonly string[]): boolean {
+  return tokens.some(token => ['source', 'sources', 'provides', 'provided', 'produces', 'producer'].includes(token))
+}
+
+function isInterfaceRelationPath(relationPath: readonly string[]): boolean {
+  return relationPath.some(segment => /interfaces?/i.test(segment))
+}
+
+function isDirectDataObjectRelationPath(relationPath: readonly string[]): boolean {
+  return relationPath.some(segment => ['usesDataObjects', 'isDataSourceFor'].includes(segment))
+}
+
+function isUsesDataObjectsPath(relationPath: readonly string[]): boolean {
+  return relationPath.includes('usesDataObjects')
+}
+
+function isDataSourcePath(relationPath: readonly string[]): boolean {
+  return relationPath.includes('isDataSourceFor')
+}
+
+function isSupportedByApplicationsPath(relationPath: readonly string[]): boolean {
+  return relationPath[0] === 'supportedByApplications'
+}
+
+function isDirectCapabilityDataObjectPath(relationPath: readonly string[]): boolean {
+  return relationPath.length === 1 && relationPath[0] === 'relatedDataObjects'
+}
+
+function hasGeographicCue(tokens: readonly string[]): boolean {
+  return tokens.some(token => ['location', 'located', 'region', 'country', 'site', 'where'].includes(token))
+}
+
+function hasOperatingSystemCue(tokens: readonly string[]): boolean {
+  return tokens.some(token =>
+    ['os', 'operating', 'system', 'linux', 'windows', 'ubuntu', 'rhel'].includes(token)
   )
 }
 
@@ -193,6 +274,49 @@ function buildContainsConstraint(
   }
 }
 
+const GENERIC_DEPLOYMENT_NOUNS = new Set([
+  'cloud',
+  'cluster',
+  'clusters',
+  'platform',
+  'platforms',
+  'server',
+  'servers',
+  'datacenter',
+  'datacenters',
+  'data center',
+  'data centers',
+])
+
+function normalizeStringConstraintValue(phrase: string, field: SemanticCandidateField): string {
+  if (!isLocativeField(field.leafField) && field.relationPath.length === 0) {
+    return phrase
+  }
+
+  const normalizedPhrase = normalizeText(phrase)
+  const phraseTokens = normalizedPhrase.split(' ').filter(Boolean)
+  if (phraseTokens.length < 2) {
+    return phrase
+  }
+
+  const trimmedTokens = [...phraseTokens]
+  while (trimmedTokens.length > 1) {
+    const lastToken = trimmedTokens[trimmedTokens.length - 1]
+    const lastTwoTokens = trimmedTokens.slice(-2).join(' ')
+    if (GENERIC_DEPLOYMENT_NOUNS.has(lastTwoTokens)) {
+      trimmedTokens.splice(-2, 2)
+      continue
+    }
+    if (GENERIC_DEPLOYMENT_NOUNS.has(lastToken)) {
+      trimmedTokens.pop()
+      continue
+    }
+    break
+  }
+
+  return trimmedTokens.length > 0 ? trimmedTokens.join(' ') : phrase
+}
+
 function scoreFieldMatch(
   phrase: string,
   tokens: readonly string[],
@@ -200,6 +324,12 @@ function scoreFieldMatch(
 ): SemanticFieldMatch | null {
   const phraseTokens = phrase.split(' ').map(stemToken)
   const stemmedUserTokens = tokens.map(stemToken)
+  const interfaceCue = hasInterfaceCue(tokens)
+  const usageCue = hasUsageCue(tokens)
+  const sourceCue = hasSourceCue(tokens)
+  const supportCue = hasSupportCue(tokens)
+  const applicationCue = hasApplicationCue(tokens)
+  const supportedApplicationCue = supportCue && applicationCue
 
   if (field.fieldKind === 'enum' && field.enumValues) {
     for (const enumValue of field.enumValues) {
@@ -211,9 +341,33 @@ function scoreFieldMatch(
       }
 
       if (normalizedPhrase === normalizedEnumValue) {
+        let score = 100 - field.relationPath.length * 18
+        if (interfaceCue) {
+          score += isInterfaceRelationPath(field.relationPath) ? 34 : -24
+        }
+        if (usageCue) {
+          score += isUsesDataObjectsPath(field.relationPath)
+            ? 16
+            : isDataSourcePath(field.relationPath)
+              ? -14
+              : isDirectDataObjectRelationPath(field.relationPath)
+                ? 6
+                : 0
+        }
+        if (sourceCue) {
+          score += isDataSourcePath(field.relationPath) ? 16 : isUsesDataObjectsPath(field.relationPath) ? -12 : 0
+        }
+        if (supportedApplicationCue) {
+          score += isSupportedByApplicationsPath(field.relationPath)
+            ? 24
+            : isDirectCapabilityDataObjectPath(field.relationPath)
+              ? -20
+              : 0
+        }
+
         return {
           constraint: buildEqConstraint(field.entityType, field.path, enumValue),
-          score: 100 - field.relationPath.length * 12,
+          score,
           phrase,
           field,
         }
@@ -224,14 +378,37 @@ function scoreFieldMatch(
         normalizedEnumValue.includes(normalizedPhrase) &&
         phraseTokens.length > 1
       ) {
+        let score = 70 - field.relationPath.length * 18
+        if (interfaceCue) {
+          score += isInterfaceRelationPath(field.relationPath) ? 34 : -24
+        }
+        if (usageCue) {
+          score += isUsesDataObjectsPath(field.relationPath)
+            ? 16
+            : isDataSourcePath(field.relationPath)
+              ? -14
+              : isDirectDataObjectRelationPath(field.relationPath)
+                ? 6
+                : 0
+        }
+        if (sourceCue) {
+          score += isDataSourcePath(field.relationPath) ? 16 : isUsesDataObjectsPath(field.relationPath) ? -12 : 0
+        }
+        if (supportedApplicationCue) {
+          score += isSupportedByApplicationsPath(field.relationPath)
+            ? 24
+            : isDirectCapabilityDataObjectPath(field.relationPath)
+              ? -20
+              : 0
+        }
+
         return {
           constraint: buildEqConstraint(field.entityType, field.path, enumValue),
-          score: 70 - field.relationPath.length * 12,
+          score,
           phrase,
           field,
         }
       }
-      let score = 35 - field.relationPath.length * 10
     }
   }
 
@@ -242,17 +419,37 @@ function scoreFieldMatch(
   let score = 35
   const locativeCue = hasLocativeCue(tokens)
   const associationCue = hasAssociationCue(tokens)
+  const geographicCue = hasGeographicCue(tokens)
+  const operatingSystemCue = hasOperatingSystemCue(tokens)
 
-  if (field.relationPath.length > 0) {
-    score += 8 + field.relationPath.length * 4
+  if (field.relationPath.length === 1) {
+    score += 12
+  } else if (field.relationPath.length >= 2) {
+    score += 2
   }
 
   if (field.leafField === 'name') {
-    score += associationCue ? 18 : locativeCue ? 6 : 12
+    if (associationCue && field.relationPath.length <= 1) {
+      score += 16
+    } else if (locativeCue) {
+      score += field.relationPath.length === 1 ? 2 : -10
+    } else {
+      score += field.relationPath.length <= 1 ? 10 : -4
+    }
   }
 
-  if (isContextualField(field.leafField)) {
-    score += locativeCue ? 18 : 8
+  if (isLocativeField(field.leafField)) {
+    score += locativeCue ? 28 : 10
+  } else if (isGeographicField(field.leafField)) {
+    score += geographicCue ? 18 : locativeCue ? -8 : 4
+  } else if (isOperatingSystemField(field.leafField)) {
+    score += operatingSystemCue ? 20 : locativeCue ? -16 : -6
+  } else if (isProviderField(field.leafField)) {
+    score += associationCue ? 8 : -10
+  } else if (isLifecycleField(field.leafField)) {
+    score -= locativeCue ? 12 : 4
+  } else if (isContextualField(field.leafField)) {
+    score += locativeCue ? 10 : 6
   }
 
   if (field.leafField === 'description') {
@@ -263,12 +460,51 @@ function scoreFieldMatch(
     score -= 15
   }
 
-  const pathTokens = splitPathTokens(field.path)
-  const overlapCount = pathTokens.filter(token => stemmedUserTokens.includes(token)).length
-  score += overlapCount * 8
+  if (new Set(field.relationPath).size !== field.relationPath.length) {
+    score -= 8
+  }
+
+  if (interfaceCue) {
+    score += isInterfaceRelationPath(field.relationPath) ? 28 : -18
+  }
+
+  if (usageCue) {
+    score += isUsesDataObjectsPath(field.relationPath)
+      ? 12
+      : isDataSourcePath(field.relationPath)
+        ? -10
+        : isDirectDataObjectRelationPath(field.relationPath)
+          ? 4
+          : 0
+  }
+
+  if (sourceCue) {
+    score += isDataSourcePath(field.relationPath) ? 12 : isUsesDataObjectsPath(field.relationPath) ? -10 : 0
+  }
+
+  if (supportedApplicationCue) {
+    score += isSupportedByApplicationsPath(field.relationPath)
+      ? 18
+      : isDirectCapabilityDataObjectPath(field.relationPath)
+        ? -16
+        : 0
+  }
+
+  const leafTokens = splitPathTokens(field.leafField)
+  const relationHeadTokens = field.relationPath.length > 0 ? splitPathTokens(field.relationPath[0]) : []
+  const leafOverlapCount = leafTokens.filter(token => stemmedUserTokens.includes(token)).length
+  const relationHeadOverlapCount = relationHeadTokens.filter(token =>
+    stemmedUserTokens.includes(token)
+  ).length
+  score += leafOverlapCount * 10
+  score += Math.min(relationHeadOverlapCount, 1) * 4
 
   return {
-    constraint: buildContainsConstraint(field.entityType, field.path, phrase),
+    constraint: buildContainsConstraint(
+      field.entityType,
+      field.path,
+      normalizeStringConstraintValue(phrase, field)
+    ),
     score,
     phrase,
     field,

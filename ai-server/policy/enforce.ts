@@ -599,12 +599,7 @@ export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): Policy
     if (resolvedEntityType.reason) {
       reasons.push(resolvedEntityType.reason)
     }
-    return buildAskClarificationDecision(
-      baseNormalized,
-      reasons,
-      [],
-      resolvedEntityType.candidates
-    )
+    return buildAskClarificationDecision(baseNormalized, reasons, [], resolvedEntityType.candidates)
   }
 
   const semanticExtraction = extractConstraints(
@@ -623,12 +618,9 @@ export function enforceCoordinatorPlan(args: EnforceCoordinatorPlanArgs): Policy
     if (resolvedIntent.reason) {
       reasons.push(resolvedIntent.reason)
     }
-    return buildAskClarificationDecision(
-      normalized,
-      reasons,
-      resolvedIntent.candidates,
-      [resolvedEntityType.value]
-    )
+    return buildAskClarificationDecision(normalized, reasons, resolvedIntent.candidates, [
+      resolvedEntityType.value,
+    ])
   }
 
   if (normalized.semanticAmbiguities.length > 0) {
