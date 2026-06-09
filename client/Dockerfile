@@ -12,7 +12,8 @@ COPY client/package.json ./package.json
 COPY client/yarn.lock ./yarn.lock
 
 # Dependencies installieren
-RUN yarn install --immutable
+RUN printf 'nodeLinker: node-modules\n' > .yarnrc.yml \
+ && yarn install --immutable
 
 # Restlichen Client-Code kopieren und bauen
 COPY client/ ./
