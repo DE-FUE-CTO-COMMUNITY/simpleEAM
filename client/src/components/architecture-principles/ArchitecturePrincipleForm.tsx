@@ -12,6 +12,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import GenericForm, { FieldConfig, TabConfig } from '../common/GenericForm'
+import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { useCategoryLabel, usePriorityLabel } from './utils'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
@@ -489,37 +490,13 @@ const ArchitecturePrincipleForm: React.FC<
         }
       />
 
-      {/* Nested Architecture Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'architectures' &&
-        nestedArchitectureData?.architectures?.[0] && (
-          <ArchitectureForm
-            data={nestedArchitectureData.architectures[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
-
-      {/* Nested Application Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'applications' &&
-        nestedApplicationData?.applications?.[0] && (
-          <ApplicationForm
-            data={nestedApplicationData.applications[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
+      <NestedEntityFormDialog
+        entityId={nestedFormState.entityId}
+        entityType={nestedFormState.entityType}
+        isOpen={nestedFormState.isOpen}
+        mode={nestedFormState.mode}
+        onClose={handleCloseNestedForm}
+      />
     </>
   )
 }

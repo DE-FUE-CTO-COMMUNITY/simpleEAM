@@ -28,6 +28,7 @@ import {
   Person,
 } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
+import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
@@ -847,69 +848,13 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         }
       />
 
-      {/* Nested Application Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'applications' &&
-        nestedApplicationData?.applications?.[0] && (
-          <ApplicationForm
-            data={nestedApplicationData.applications[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
-
-      {/* Nested Data Object Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'dataObjects' &&
-        nestedDataObjectData?.dataObjects?.[0] && (
-          <DataObjectForm
-            data={nestedDataObjectData.dataObjects[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
-
-      {/* Nested Architecture Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'architectures' &&
-        nestedArchitectureData?.architectures?.[0] && (
-          <ArchitectureForm
-            data={nestedArchitectureData.architectures[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
-
-      {/* Nested Application Interface Form (for predecessors/successors) */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'applicationInterfaces' &&
-        nestedInterfaceData?.applicationInterfaces?.[0] && (
-          <ApplicationInterfaceForm
-            data={nestedInterfaceData.applicationInterfaces[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
+      <NestedEntityFormDialog
+        entityId={nestedFormState.entityId}
+        entityType={nestedFormState.entityType}
+        isOpen={nestedFormState.isOpen}
+        mode={nestedFormState.mode}
+        onClose={handleCloseNestedForm}
+      />
     </>
   )
 }

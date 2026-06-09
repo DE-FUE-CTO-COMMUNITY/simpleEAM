@@ -20,6 +20,7 @@ import {
   SovereigntyMaturity,
 } from '../../gql/generated'
 import GenericForm, { FieldConfig } from '../common/GenericForm'
+import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { useFeatureFlags } from '@/lib/feature-flags'
@@ -616,55 +617,13 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
         }
       />
 
-      {/* Nested Capability Form (for child capabilities) */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'capabilities' &&
-        nestedCapabilityData?.businessCapabilities?.[0] && (
-          <CapabilityForm
-            data={nestedCapabilityData.businessCapabilities[0]}
-            availableCapabilities={availableCapabilities}
-            availableTags={availableTags}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
-
-      {/* Nested Application Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'applications' &&
-        nestedApplicationData?.applications?.[0] && (
-          <ApplicationForm
-            data={nestedApplicationData.applications[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
-
-      {/* Nested Architecture Form */}
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'architectures' &&
-        nestedArchitectureData?.architectures?.[0] && (
-          <ArchitectureForm
-            data={nestedArchitectureData.architectures[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
+      <NestedEntityFormDialog
+        entityId={nestedFormState.entityId}
+        entityType={nestedFormState.entityType}
+        isOpen={nestedFormState.isOpen}
+        mode={nestedFormState.mode}
+        onClose={handleCloseNestedForm}
+      />
     </>
   )
 }

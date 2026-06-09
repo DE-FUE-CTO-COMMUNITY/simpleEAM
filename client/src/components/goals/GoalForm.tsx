@@ -19,6 +19,7 @@ import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { isArchitect } from '@/lib/auth'
 import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/GenericForm'
+import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { GenericFormProps } from '../common/GenericFormProps'
 import {
   Gea_Goal,
@@ -845,20 +846,13 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
         }
       />
 
-      {nestedFormState.isOpen &&
-        nestedFormState.entityType === 'architectures' &&
-        nestedArchitectureData?.architectures?.[0] && (
-          <ArchitectureForm
-            data={nestedArchitectureData.architectures[0]}
-            isOpen={true}
-            mode={nestedFormState.mode}
-            isNested={true}
-            onClose={handleCloseNestedForm}
-            onSubmit={async () => {}}
-            onDelete={async () => {}}
-            loading={false}
-          />
-        )}
+      <NestedEntityFormDialog
+        entityId={nestedFormState.entityId}
+        entityType={nestedFormState.entityType}
+        isOpen={nestedFormState.isOpen}
+        mode={nestedFormState.mode}
+        onClose={handleCloseNestedForm}
+      />
     </>
   )
 }
