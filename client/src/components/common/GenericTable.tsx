@@ -119,10 +119,24 @@ export function GenericTable<T, F>({
 
   // Aktualisiere pageSize wenn sich automaticPageSize ändert
   useEffect(() => {
-    setPageSize(automaticPageSize)
-    // Reset auf erste Seite wenn sich die Seitengröße ändert
-    setPageIndex(0)
-  }, [automaticPageSize])
+    setPageSize(currentPageSize => {
+      if (currentPageSize === automaticPageSize) {
+        return currentPageSize
+      }
+
+      return automaticPageSize
+    })
+
+    setPageIndex(currentPageIndex => {
+      const totalPages = Math.max(1, Math.ceil(data.length / automaticPageSize))
+
+      if (currentPageIndex >= totalPages) {
+        return totalPages - 1
+      }
+
+      return currentPageIndex
+    })
+  }, [automaticPageSize, data.length])
 
   // Handler für das Öffnen des Formulars zur Detailansicht
   const handleViewItemClick = useCallback(
@@ -318,6 +332,7 @@ export function GenericTable<T, F>({
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     manualPagination: false,
+    autoResetPageIndex: false,
     enableRowSelection: false,
   })
 

@@ -118,8 +118,8 @@ services:
     depends_on:
       - keycloak
       - temporal
-    entrypoint: [ "yarn" ]
-    command: [ "start" ]
+    entrypoint: ["yarn"]
+    command: ["start"]
     environment:
       - NODE_ENV=${NODE_ENV}
       - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
@@ -186,8 +186,8 @@ services:
     depends_on:
       - server
       - temporal
-    entrypoint: [ "yarn" ]
-    command: [ "analytics:worker" ]
+    entrypoint: ["yarn"]
+    command: ["analytics:worker"]
     environment:
       - NODE_ENV=${NODE_ENV}
       - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
@@ -296,11 +296,10 @@ services:
     volumes:
       - ./tools/temporal/postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test:
-        [
+      test: [
           "CMD-SHELL",
           "pg_isready -U ${TEMPORAL_DB_USER:-temporal} -d
-            ${TEMPORAL_DB_NAME:-temporal}",
+          ${TEMPORAL_DB_NAME:-temporal}",
         ]
       interval: 10s
       timeout: 5s
@@ -369,8 +368,8 @@ services:
     depends_on:
       - server
       - temporal
-    entrypoint: [ "yarn" ]
-    command: [ "worker" ]
+    entrypoint: ["yarn"]
+    command: ["worker"]
     environment:
       - NODE_ENV=${NODE_ENV}
       - GRAPHQL_INTERNAL_URL=http://server:${GRAPHQL_INTERNAL_PORT}/graphql
