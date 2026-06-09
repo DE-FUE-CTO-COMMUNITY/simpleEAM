@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useTranslations } from 'next-intl'
-import { useQuery, gql } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { z } from 'zod'
 import { isArchitect } from '@/lib/auth'
 import {
@@ -38,12 +38,6 @@ import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
-import CapabilityForm from '../capabilities/CapabilityForm'
-import ApplicationForm from '../applications/ApplicationForm'
-import DataObjectForm from '../dataobjects/DataObjectForm'
-import InfrastructureForm from '../infrastructure/InfrastructureForm'
-import ArchitectureForm from '../architectures/ArchitectureForm'
-import ArchitecturePrincipleForm from '../architecture-principles/ArchitecturePrincipleForm'
 
 export type AicomponentFormValues = {
   name: string
@@ -100,7 +94,6 @@ export default function AicomponentForm({
   const isSupEnabled = featureFlags.SUP
   const isSovereigntyEnabled = featureFlags.Sovereignty
 
-  // State for nested entity forms
   const [nestedFormState, setNestedFormState] = useState<{
     isOpen: boolean
     entityType: string | null
@@ -113,19 +106,17 @@ export default function AicomponentForm({
     mode: 'view',
   })
 
-  // Initialize chip click handlers
   const { createChipClickHandler } = useChipClickHandlers({
-    onOpenNestedForm: (entityType, entityId, mode) => {
+    onOpenNestedForm: (entityType, entityId, nestedMode) => {
       setNestedFormState({
         isOpen: true,
         entityType,
         entityId,
-        mode,
+        mode: nestedMode,
       })
     },
   })
 
-  // Handler to close nested form
   const handleCloseNestedForm = () => {
     setNestedFormState({
       isOpen: false,
@@ -137,7 +128,6 @@ export default function AicomponentForm({
 
   const companyWhere = useCompanyWhere('company')
 
-  // Schema for form validation mit internationalisierten Fehlermeldungen
   const aicomponentSchema = z.object({
     name: z.string().min(1, tValidation('required')),
     description: z.string().optional(),
@@ -170,7 +160,6 @@ export default function AicomponentForm({
     lastSovereigntyAssessmentAt: z.date().optional().nullable(),
   })
 
-  // GraphQL Queries für Relationship-Daten
   const { data: personsData, loading: personsLoading } = useQuery(GET_PERSONS)
   const { data: capabilitiesData, loading: capabilitiesLoading } = useQuery(GET_CAPABILITIES, {
     variables: { where: companyWhere },
@@ -199,358 +188,6 @@ export default function AicomponentForm({
     variables: { where: companyWhere },
     skip: !isSupEnabled,
   })
-
-  // Queries for nested entity forms
-  const { data: nestedCapabilityData } = useQuery(
-    gql`
-      query GetNestedCapability($where: BusinessCapabilityWhere) {
-        businessCapabilities(where: $where) {
-          id
-          name
-          description
-          maturityLevel
-          businessValue
-          status
-          type
-          sequenceNumber
-          introductionDate
-          endDate
-          owners {
-            id
-            firstName
-            lastName
-          }
-          tags
-          parents {
-            id
-            name
-          }
-          children {
-            id
-            name
-          }
-          relatedDataObjects {
-            id
-            name
-          }
-          supportedByApplications {
-            id
-            name
-          }
-          partOfArchitectures {
-            id
-            name
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'capabilities',
-    }
-  )
-
-  const { data: nestedApplicationData } = useQuery(
-    gql`
-      query GetNestedApplication($where: ApplicationWhere) {
-        applications(where: $where) {
-          id
-          name
-          description
-          status
-          criticality
-          costs
-          vendor
-          version
-          hostingEnvironment
-          technologyStack
-          introductionDate
-          endOfLifeDate
-          planningDate
-          endOfUseDate
-          timeCategory
-          sevenRStrategy
-          owners {
-            id
-            firstName
-            lastName
-          }
-          supportsCapabilities {
-            id
-            name
-          }
-          usesDataObjects {
-            id
-            name
-          }
-          sourceOfInterfaces {
-            id
-            name
-          }
-          targetOfInterfaces {
-            id
-            name
-          }
-          partOfArchitectures {
-            id
-            name
-          }
-          implementsPrinciples {
-            id
-            name
-          }
-          depictedInDiagrams {
-            id
-            title
-          }
-          parents {
-            id
-            name
-          }
-          components {
-            id
-            name
-          }
-          predecessors {
-            id
-            name
-          }
-          successors {
-            id
-            name
-          }
-          hostedOn {
-            id
-            name
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-    }
-  )
-
-  const { data: nestedDataObjectData } = useQuery(
-    gql`
-      query GetNestedDataObject($where: DataObjectWhere) {
-        dataObjects(where: $where) {
-          id
-          name
-          description
-          classification
-          format
-          dataSources
-          planningDate
-          introductionDate
-          endOfUseDate
-          endOfLifeDate
-          owners {
-            id
-            firstName
-            lastName
-          }
-          tags
-          usedByApplications {
-            id
-            name
-          }
-          relatedToCapabilities {
-            id
-            name
-          }
-          transferredInInterfaces {
-            id
-            name
-          }
-          partOfArchitectures {
-            id
-            name
-          }
-          depictedInDiagrams {
-            id
-            title
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'dataObjects',
-    }
-  )
-
-  const { data: nestedInfrastructureData } = useQuery(
-    gql`
-      query GetNestedInfrastructure($where: InfrastructureWhere) {
-        infrastructures(where: $where) {
-          id
-          name
-          description
-          infrastructureType
-          status
-          vendor
-          version
-          location
-          capacity
-          ipAddress
-          operatingSystem
-          specifications
-          maintenanceWindow
-          costs
-          planningDate
-          introductionDate
-          endOfUseDate
-          endOfLifeDate
-          owners {
-            id
-            firstName
-            lastName
-          }
-          parentInfrastructure {
-            id
-            name
-          }
-          childInfrastructures {
-            id
-            name
-          }
-          hostsApplications {
-            id
-            name
-          }
-          partOfArchitectures {
-            id
-            name
-          }
-          depictedInDiagrams {
-            id
-            title
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'infrastructures',
-    }
-  )
-
-  const { data: nestedArchitectureData } = useQuery(
-    gql`
-      query GetNestedArchitecture($where: ArchitectureWhere) {
-        architectures(where: $where) {
-          id
-          name
-          description
-          type
-          domain
-          status
-          owners {
-            id
-            firstName
-            lastName
-          }
-          includedApplications {
-            id
-            name
-          }
-          includedCapabilities {
-            id
-            name
-          }
-          includedDataObjects {
-            id
-            name
-          }
-          includedInfrastructures {
-            id
-            name
-          }
-          includedInterfaces {
-            id
-            name
-          }
-          appliedPrinciples {
-            id
-            name
-          }
-          diagrams {
-            id
-            title
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-    }
-  )
-
-  const { data: nestedPrincipleData } = useQuery(
-    gql`
-      query GetNestedPrinciple($where: ArchitecturePrincipleWhere) {
-        architecturePrinciples(where: $where) {
-          id
-          name
-          description
-          category
-          priority
-          rationale
-          implications
-          isActive
-          tags
-          owners {
-            id
-            firstName
-            lastName
-          }
-          appliedInArchitectures {
-            id
-            name
-          }
-          implementedByApplications {
-            id
-            name
-          }
-          implementedByAIComponents {
-            id
-            name
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architecturePrinciples',
-    }
-  )
 
   // Standardwerte für das Formular
   const defaultValues: AicomponentFormValues = {
@@ -584,7 +221,8 @@ export default function AicomponentForm({
     sovereigntyAchResilience: aicomponent?.sovereigntyAchResilience ?? null,
     sovereigntyAchSecurity: aicomponent?.sovereigntyAchSecurity ?? null,
     sovereigntyAchControl: aicomponent?.sovereigntyAchControl ?? null,
-    sovereigntyAchStrategicAutonomyEvidence: aicomponent?.sovereigntyAchStrategicAutonomyEvidence ?? '',
+    sovereigntyAchStrategicAutonomyEvidence:
+      aicomponent?.sovereigntyAchStrategicAutonomyEvidence ?? '',
     lastSovereigntyAssessmentAt: aicomponent?.lastSovereigntyAssessmentAt
       ? new Date(aicomponent.lastSovereigntyAssessmentAt)
       : new Date(),
@@ -650,7 +288,8 @@ export default function AicomponentForm({
         sovereigntyAchResilience: aicomponent.sovereigntyAchResilience ?? null,
         sovereigntyAchSecurity: aicomponent.sovereigntyAchSecurity ?? null,
         sovereigntyAchControl: aicomponent.sovereigntyAchControl ?? null,
-        sovereigntyAchStrategicAutonomyEvidence: aicomponent.sovereigntyAchStrategicAutonomyEvidence ?? '',
+        sovereigntyAchStrategicAutonomyEvidence:
+          aicomponent.sovereigntyAchStrategicAutonomyEvidence ?? '',
         lastSovereigntyAssessmentAt: aicomponent.lastSovereigntyAssessmentAt
           ? new Date(aicomponent.lastSovereigntyAssessmentAt)
           : new Date(),

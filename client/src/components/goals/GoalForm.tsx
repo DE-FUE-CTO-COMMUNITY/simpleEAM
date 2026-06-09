@@ -29,7 +29,6 @@ import {
   Gea_Strategy,
   Gea_Mission,
 } from '../../gql/generated'
-import ArchitectureForm from '../architectures/ArchitectureForm'
 
 interface GoalVisionRelationInput {
   visionId: string
@@ -184,13 +183,6 @@ const GoalForm: React.FC<GenericFormProps<Gea_Goal, GoalFormValues>> = ({
 
   const { data: strategiesData, loading: strategiesLoading } = useQuery(GET_STRATEGIES, {
     variables: { where: companyWhere },
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
   })
 
   const goalSchema = React.useMemo(() => createGoalSchema(tForm), [tForm])

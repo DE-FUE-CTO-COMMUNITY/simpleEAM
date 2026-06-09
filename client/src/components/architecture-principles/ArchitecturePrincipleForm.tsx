@@ -16,8 +16,6 @@ import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { useCategoryLabel, usePriorityLabel } from './utils'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
-import ArchitectureForm from '../architectures/ArchitectureForm'
-import ApplicationForm from '../applications/ApplicationForm'
 
 // Schema factory function with translations
 const createArchitecturePrincipleSchema = (t: any) =>
@@ -111,17 +109,6 @@ const ArchitecturePrincipleForm: React.FC<
   })
   const { data: applicationData, loading: applicationLoading } = useQuery(GET_APPLICATIONS, {
     variables: { where: companyWhere },
-  })
-
-  // Nested queries for chip navigation
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-  })
-
-  const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
   })
 
   // Initialize form data with useMemo

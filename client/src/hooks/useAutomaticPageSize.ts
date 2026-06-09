@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react'
  * @returns Die berechnete Seitengröße
  */
 const useAutomaticPageSize = (
-  tableRef: React.RefObject<HTMLElement>,
+  tableRef: React.RefObject<HTMLElement | null>,
   headerHeight: number = 60,
   footerHeight: number = 80,
   rowHeight: number = 60,

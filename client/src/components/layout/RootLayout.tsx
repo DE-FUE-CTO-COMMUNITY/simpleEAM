@@ -23,7 +23,6 @@ import {
   Functions as FunctionIcon,
   AccountTree as ProcessIcon,
   GridOn as GridOnIcon,
-  SmartToy as SmartToyIcon,
   ConnectWithoutContact as InteractionIcon,
   Event as EventIcon,
   MiscellaneousServices as ServiceIcon,

@@ -21,7 +21,6 @@ import GenericForm, { FieldConfig, TabConfig, SelectOption } from '../common/Gen
 import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { GenericFormProps } from '../common/GenericFormProps'
 import { Gea_Vision, Architecture, Gea_Mission, Gea_Value, Gea_Goal } from '../../gql/generated'
-import ArchitectureForm from '../architectures/ArchitectureForm'
 
 interface VisionMissionRelationInput {
   missionId: string
@@ -163,13 +162,6 @@ const VisionForm: React.FC<VisionFormProps> = ({
 
   const { data: goalsData, loading: goalsLoading } = useQuery(GET_GOALS, {
     variables: { where: companyWhere },
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
   })
 
   const visionSchema = React.useMemo(() => createVisionSchema(tForm), [tForm])

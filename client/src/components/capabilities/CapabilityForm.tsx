@@ -10,7 +10,6 @@ import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
-import { GET_CAPABILITIES } from '@/graphql/capability'
 import {
   BusinessCapability,
   CapabilityStatus,
@@ -25,8 +24,6 @@ import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { buildSovereigntyRequirementFields } from '../common/SovereigntyFields'
-import ApplicationForm from '../applications/ApplicationForm'
-import ArchitectureForm from '../architectures/ArchitectureForm'
 
 // Schema factory function with translations
 const createCapabilitySchema = (t: any) =>
@@ -176,28 +173,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
   // Diagramme laden
   const { data: diagramData, loading: diagramLoading } = useQuery(GET_DIAGRAMS, {
     variables: { where: companyWhere },
-  })
-
-  // Queries for individual nested entities
-  const { data: nestedCapabilityData } = useQuery(GET_CAPABILITIES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'capabilities',
-  })
-
-  const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
   })
 
   // Initialize form data with useMemo to avoid unnecessary re-renders

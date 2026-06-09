@@ -16,7 +16,6 @@ import { GET_PERSONS } from '@/graphql/person'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
-import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURE_PRINCIPLES } from '@/graphql/architecturePrinciple'
@@ -28,12 +27,6 @@ import { isArchitect } from '@/lib/auth'
 import { useDomainLabel, useTypeLabel } from './utils'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
-import CapabilityForm from '../capabilities/CapabilityForm'
-import ApplicationForm from '../applications/ApplicationForm'
-import DataObjectForm from '../dataobjects/DataObjectForm'
-import ApplicationInterfaceForm from '../interfaces/ApplicationInterfaceForm'
-import InfrastructureForm from '../infrastructure/InfrastructureForm'
-import ArchitecturePrincipleForm from '../architecture-principles/ArchitecturePrincipleForm'
 
 // Schema for form validation
 export const architectureSchema = z.object({
@@ -157,42 +150,6 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
     GET_INFRASTRUCTURES,
     { variables: { where: companyWhere } }
   )
-
-  // Nested queries for chip navigation (on demand)
-  const { data: nestedCapabilityData } = useQuery(GET_CAPABILITIES, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'capabilities',
-  })
-
-  const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-  })
-
-  const { data: nestedDataObjectData } = useQuery(GET_DATA_OBJECTS, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'dataObjects',
-  })
-
-  const { data: nestedInterfaceData } = useQuery(GET_APPLICATION_INTERFACES, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applicationInterfaces',
-  })
-
-  const { data: nestedInfrastructureData } = useQuery(GET_INFRASTRUCTURES, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'infrastructures',
-  })
-
-  const { data: nestedPrincipleData } = useQuery(GET_ARCHITECTURE_PRINCIPLES, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architecturePrinciples',
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: { where: { id: { eq: nestedFormState.entityId }, ...companyWhere } },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-  })
 
   // Initialize form data with useMemo
   const defaultValues = React.useMemo<ArchitectureFormValues>(
@@ -418,7 +375,7 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
   const diagramIds = useStore(form.store, (state: any) => state.values.diagramIds)
 
   // Verwende useRef, um den vorherigen Zustand zu speichern, ohne Rerendering auszulösen
-  const prevDiagramIdsRef = React.useRef<string[]>()
+  const prevDiagramIdsRef = React.useRef<string[] | undefined>(undefined)
 
   useEffect(() => {
     // Vergleiche aktuelle mit vorherigen Diagramm-IDs

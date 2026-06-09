@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useForm, useStore } from '@tanstack/react-form'
 import { z } from 'zod'
-import { useQuery, gql } from '@apollo/client'
+import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import { Alert } from '@mui/material'
 import {
@@ -51,12 +51,6 @@ import { useFeatureFlags } from '@/lib/feature-flags'
 import { useLensSettings } from '@/lib/lens-settings'
 import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
-import CapabilityForm from '../capabilities/CapabilityForm'
-import DataObjectForm from '../dataobjects/DataObjectForm'
-import ApplicationInterfaceForm from '../interfaces/ApplicationInterfaceForm'
-import ArchitectureForm from '../architectures/ArchitectureForm'
-import ArchitecturePrincipleForm from '../architecture-principles/ArchitecturePrincipleForm'
-import InfrastructureForm from '../infrastructure/InfrastructureForm'
 
 // Basis-Schema factory function that accepts translations
 const createBaseApplicationSchema = (t: any) =>
@@ -431,151 +425,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     variables: { where: companyWhere },
     skip: !isSupEnabled,
   })
-
-  // Queries for individual nested entities
-  const { data: nestedCapabilityData } = useQuery(GET_CAPABILITIES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'capabilities',
-  })
-
-  const { data: nestedDataObjectData } = useQuery(GET_DATA_OBJECTS, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'dataObjects',
-  })
-
-  const { data: nestedInterfaceData } = useQuery(GET_APPLICATION_INTERFACES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applicationInterfaces',
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-  })
-
-  const { data: nestedPrincipleData } = useQuery(GET_ARCHITECTURE_PRINCIPLES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architecturePrinciples',
-  })
-
-  const { data: nestedInfrastructureData } = useQuery(GET_INFRASTRUCTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'infrastructures',
-  })
-
-  const { data: nestedApplicationData } = useQuery(
-    gql`
-      query GetApplication($where: ApplicationWhere) {
-        applications(where: $where) {
-          id
-          name
-          description
-          status
-          criticality
-          costs
-          vendor
-          version
-          hostingEnvironment
-          technologyStack
-          introductionDate
-          endOfLifeDate
-          planningDate
-          endOfUseDate
-          timeCategory
-          sevenRStrategy
-          owners {
-            id
-            firstName
-            lastName
-          }
-          supportsCapabilities {
-            id
-            name
-          }
-          supportsBusinessProcesses {
-            id
-            name
-          }
-          usesDataObjects {
-            id
-            name
-          }
-          sourceOfInterfaces {
-            id
-            name
-          }
-          targetOfInterfaces {
-            id
-            name
-          }
-          partOfArchitectures {
-            id
-            name
-          }
-          implementsPrinciples {
-            id
-            name
-          }
-          depictedInDiagrams {
-            id
-            title
-          }
-          parents {
-            id
-            name
-          }
-          components {
-            id
-            name
-          }
-          predecessors {
-            id
-            name
-          }
-          successors {
-            id
-            name
-          }
-          hostedOn {
-            id
-            name
-          }
-          providedBy {
-            id
-            name
-          }
-          supportedBy {
-            id
-            name
-          }
-          maintainedBy {
-            id
-            name
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    `,
-    {
-      variables: {
-        where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-      },
-      skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-    }
-  )
 
   // Standardwerte für das Formular
   const defaultValues: ApplicationFormValues = {

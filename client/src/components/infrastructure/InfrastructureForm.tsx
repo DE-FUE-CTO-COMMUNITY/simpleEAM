@@ -41,8 +41,6 @@ import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
-import ApplicationForm from '../applications/ApplicationForm'
-import ArchitectureForm from '../architectures/ArchitectureForm'
 
 // Basis-Schema ohne Validierung
 const baseInfrastructureSchema = z.object({
@@ -299,28 +297,6 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
     }
   )
 
-  // Nested entity queries for chip navigation (loaded on demand)
-  const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-  })
-
-  const { data: nestedInfrastructureData } = useQuery(GET_INFRASTRUCTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'infrastructures',
-  })
-
   // Initialize form data with useMemo, um unnötige Re-Renders zu vermeiden
   const defaultValues = React.useMemo<InfrastructureFormValues>(
     () => ({
@@ -363,7 +339,8 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
       sovereigntyAchResilience: infrastructure?.sovereigntyAchResilience || null,
       sovereigntyAchSecurity: infrastructure?.sovereigntyAchSecurity || null,
       sovereigntyAchControl: infrastructure?.sovereigntyAchControl || null,
-      sovereigntyAchStrategicAutonomyEvidence: infrastructure?.sovereigntyAchStrategicAutonomyEvidence || '',
+      sovereigntyAchStrategicAutonomyEvidence:
+        infrastructure?.sovereigntyAchStrategicAutonomyEvidence || '',
       lastSovereigntyAssessmentAt: infrastructure?.lastSovereigntyAssessmentAt
         ? new Date(infrastructure.lastSovereigntyAssessmentAt)
         : null,
@@ -471,7 +448,8 @@ const InfrastructureForm: React.FC<GenericFormProps<Infrastructure, Infrastructu
         sovereigntyAchResilience: infrastructure.sovereigntyAchResilience ?? null,
         sovereigntyAchSecurity: infrastructure.sovereigntyAchSecurity ?? null,
         sovereigntyAchControl: infrastructure.sovereigntyAchControl ?? null,
-        sovereigntyAchStrategicAutonomyEvidence: infrastructure.sovereigntyAchStrategicAutonomyEvidence ?? '',
+        sovereigntyAchStrategicAutonomyEvidence:
+          infrastructure.sovereigntyAchStrategicAutonomyEvidence ?? '',
         lastSovereigntyAssessmentAt: infrastructure.lastSovereigntyAssessmentAt
           ? new Date(infrastructure.lastSovereigntyAssessmentAt)
           : null,

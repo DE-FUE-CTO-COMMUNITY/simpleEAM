@@ -32,9 +32,6 @@ import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
-import ApplicationForm from '../applications/ApplicationForm'
-import DataObjectForm from '../dataobjects/DataObjectForm'
-import ArchitectureForm from '../architectures/ArchitectureForm'
 
 // Base schema factory function that accepts translations
 const createBaseApplicationInterfaceSchema = (t: any) =>
@@ -306,35 +303,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       variables: { where: companyWhere },
     }
   )
-
-  // Nested entity queries for chip navigation
-  const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-  })
-
-  const { data: nestedDataObjectData } = useQuery(GET_DATA_OBJECTS, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'dataObjects',
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-  })
-
-  const { data: nestedInterfaceData } = useQuery(GET_APPLICATION_INTERFACES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applicationInterfaces',
-  })
 
   // Initialize form data with useMemo to avoid unnecessary re-renders
   const defaultValues = React.useMemo<ApplicationInterfaceFormValues>(

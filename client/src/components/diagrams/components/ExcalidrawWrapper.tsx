@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useLocale, useTranslations } from 'next-intl'
+import '@excalidraw/excalidraw/index.css'
 import { ExcalidrawComponentProps } from '../types/DiagramTypes'
 import { useThemeMode } from '@/contexts/ThemeContext'
 import { useCompanyContext } from '@/contexts/CompanyContext'
@@ -17,9 +18,6 @@ import { useAuth } from '@/lib/auth'
 // Dynamic import of Excalidraw to avoid server-side rendering
 const ExcalidrawWrapper = dynamic(
   async () => {
-    // Important: First import the CSS, then the component
-    await import('@excalidraw/excalidraw/index.css')
-
     // Import dynamic theme system - this handles ALL styling including structure and colors
     const { injectExcalidrawThemeCSS } = await import('@/styles/excalidraw-dynamic-theme')
 

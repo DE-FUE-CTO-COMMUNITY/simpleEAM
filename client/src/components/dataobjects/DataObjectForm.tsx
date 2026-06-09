@@ -17,7 +17,7 @@ import { GET_ARCHITECTURES } from '@/graphql/architecture'
 import { GET_CAPABILITIES } from '@/graphql/capability'
 import { GET_DIAGRAMS } from '@/graphql/diagram'
 import { GET_APPLICATION_INTERFACES } from '@/graphql/applicationInterface'
-import { GET_DATA_OBJECTS, GET_DATA_OBJECT } from '@/graphql/dataObject'
+import { GET_DATA_OBJECTS } from '@/graphql/dataObject'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { useFeatureFlags } from '@/lib/feature-flags'
@@ -32,10 +32,6 @@ import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { buildSovereigntyRequirementFields } from '../common/SovereigntyFields'
-import ApplicationForm from '../applications/ApplicationForm'
-import CapabilityForm from '../capabilities/CapabilityForm'
-import ApplicationInterfaceForm from '../interfaces/ApplicationInterfaceForm'
-import ArchitectureForm from '../architectures/ArchitectureForm'
 
 // Basis-Schema factory function with translations
 const createBaseDataObjectSchema = (t: any) =>
@@ -200,42 +196,6 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     variables: { where: companyWhere },
   })
 
-  // Nested entity queries (loaded on demand via chip click)
-  const { data: nestedApplicationData } = useQuery(GET_APPLICATIONS, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applications',
-  })
-
-  const { data: nestedCapabilityData } = useQuery(GET_CAPABILITIES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'capabilities',
-  })
-
-  const { data: nestedInterfaceData } = useQuery(GET_APPLICATION_INTERFACES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'applicationInterfaces',
-  })
-
-  const { data: nestedArchitectureData } = useQuery(GET_ARCHITECTURES, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'architectures',
-  })
-
-  const { data: nestedDataObjectData } = useQuery(GET_DATA_OBJECT, {
-    variables: {
-      where: { id: { eq: nestedFormState.entityId }, ...companyWhere },
-    },
-    skip: !nestedFormState.isOpen || nestedFormState.entityType !== 'dataObjects',
-  })
-
   // Initialize form data with useMemo to avoid unnecessary re-renders
   const defaultValues = React.useMemo<DataObjectFormValues>(
     () => ({
@@ -263,7 +223,8 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       sovereigntyReqSecurity: dataObject?.sovereigntyReqSecurity || null,
       sovereigntyReqControl: dataObject?.sovereigntyReqControl || null,
       sovereigntyReqWeight: dataObject?.sovereigntyReqWeight ?? 1,
-      sovereigntyReqStrategicAutonomyRationale: dataObject?.sovereigntyReqStrategicAutonomyRationale || '',
+      sovereigntyReqStrategicAutonomyRationale:
+        dataObject?.sovereigntyReqStrategicAutonomyRationale || '',
     }),
     [dataObject, currentPerson?.id]
   )
@@ -324,7 +285,8 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         sovereigntyReqSecurity: dataObject.sovereigntyReqSecurity ?? null,
         sovereigntyReqControl: dataObject.sovereigntyReqControl ?? null,
         sovereigntyReqWeight: dataObject.sovereigntyReqWeight ?? null,
-        sovereigntyReqStrategicAutonomyRationale: dataObject.sovereigntyReqStrategicAutonomyRationale ?? '',
+        sovereigntyReqStrategicAutonomyRationale:
+          dataObject.sovereigntyReqStrategicAutonomyRationale ?? '',
       }
 
       // Reset form with values from existing DataObject
