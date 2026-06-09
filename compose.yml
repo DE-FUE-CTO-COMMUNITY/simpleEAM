@@ -2,6 +2,22 @@ services:
   # Neo4j Database
   neo4j:
     image: neo4j:5.26
+    entrypoint:
+      - tini
+      - -g
+      - --
+      - /bin/bash
+      - -ec
+    command:
+      - |
+        APJAR="$$(ls -1 /var/lib/neo4j/labs/apoc-*.jar 2>/dev/null | head -n1 || true)"
+        if [ -z "$$APJAR" ]; then
+          echo "APOC jar not found in /var/lib/neo4j/labs"
+          exit 1
+        fi
+        find /plugins -maxdepth 1 -type f -name 'apoc*.jar' -delete
+        cp "$$APJAR" /plugins/apoc.jar
+        exec /startup/docker-entrypoint.sh neo4j
     restart: unless-stopped
     ports:
       - "${NEO4J_EXTERNAL_PORT}:${NEO4J_PORT}" # HTTP
