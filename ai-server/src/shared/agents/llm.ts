@@ -179,6 +179,51 @@ export const extractLlmText = (payload: unknown): string => {
   return ''
 }
 
+const extractLlmErrorText = (payload: unknown): string => {
+  if (typeof payload === 'string') return payload.trim()
+  if (!payload || typeof payload !== 'object') return ''
+
+  const data = payload as Record<string, unknown>
+  const error = data.error
+
+  if (typeof error === 'string' && error.trim()) return error.trim()
+
+  if (error && typeof error === 'object') {
+    const errorData = error as Record<string, unknown>
+    if (typeof errorData.message === 'string' && errorData.message.trim()) {
+      return errorData.message.trim()
+    }
+    if (typeof errorData.code === 'string' && errorData.code.trim()) {
+      return errorData.code.trim()
+    }
+  }
+
+  if (typeof data.message === 'string' && data.message.trim()) return data.message.trim()
+  if (typeof data.detail === 'string' && data.detail.trim()) return data.detail.trim()
+  return ''
+}
+
+const isChatCompletionsEndpoint = (url: string): boolean => {
+  try {
+    const pathname = new URL(url).pathname.replace(/\/+$/, '')
+    return pathname.endsWith('/chat/completions')
+  } catch {
+    return /\/chat\/completions\/?$/i.test(url)
+  }
+}
+
+const toHttpError = (
+  status: number,
+  statusText: string,
+  payload: unknown,
+  fallbackMessage?: string
+): Error => {
+  const details = extractLlmErrorText(payload)
+  if (details) return new Error(`LLM HTTP error ${status}: ${details}`)
+  if (fallbackMessage) return new Error(fallbackMessage)
+  return new Error(`LLM HTTP error ${status}: ${statusText}`)
+}
+
 export const callLlm = async (
   prompt: string,
   config: LlmConfig,
@@ -216,6 +261,11 @@ export const callLlm = async (
         const payload = (await openAiResponse.json().catch(() => null)) as unknown
         const text = extractLlmText(payload)
         if (text.trim()) return text
+      } else {
+        const errorPayload = (await openAiResponse.json().catch(() => null)) as unknown
+        if (isChatCompletionsEndpoint(llmConfig.endpointUrl)) {
+          throw toHttpError(openAiResponse.status, openAiResponse.statusText, errorPayload)
+        }
       }
 
       const genericResponse = await fetchWithTimeout(
@@ -235,7 +285,13 @@ export const callLlm = async (
       )
 
       if (!genericResponse.ok) {
-        throw new Error(`LLM HTTP error ${genericResponse.status}: ${genericResponse.statusText}`)
+        const errorPayload = (await genericResponse.json().catch(() => null)) as unknown
+        throw toHttpError(
+          genericResponse.status,
+          genericResponse.statusText,
+          errorPayload,
+          `LLM HTTP error ${genericResponse.status}: ${genericResponse.statusText}`
+        )
       }
 
       const genericPayload = (await genericResponse.json().catch(() => null)) as unknown
