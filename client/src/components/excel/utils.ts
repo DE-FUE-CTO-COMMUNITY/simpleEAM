@@ -173,8 +173,13 @@ export const getRelationshipFields = (entityType: string): string[] => {
 // Helper function to transform input for UPDATE mutations (wrap scalars in { set: value })
 export const transformInputForUpdate = (input: any): any => {
   const transformed: any = {}
+  const nonUpdatableFields = new Set(['id', 'createdAt', 'updatedAt', '__typename'])
 
   for (const [key, value] of Object.entries(input)) {
+    if (nonUpdatableFields.has(key)) {
+      continue
+    }
+
     if (key.includes('connect') || key.includes('disconnect') || key.includes('create')) {
       // Relationship fields - keep as is
       transformed[key] = value
