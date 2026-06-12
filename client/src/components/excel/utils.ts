@@ -283,6 +283,8 @@ export const checkEntityExists = async (
 
 // Helper function to create entity input based on entity type and row data
 export const createEntityInput = (entityType: string, row: any): any => {
+  row = { ...row, updatedAt: new Date().toISOString() }
+
   const toYearDate = (value: unknown): Date | undefined => {
     if (value === null || value === undefined || value === '') {
       return undefined

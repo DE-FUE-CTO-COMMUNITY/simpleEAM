@@ -90,6 +90,8 @@ export const validateBpmnXmlForImport = async (xml: unknown): Promise<string[]> 
  * WICHTIG: Entfernt id und createdAt, da diese in Create-Input-Typen nicht erlaubt sind
  */
 export const createEntityInputFromJson = (entityType: string, row: any): any => {
+  row = { ...row, updatedAt: new Date().toISOString() }
+
   const toYearDate = (value: unknown): Date | undefined => {
     if (value === null || value === undefined || value === '') {
       return undefined

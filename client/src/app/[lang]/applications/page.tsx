@@ -265,7 +265,8 @@ const ApplicationsPage = () => {
       sovereigntyAchResilience: applicationData.sovereigntyAchResilience,
       sovereigntyAchSecurity: applicationData.sovereigntyAchSecurity,
       sovereigntyAchControl: applicationData.sovereigntyAchControl,
-      sovereigntyAchStrategicAutonomyEvidence: applicationData.sovereigntyAchStrategicAutonomyEvidence,
+      sovereigntyAchStrategicAutonomyEvidence:
+        applicationData.sovereigntyAchStrategicAutonomyEvidence,
       lastSovereigntyAssessmentAt: applicationData.lastSovereigntyAssessmentAt,
       status: applicationData.status,
       criticality: applicationData.criticality,
@@ -489,7 +490,9 @@ const ApplicationsPage = () => {
     const input: Record<string, any> = {
       name: { set: applicationData.name },
       description: { set: applicationData.description },
-      sovereigntyAchStrategicAutonomy: { set: applicationData.sovereigntyAchStrategicAutonomy ?? null },
+      sovereigntyAchStrategicAutonomy: {
+        set: applicationData.sovereigntyAchStrategicAutonomy ?? null,
+      },
       sovereigntyAchResilience: {
         set: applicationData.sovereigntyAchResilience ?? null,
       },
@@ -499,7 +502,9 @@ const ApplicationsPage = () => {
       sovereigntyAchControl: {
         set: applicationData.sovereigntyAchControl ?? null,
       },
-      sovereigntyAchStrategicAutonomyEvidence: { set: applicationData.sovereigntyAchStrategicAutonomyEvidence ?? null },
+      sovereigntyAchStrategicAutonomyEvidence: {
+        set: applicationData.sovereigntyAchStrategicAutonomyEvidence ?? null,
+      },
       lastSovereigntyAssessmentAt: { set: applicationData.lastSovereigntyAssessmentAt ?? null },
       status: { set: applicationData.status },
       criticality: { set: applicationData.criticality },

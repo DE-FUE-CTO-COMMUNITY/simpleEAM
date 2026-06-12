@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@apollo/client'
 import { GET_APPLICATION, GET_APPLICATIONS, UPDATE_APPLICATION } from '@/graphql/application'
-import { GET_APPLICATION_INTERFACE, UPDATE_APPLICATION_INTERFACE } from '@/graphql/applicationInterface'
+import {
+  GET_APPLICATION_INTERFACE,
+  UPDATE_APPLICATION_INTERFACE,
+} from '@/graphql/applicationInterface'
 import { GET_ARCHITECTURES, UPDATE_ARCHITECTURE } from '@/graphql/architecture'
 import {
   GET_ARCHITECTURE_PRINCIPLES,
@@ -240,7 +243,9 @@ function NestedApplicationForm({
     const input: Record<string, unknown> = {
       name: { set: applicationData.name },
       description: { set: applicationData.description },
-      sovereigntyAchStrategicAutonomy: { set: applicationData.sovereigntyAchStrategicAutonomy ?? null },
+      sovereigntyAchStrategicAutonomy: {
+        set: applicationData.sovereigntyAchStrategicAutonomy ?? null,
+      },
       sovereigntyAchResilience: { set: applicationData.sovereigntyAchResilience ?? null },
       sovereigntyAchSecurity: { set: applicationData.sovereigntyAchSecurity ?? null },
       sovereigntyAchControl: { set: applicationData.sovereigntyAchControl ?? null },
@@ -286,7 +291,13 @@ function NestedApplicationForm({
     onSaved()
   }
 
-  if (loading || allApplicationsLoading || error || allApplicationsError || !data?.applications?.[0]) {
+  if (
+    loading ||
+    allApplicationsLoading ||
+    error ||
+    allApplicationsError ||
+    !data?.applications?.[0]
+  ) {
     return null
   }
 
@@ -342,7 +353,9 @@ function NestedCapabilityForm({
       name: { set: capabilityData.name },
       description: { set: capabilityData.description },
       maturityLevel: { set: capabilityData.maturityLevel },
-      sovereigntyReqStrategicAutonomy: { set: capabilityData.sovereigntyReqStrategicAutonomy ?? null },
+      sovereigntyReqStrategicAutonomy: {
+        set: capabilityData.sovereigntyReqStrategicAutonomy ?? null,
+      },
       sovereigntyReqResilience: { set: capabilityData.sovereigntyReqResilience ?? null },
       sovereigntyReqSecurity: { set: capabilityData.sovereigntyReqSecurity ?? null },
       sovereigntyReqControl: { set: capabilityData.sovereigntyReqControl ?? null },
