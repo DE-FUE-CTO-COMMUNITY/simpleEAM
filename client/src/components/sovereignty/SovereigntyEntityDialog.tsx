@@ -188,7 +188,6 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
       costs: { set: base.costs },
       vendor: { set: base.vendor },
       version: { set: base.version },
-      hostingEnvironment: { set: base.hostingEnvironment },
       technologyStack: { set: base.technologyStack },
       planningDate: { set: base.planningDate },
       introductionDate: { set: base.introductionDate },

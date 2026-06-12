@@ -17,7 +17,6 @@ export const baseApplicationSchema = z.object({
   costs: z.number().min(0, 'Costs must be positive'),
   vendor: z.string().optional(),
   version: z.string().optional(),
-  hostingEnvironment: z.string().optional(),
   technologyStack: z.array(z.string()).default([]),
   introductionDate: z.string().optional(),
   endOfLifeDate: z.string().optional(),
@@ -52,7 +51,6 @@ export type ApplicationType = Pick<
   | 'costs'
   | 'vendor'
   | 'version'
-  | 'hostingEnvironment'
   | 'technologyStack'
   | 'introductionDate'
   | 'endOfLifeDate'

@@ -234,7 +234,6 @@ export const fetchApplicationsForJson = async (
       status: app.status || '',
       criticality: app.criticality || '',
       vendor: app.vendor || '',
-      hostingEnvironment: app.hostingEnvironment || '',
       // Numeric fields
       costs: app.costs || undefined,
       // Date fields - alle wichtigen Datums-Felder hinzufügen

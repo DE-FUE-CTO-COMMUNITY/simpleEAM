@@ -2409,6 +2409,7 @@
         "multiTabWarnings": "Multi-Tab-Datei geladen, aber {count} Fehler gefunden.",
         "singleTabValidated": "Datei erfolgreich validiert. {count} gültige Datensätze gefunden.",
         "singleTabWarnings": "Datei geladen, aber {count} Fehler gefunden.",
+        "excelTabMismatch": "Excel-Tab \"{sheetName}\" passt nicht zum ausgewählten Elementtyp. Erwartet wird ein Tab für \"{expectedTabName}\".",
         "fileLoadError": "Fehler beim Laden der Datei: {error}",
         "multiTabImportSuccess": "Multi-Tab-Import erfolgreich abgeschlossen. {count} Datensätze importiert.",
         "multiTabImportPartial": "Multi-Tab-Import mit Fehlern abgeschlossen. {imported} Datensätze importiert, {failed} fehlgeschlagen.",

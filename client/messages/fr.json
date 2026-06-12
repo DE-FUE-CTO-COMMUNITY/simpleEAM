@@ -2462,6 +2462,7 @@
         "multiTabWarnings": "Fichier multi-onglets chargé, mais erreurs {count} détectées.",
         "singleTabValidated": "Fichier validé avec succès. {count} enregistrements valides trouvés.",
         "singleTabWarnings": "Fichier chargé, mais erreurs {count} détectées.",
+        "excelTabMismatch": "L'onglet Excel \"{sheetName}\" ne correspond pas au type d'élément sélectionné. Un onglet pour \"{expectedTabName}\" est attendu.",
         "fileLoadError": "Erreur de chargement du fichier : {error}",
         "multiTabImportSuccess": "L'importation multi-onglets s'est terminée avec succès. {count} enregistrements importés.",
         "multiTabImportPartial": "Importation multi-onglets terminée avec des erreurs. {imported} enregistrements importés, {failed} a échoué.",

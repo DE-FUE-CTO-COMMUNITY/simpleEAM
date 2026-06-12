@@ -189,7 +189,6 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'costs',
                       'vendor',
                       'version',
-                      'hostingEnvironment',
                       'technologyStack',
                       'planningDate',
                       'introductionDate',

@@ -32,7 +32,6 @@ export const APPLICATION_DEFAULT_COLUMN_VISIBILITY = {
   supportsCapabilities: false,
   supportsBusinessProcesses: false,
   usesDataObjects: false,
-  hostingEnvironment: false,
   technologyStack: false,
   planningDate: false,
   introductionDate: false,
@@ -224,11 +223,6 @@ const ApplicationTableWithGenericTable: React.FC<ApplicationTableProps> = ({
         cell: info => formatCosts(info.getValue()),
       }),
       // Weitere versteckte Spalten
-      columnHelper.accessor('hostingEnvironment', {
-        header: t('hostingEnvironment'),
-        cell: info => info.getValue() || '-',
-        enableHiding: true,
-      }),
       columnHelper.accessor('technologyStack', {
         header: t('technologyStack'),
         cell: info => {

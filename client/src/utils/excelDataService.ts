@@ -235,7 +235,6 @@ export const fetchApplicationsForExport = async (
       costs: app.costs || 0,
       vendor: app.vendor || '',
       version: app.version || '',
-      hostingEnvironment: app.hostingEnvironment || '',
       technologyStack: app.technologyStack?.join(',') || '',
       planningDate: formatDateForExport(app.planningDate),
       introductionDate: formatDateForExport(app.introductionDate),
@@ -1413,7 +1412,6 @@ export const getApplicationsTemplate = (): ExcelExportData => ({
   costs: 0,
   vendor: '',
   version: '',
-  hostingEnvironment: '',
   technologyStack: '', // Komma-getrennte Technologien
   planningDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
   introductionDate: '', // ISO-Format: 2024-01-01T12:00:00.000Z
@@ -2326,7 +2324,6 @@ export const getTemplateWithExamples = (
           costs: 50000,
           vendor: 'Salesforce',
           version: '2024.1',
-          hostingEnvironment: 'cloud',
           technologyStack: 'Java,React,PostgreSQL',
           introductionDate: '2023-01-01T00:00:00.000Z',
           endOfLifeDate: '2028-12-31T23:59:59.000Z',
@@ -2632,7 +2629,6 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'costs',
         'vendor',
         'version',
-        'hostingEnvironment',
         'technologyStack',
         'planningDate',
         'introductionDate',

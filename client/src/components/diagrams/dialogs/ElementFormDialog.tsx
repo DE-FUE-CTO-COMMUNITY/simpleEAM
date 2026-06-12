@@ -240,7 +240,6 @@ function ApplicationFormWrapper({
         costs: { set: applicationData.costs },
         vendor: { set: applicationData.vendor },
         version: { set: applicationData.version },
-        hostingEnvironment: { set: applicationData.hostingEnvironment },
         technologyStack: { set: applicationData.technologyStack },
         planningDate: { set: applicationData.planningDate },
         introductionDate: { set: applicationData.introductionDate },

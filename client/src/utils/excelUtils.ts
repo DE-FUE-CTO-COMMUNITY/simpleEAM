@@ -32,6 +32,11 @@ interface MultiTabExportOptions {
   includeHeaders: boolean
 }
 
+export interface ImportedExcelSheet {
+  sheetName: string
+  data: ExcelExportData[]
+}
+
 /**
  * Exportiert Daten in eine Excel- oder CSV-Datei
  */
@@ -136,7 +141,7 @@ export const exportMultiTabToExcel = async (
 /**
  * Liest eine Excel- oder CSV-Datei und gibt die Daten zurück
  */
-export const importFromExcel = (file: File): Promise<ExcelExportData[]> => {
+export const importFirstSheetFromExcel = (file: File): Promise<ImportedExcelSheet> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
 
@@ -173,7 +178,7 @@ export const importFromExcel = (file: File): Promise<ExcelExportData[]> => {
           return obj
         })
 
-        resolve(result)
+        resolve({ sheetName, data: result })
       } catch (error) {
         reject(
           new Error(
@@ -189,6 +194,11 @@ export const importFromExcel = (file: File): Promise<ExcelExportData[]> => {
 
     reader.readAsArrayBuffer(file)
   })
+}
+
+export const importFromExcel = async (file: File): Promise<ExcelExportData[]> => {
+  const { data } = await importFirstSheetFromExcel(file)
+  return data
 }
 
 /**

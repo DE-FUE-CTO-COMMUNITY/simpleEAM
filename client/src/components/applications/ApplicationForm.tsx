@@ -65,11 +65,6 @@ const createBaseApplicationSchema = (t: any) =>
     costs: z.number().min(0, t('validation.costsMin')).optional().nullable(),
     vendor: z.string().max(100, t('validation.vendorMax')).optional().nullable(),
     version: z.string().max(50, t('validation.versionMax')).optional().nullable(),
-    hostingEnvironment: z
-      .string()
-      .max(100, t('validation.hostingEnvironmentMax'))
-      .optional()
-      .nullable(),
     technologyStack: z.array(z.string()).optional().nullable(),
     introductionDate: z.date().optional().nullable(),
     endOfLifeDate: z.date().optional().nullable(),
@@ -435,7 +430,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
     costs: application?.costs ?? null,
     vendor: application?.vendor ?? null,
     version: application?.version ?? null,
-    hostingEnvironment: application?.hostingEnvironment ?? null,
     technologyStack: application?.technologyStack ?? [],
     introductionDate: application?.introductionDate ? new Date(application.introductionDate) : null,
     endOfLifeDate: application?.endOfLifeDate ? new Date(application.endOfLifeDate) : null,
@@ -536,7 +530,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
         costs: application?.costs ?? null,
         vendor: application?.vendor ?? null,
         version: application?.version ?? null,
-        hostingEnvironment: application?.hostingEnvironment ?? null,
         technologyStack: application?.technologyStack ?? [],
         introductionDate: application?.introductionDate
           ? new Date(application.introductionDate)
@@ -838,14 +831,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       type: 'text',
       tabId: 'technical',
       validators: baseApplicationSchema.shape.version,
-      size: { xs: 12, md: 6 },
-    },
-    {
-      name: 'hostingEnvironment',
-      label: t('hostingEnvironment'),
-      type: 'text',
-      tabId: 'technical',
-      validators: baseApplicationSchema.shape.hostingEnvironment,
       size: { xs: 12, md: 6 },
     },
     {

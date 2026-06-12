@@ -13,7 +13,24 @@ import {
 } from '../../utils/jsonInputUtils'
 import { exportToJson } from '../../utils/jsonUtils'
 import { ImportWithMappingResult, EntityMapping, ImportResult } from './types'
-import { resolveEntityTypeFromTabName, isGeaEntityType } from './constants'
+import {
+  resolveEntityTypeFromTabName,
+  isGeaEntityType,
+  doesTabNameMatchEntityType,
+  reverseEntityTypeMapping,
+} from './constants'
+
+class ExcelTabMismatchError extends Error {
+  sheetName: string
+  expectedTabName: string
+
+  constructor(sheetName: string, expectedTabName: string) {
+    super('EXCEL_TAB_MISMATCH')
+    this.name = 'ExcelTabMismatchError'
+    this.sheetName = sheetName
+    this.expectedTabName = expectedTabName
+  }
+}
 
 /**
  * Extracts a readable error message from various error types
@@ -483,8 +500,15 @@ export const handleSingleTabImport = async (
   let data: any[] = []
 
   if (format === 'xlsx' && entityType !== 'diagrams') {
-    const { importFromExcel } = await import('../../utils/excelUtils')
-    data = await importFromExcel(file)
+    const { importFirstSheetFromExcel } = await import('../../utils/excelUtils')
+    const importedSheet = await importFirstSheetFromExcel(file)
+
+    if (!doesTabNameMatchEntityType(importedSheet.sheetName, entityType)) {
+      const expectedTabName = reverseEntityTypeMapping[entityType] || entityType
+      throw new ExcelTabMismatchError(importedSheet.sheetName, expectedTabName)
+    }
+
+    data = importedSheet.data
   } else if (format === 'json' || entityType === 'diagrams') {
     const { importFromJson } = await import('../../utils/jsonUtils')
     data = await importFromJson(file)
@@ -1117,11 +1141,50 @@ const createRelationshipUpdateInput = (
       if (row.usesDataObjects) {
         input.usesDataObjects = processRelationshipField('usesDataObjects', row.usesDataObjects)
       }
+      if (row.sourceOfInterfaces) {
+        input.sourceOfInterfaces = processRelationshipField(
+          'sourceOfInterfaces',
+          row.sourceOfInterfaces
+        )
+      }
+      if (row.targetOfInterfaces) {
+        input.targetOfInterfaces = processRelationshipField(
+          'targetOfInterfaces',
+          row.targetOfInterfaces
+        )
+      }
       if (row.partOfArchitectures) {
         input.partOfArchitectures = processRelationshipField(
           'partOfArchitectures',
           row.partOfArchitectures
         )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
+        )
+      }
+      if (row.parents) {
+        input.parents = processRelationshipField('parents', row.parents)
+      }
+      if (row.components) {
+        input.components = processRelationshipField('components', row.components)
+      }
+      if (row.predecessors) {
+        input.predecessors = processRelationshipField('predecessors', row.predecessors)
+      }
+      if (row.successors) {
+        input.successors = processRelationshipField('successors', row.successors)
+      }
+      if (row.implementsPrinciples) {
+        input.implementsPrinciples = processRelationshipField(
+          'implementsPrinciples',
+          row.implementsPrinciples
+        )
+      }
+      if (row.hostedOn) {
+        input.hostedOn = processRelationshipField('hostedOn', row.hostedOn)
       }
       break
 

@@ -128,6 +128,11 @@ export const resolveEntityTypeFromTabName = (tabName: string): string | undefine
   return entityTypeMapping[tabName] || normalizedEntityTypeMapping[normalizeTabName(tabName)]
 }
 
+export const doesTabNameMatchEntityType = (tabName: string, entityType: string): boolean => {
+  const resolvedEntityType = resolveEntityTypeFromTabName(tabName)
+  return resolvedEntityType === entityType
+}
+
 // Umkehrung für Export-Tab-Namen
 export const reverseEntityTypeMapping: Record<string, string> = {
   businessCapabilities: 'Business Capabilities',

@@ -2462,6 +2462,7 @@
         "multiTabWarnings": "Multi-tab file loaded, but {count} errors found.",
         "singleTabValidated": "File successfully validated. {count} valid records found.",
         "singleTabWarnings": "File loaded, but {count} errors found.",
+        "excelTabMismatch": "Excel tab \"{sheetName}\" does not match the selected element type. Expected a tab for \"{expectedTabName}\".",
         "fileLoadError": "Error loading file: {error}",
         "multiTabImportSuccess": "Multi-tab import successfully completed. {count} records imported.",
         "multiTabImportPartial": "Multi-tab import completed with errors. {imported} records imported, {failed} failed.",

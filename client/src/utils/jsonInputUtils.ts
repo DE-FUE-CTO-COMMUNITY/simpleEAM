@@ -181,7 +181,6 @@ export const createEntityInputFromJson = (entityType: string, row: any): any => 
           ? row.criticality
           : 'MEDIUM',
         vendor: row.vendor || '',
-        hostingEnvironment: row.hostingEnvironment || '',
         // Numeric fields
         costs:
           typeof row.costs === 'number' ? row.costs : row.costs ? parseFloat(row.costs) : undefined,

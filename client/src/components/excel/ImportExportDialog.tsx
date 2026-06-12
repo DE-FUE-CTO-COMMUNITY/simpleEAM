@@ -46,6 +46,8 @@ import {
   defaultDeleteSettings,
   getEntityTypeOrder,
   isGeaEntityType,
+  doesTabNameMatchEntityType,
+  reverseEntityTypeMapping,
 } from './constants'
 import {
   handleMultiTabImport,
@@ -81,6 +83,24 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
   const { selectedLens } = useLensSelection()
   const isGeaEnabled = featureFlags.GEA
   const isTechnologyManagementLensActive = selectedLens === 'technologyManagement'
+  const getImportErrorMessage = (error: unknown) => {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'name' in error &&
+      error.name === 'ExcelTabMismatchError' &&
+      'sheetName' in error &&
+      'expectedTabName' in error
+    ) {
+      return t('import.messages.excelTabMismatch', {
+        sheetName: String((error as { sheetName: unknown }).sheetName),
+        expectedTabName: String((error as { expectedTabName: unknown }).expectedTabName),
+      })
+    }
+
+    return error instanceof Error ? error.message : tCommon('unknownError')
+  }
+
   const technologyManagementEntityTypes: EntityType[] = [
     'productFamilies',
     'softwareProducts',
@@ -338,8 +358,24 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         let data: any[] = []
 
         if (importSettings.format === 'xlsx' && importSettings.entityType !== 'diagrams') {
-          const { importFromExcel } = await import('../../utils/excelUtils')
-          data = await importFromExcel(file)
+          const { importFirstSheetFromExcel } = await import('../../utils/excelUtils')
+          const importedSheet = await importFirstSheetFromExcel(file)
+
+          if (!doesTabNameMatchEntityType(importedSheet.sheetName, importSettings.entityType)) {
+            const expectedTabName =
+              reverseEntityTypeMapping[importSettings.entityType] || importSettings.entityType
+            const error = new Error('EXCEL_TAB_MISMATCH') as Error & {
+              name: string
+              sheetName: string
+              expectedTabName: string
+            }
+            error.name = 'ExcelTabMismatchError'
+            error.sheetName = importedSheet.sheetName
+            error.expectedTabName = expectedTabName
+            throw error
+          }
+
+          data = importedSheet.data
         } else if (importSettings.format === 'json' || importSettings.entityType === 'diagrams') {
           const { importFromJson } = await import('../../utils/jsonUtils')
           data = await importFromJson(file)
@@ -367,7 +403,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (err) {
       enqueueSnackbar(
         t('import.messages.fileLoadError', {
-          error: err instanceof Error ? err.message : tCommon('unknownError'),
+          error: getImportErrorMessage(err),
         }),
         { variant: 'error' }
       )
@@ -469,7 +505,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
     } catch (error) {
       enqueueSnackbar(
         t('import.messages.importError', {
-          error: error instanceof Error ? error.message : tCommon('unknownError'),
+          error: getImportErrorMessage(error),
         }),
         { variant: 'error' }
       )

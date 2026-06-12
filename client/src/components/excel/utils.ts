@@ -49,7 +49,16 @@ export const getRelationshipFields = (entityType: string): string[] => {
         'supportsCapabilities',
         'supportsBusinessProcesses',
         'usesDataObjects',
+        'sourceOfInterfaces',
+        'targetOfInterfaces',
         'partOfArchitectures',
+        'depictedInDiagrams',
+        'parents',
+        'components',
+        'predecessors',
+        'successors',
+        'implementsPrinciples',
+        'hostedOn',
       ]
     case 'businessProcesses':
       return [
@@ -403,7 +412,6 @@ export const createEntityInput = (entityType: string, row: any): any => {
         status: validStatus,
         criticality: validCriticality,
         vendor: row.vendor || '',
-        hostingEnvironment: row.hostingEnvironment || '',
         // Numeric fields
         costs:
           typeof row.costs === 'number' ? row.costs : row.costs ? parseFloat(row.costs) : undefined,
