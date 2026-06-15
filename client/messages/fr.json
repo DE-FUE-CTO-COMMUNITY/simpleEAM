@@ -94,6 +94,8 @@
     "transformations": "Transformations",
     "tabs": {
       "general": "Général",
+      "dates": "Dates",
+      "outcome": "Résultat",
       "relationships": "Relations",
       "impacts": "Impacts"
     },
@@ -895,6 +897,8 @@
     },
     "tabs": {
       "general": "Général",
+      "dates": "Dates",
+      "outcome": "Résultat",
       "relationships": "Relations",
       "impacts": "Impacts"
     },
@@ -974,7 +978,7 @@
     },
     "impactActions": {
       "CREATED": "Créé",
-      "CHANGED": "Modifié",
+      "MODIFIED": "Modifié",
       "REMOVED": "Supprimé"
     },
     "statuses": {

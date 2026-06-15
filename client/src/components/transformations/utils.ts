@@ -14,7 +14,7 @@ import {
   TransformationImpactEdge,
 } from './types'
 
-export const defaultImpactAction = TransformationImpactAction.CHANGED
+export const defaultImpactAction = TransformationImpactAction.MODIFIED
 
 export const createEmptyTransformationFormValues = (ownerId = ''): TransformationFormValues => ({
   name: '',

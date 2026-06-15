@@ -1,10 +1,22 @@
 'use client'
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useForm } from '@tanstack/react-form'
 import { useQuery } from '@apollo/client'
 import { z } from 'zod'
-import { Autocomplete, Chip, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material'
+import {
+  Autocomplete,
+  Avatar,
+  Button,
+  Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  MenuItem,
+  Stack,
+  TextField,
+} from '@mui/material'
 import { useTranslations } from 'next-intl'
 import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_Aicomponents } from '@/graphql/aicomponent'
@@ -125,6 +137,32 @@ interface ImpactFieldProps {
   getActionLabel: (action: TransformationImpactAction) => string
 }
 
+const getImpactActionAvatarLabel = (action: TransformationImpactAction) => {
+  switch (action) {
+    case TransformationImpactAction.CREATED:
+      return 'C'
+    case TransformationImpactAction.MODIFIED:
+      return 'M'
+    case TransformationImpactAction.REMOVED:
+      return 'R'
+    default:
+      return 'M'
+  }
+}
+
+const getImpactActionChipColor = (action: TransformationImpactAction) => {
+  switch (action) {
+    case TransformationImpactAction.CREATED:
+      return 'success' as const
+    case TransformationImpactAction.MODIFIED:
+      return 'info' as const
+    case TransformationImpactAction.REMOVED:
+      return 'error' as const
+    default:
+      return 'default' as const
+  }
+}
+
 function ImpactField({
   formField,
   disabled,
@@ -135,18 +173,51 @@ function ImpactField({
   actionOptions,
   getActionLabel,
 }: ImpactFieldProps) {
+  const tActions = useTranslations('transformations.actions')
   const relations = Array.isArray(formField.state.value)
     ? (formField.state.value as ImpactRelation[])
     : []
   const selectedOptions = options.filter(option =>
     relations.some(relation => relation.id === option.id)
   )
+  const [editingRelationId, setEditingRelationId] = useState<string | null>(null)
+  const [editingAction, setEditingAction] =
+    useState<TransformationImpactAction>(defaultImpactAction)
+  const [editingNotes, setEditingNotes] = useState('')
+  const [isNewRelationDialog, setIsNewRelationDialog] = useState(false)
 
-  const handleSelectionChange = (ids: string[]) => {
+  const closeDialogState = () => {
+    setEditingRelationId(null)
+    setEditingAction(defaultImpactAction)
+    setEditingNotes('')
+    setIsNewRelationDialog(false)
+  }
+
+  const removeRelation = (id: string) => {
+    formField.handleChange(relations.filter(relation => relation.id !== id))
+  }
+
+  const openRelationDialog = (relation: ImpactRelation, isNew = false) => {
+    setEditingRelationId(relation.id)
+    setEditingAction(relation.action || defaultImpactAction)
+    setEditingNotes(relation.notes)
+    setIsNewRelationDialog(isNew)
+  }
+
+  const handleSelectionChange = (selected: IdName[]) => {
+    const ids = selected.map(item => item.id)
     const nextRelations = ids.map(
       id => relations.find(relation => relation.id === id) ?? createImpactRelation(id)
     )
     formField.handleChange(nextRelations)
+
+    const newRelation = nextRelations.find(
+      relation => !relations.some(existingRelation => existingRelation.id === relation.id)
+    )
+
+    if (newRelation) {
+      openRelationDialog(newRelation, true)
+    }
   }
 
   const handleRelationChange = (id: string, update: Partial<ImpactRelation>) => {
@@ -155,68 +226,114 @@ function ImpactField({
     )
   }
 
+  const handleDialogSave = () => {
+    if (!editingRelationId) {
+      return
+    }
+
+    handleRelationChange(editingRelationId, {
+      action: editingAction,
+      notes: editingNotes,
+    })
+    closeDialogState()
+  }
+
+  const handleDialogClose = () => {
+    if (isNewRelationDialog && editingRelationId) {
+      removeRelation(editingRelationId)
+    }
+    closeDialogState()
+  }
+
+  const editingOption = editingRelationId
+    ? (options.find(option => option.id === editingRelationId) ?? null)
+    : null
+
   return (
     <Stack spacing={1.5}>
       <Autocomplete
         multiple
         options={options}
         value={selectedOptions}
-        onChange={(_event, value) => handleSelectionChange(value.map(item => item.id))}
+        onChange={(_event, value) => handleSelectionChange(value)}
         getOptionLabel={option => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         disabled={disabled}
         renderTags={(value, getTagProps) =>
-          value.map((option, index) => (
-            <Chip {...getTagProps({ index })} key={option.id} label={option.name} size="small" />
-          ))
+          value.map((option, index) => {
+            const relation = relations.find(item => item.id === option.id)
+            const tagProps = getTagProps({ index })
+
+            return (
+              <Chip
+                {...tagProps}
+                key={option.id}
+                label={option.name}
+                size="small"
+                clickable={!disabled}
+                color={getImpactActionChipColor(relation?.action || defaultImpactAction)}
+                avatar={
+                  <Avatar>
+                    {getImpactActionAvatarLabel(relation?.action || defaultImpactAction)}
+                  </Avatar>
+                }
+                onClick={event => {
+                  event.preventDefault()
+                  event.stopPropagation()
+                  if (!disabled && relation) {
+                    openRelationDialog(relation)
+                  }
+                }}
+                onMouseDown={event => {
+                  event.stopPropagation()
+                }}
+                onDelete={
+                  disabled
+                    ? undefined
+                    : () => {
+                        removeRelation(option.id)
+                      }
+                }
+              />
+            )
+          })
         }
         renderInput={params => <TextField {...params} label={label} />}
       />
-      {relations.map(relation => {
-        const option = options.find(item => item.id === relation.id)
-        if (!option) {
-          return null
-        }
-
-        return (
-          <Paper key={relation.id} variant="outlined" sx={{ p: 2 }}>
-            <Stack spacing={1.5}>
-              <Typography variant="body2" fontWeight={600}>
-                {option.name}
-              </Typography>
-              <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
-                <TextField
-                  select
-                  label={actionLabel}
-                  value={relation.action || defaultImpactAction}
-                  onChange={event =>
-                    handleRelationChange(relation.id, {
-                      action: event.target.value as TransformationImpactAction,
-                    })
-                  }
-                  disabled={disabled}
-                  sx={{ minWidth: 220 }}
-                >
-                  {actionOptions.map(action => (
-                    <MenuItem key={action} value={action}>
-                      {getActionLabel(action)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  label={notesLabel}
-                  value={relation.notes}
-                  onChange={event =>
-                    handleRelationChange(relation.id, { notes: event.target.value })
-                  }
-                  disabled={disabled}
-                  fullWidth
-                />
-              </Stack>
-            </Stack>
-          </Paper>
-        )
-      })}
+      <Dialog open={editingRelationId !== null} onClose={handleDialogClose} maxWidth="sm" fullWidth>
+        <DialogTitle>{editingOption ? `${label}: ${editingOption.name}` : label}</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={2} sx={{ pt: 1 }}>
+            <TextField
+              select
+              label={actionLabel}
+              value={editingAction}
+              onChange={event => setEditingAction(event.target.value as TransformationImpactAction)}
+              fullWidth
+            >
+              {actionOptions.map(action => (
+                <MenuItem key={action} value={action}>
+                  {getActionLabel(action)}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              label={notesLabel}
+              value={editingNotes}
+              onChange={event => setEditingNotes(event.target.value)}
+              fullWidth
+              multiline
+              minRows={3}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose}>{tActions('cancel')}</Button>
+          <Button onClick={handleDialogSave} variant="contained">
+            {tActions('save')}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   )
 }
@@ -404,6 +521,8 @@ const TransformationForm: React.FC<
 
   const tabs: TabConfig[] = [
     { id: 'general', label: t('tabs.general') },
+    { id: 'dates', label: t('tabs.dates') },
+    { id: 'outcome', label: t('tabs.outcome') },
     { id: 'relationships', label: t('tabs.relationships') },
     { id: 'impacts', label: t('tabs.impacts') },
   ]
@@ -471,21 +590,21 @@ const TransformationForm: React.FC<
       label: tForm('targetDate'),
       type: 'date',
       size: { xs: 12, md: 4 },
-      tabId: 'general',
+      tabId: 'dates',
     },
     {
       name: 'startDate',
       label: tForm('startDate'),
       type: 'date',
       size: { xs: 12, md: 4 },
-      tabId: 'general',
+      tabId: 'dates',
     },
     {
       name: 'completionDate',
       label: tForm('completionDate'),
       type: 'date',
       size: { xs: 12, md: 4 },
-      tabId: 'general',
+      tabId: 'dates',
     },
     {
       name: 'rationale',
@@ -493,7 +612,7 @@ const TransformationForm: React.FC<
       type: 'textarea',
       rows: 3,
       size: 12,
-      tabId: 'general',
+      tabId: 'outcome',
     },
     {
       name: 'expectedOutcome',
@@ -501,7 +620,7 @@ const TransformationForm: React.FC<
       type: 'textarea',
       rows: 3,
       size: 12,
-      tabId: 'general',
+      tabId: 'outcome',
     },
     {
       name: 'tags',
