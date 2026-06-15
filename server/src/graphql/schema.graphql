@@ -83,6 +83,8 @@ type BusinessCapability
   relatedDataObjects: [DataObject!]! @relationship(type: "RELATED_TO", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 """
@@ -144,6 +146,8 @@ type BusinessProcess
   supportedByApplications: [Application!]! @relationship(type: "SUPPORTS", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 # GEA# elements (GraphQL names cannot include #, so GEA_ is used as a safe prefix)
@@ -336,6 +340,7 @@ type GEA_Goal
     @relationship(type: "SUPPORTS", direction: OUT, properties: "GEARelationshipProperties")
   achievedByStrategies: [GEA_Strategy!]!
     @relationship(type: "ACHIEVES", direction: IN, properties: "GEARelationshipProperties")
+  advancedByTransformations: [Transformation!]! @relationship(type: "ADVANCES_GOAL", direction: IN)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
 }
@@ -381,6 +386,70 @@ type GEA_Strategy
     @relationship(type: "ACHIEVES", direction: OUT, properties: "GEARelationshipProperties")
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+}
+
+"""
+Transformation – represents a planned or ongoing transformation of the enterprise architecture
+"""
+type Transformation
+  @node
+  @authorization(
+    validate: [
+      { operations: [CREATE], where: { jwt: { roles: { includes: "architect" } } } }
+      {
+        operations: [UPDATE, DELETE]
+        where: {
+          AND: [
+            { jwt: { roles: { includes: "architect" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+      { operations: [CREATE, UPDATE, DELETE], where: { jwt: { roles: { includes: "admin" } } } }
+    ]
+    filter: [
+      {
+        where: {
+          OR: [
+            { jwt: { roles: { includes: "admin" } } }
+            { node: { company: { some: { id_IN: "$jwt.company_ids" } } } }
+          ]
+        }
+      }
+    ]
+  ) {
+  id: ID! @id
+  name: String!
+  description: String
+  status: TransformationStatus!
+  targetDate: Date
+  startDate: Date
+  completionDate: Date
+  priority: TransformationPriority
+  rationale: String
+  expectedOutcome: String
+  tags: [String!]
+  createdAt: DateTime! @timestamp(operations: [CREATE])
+  updatedAt: DateTime @timestamp(operations: [UPDATE])
+  owners: [Person!]! @relationship(type: "OWNED_BY", direction: OUT)
+  company: [Company!]! @relationship(type: "OWNED_BY", direction: OUT)
+  sourceArchitecture: [Architecture!]! @relationship(type: "TRANSFORMS_FROM", direction: OUT)
+  targetArchitectures: [Architecture!]! @relationship(type: "TRANSFORMS_TO", direction: OUT)
+  goals: [GEA_Goal!]! @relationship(type: "ADVANCES_GOAL", direction: OUT)
+  impactsCapabilities: [BusinessCapability!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
+  impactsApplications: [Application!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
+  impactsAIComponents: [AIComponent!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
+  impactsDataObjects: [DataObject!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
+  impactsInterfaces: [ApplicationInterface!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
+  impactsInfrastructure: [Infrastructure!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
+  impactsBusinessProcesses: [BusinessProcess!]!
+    @relationship(type: "IMPACTS", direction: OUT, properties: "TransformationImpactProperties")
 }
 
 """
@@ -466,6 +535,14 @@ type GEARelationshipProperties @relationshipProperties {
 }
 
 """
+Transformation impact properties for relationships between transformations and impacted elements
+"""
+type TransformationImpactProperties @relationshipProperties {
+  action: TransformationImpactAction!
+  notes: String
+}
+
+"""
 Person – represents an individual within the organization
 """
 type Person
@@ -522,6 +599,7 @@ type Person
   ownedGEAValues: [GEA_Value!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAGoals: [GEA_Goal!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAStrategies: [GEA_Strategy!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedTransformations: [Transformation!]! @relationship(type: "OWNED_BY", direction: IN)
   createdAnalyticsReports: [AnalyticsReport!]! @relationship(type: "CREATED_BY", direction: IN)
   createdAnalyticsReportFolders: [ReportFolder!]! @relationship(type: "CREATED_BY", direction: IN)
 }
@@ -796,6 +874,8 @@ type Application
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
   supportedBy: [Supplier!]! @relationship(type: "SUPPORTED_BY", direction: OUT)
   maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 """
@@ -852,6 +932,8 @@ type ApplicationInterface
   dataObjects: [DataObject!]! @relationship(type: "TRANSFERS", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 """
@@ -933,6 +1015,8 @@ type DataObject
       direction: IN
       properties: "DataObjectRelationship"
     )
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 """
@@ -1014,6 +1098,8 @@ type Infrastructure
   providedBy: [Supplier!]! @relationship(type: "PROVIDED_BY", direction: OUT)
   hostedBy: [Supplier!]! @relationship(type: "HOSTED_BY", direction: OUT)
   maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 """
@@ -1394,6 +1480,8 @@ type AIComponent
   maintainedBy: [Supplier!]! @relationship(type: "MAINTAINED_BY", direction: OUT)
   partOfArchitectures: [Architecture!]! @relationship(type: "CONTAINS", direction: IN)
   depictedInDiagrams: [Diagram!]! @relationship(type: "DEPICTED_IN", direction: OUT)
+  impactedByTransformations: [Transformation!]!
+    @relationship(type: "IMPACTS", direction: IN, properties: "TransformationImpactProperties")
 }
 
 """
@@ -1463,6 +1551,7 @@ type Company
   ownedGEAValues: [GEA_Value!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAGoals: [GEA_Goal!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedGEAStrategies: [GEA_Strategy!]! @relationship(type: "OWNED_BY", direction: IN)
+  ownedTransformations: [Transformation!]! @relationship(type: "OWNED_BY", direction: IN)
   employees: [Person!]! @relationship(type: "EMPLOYED_BY", direction: IN)
   ownedArchitectures: [Architecture!]! @relationship(type: "OWNED_BY", direction: IN)
   ownedDiagrams: [Diagram!]! @relationship(type: "OWNED_BY", direction: IN)
@@ -1792,6 +1881,8 @@ type Architecture
   containsGEAValues: [GEA_Value!]! @relationship(type: "CONTAINS", direction: OUT)
   containsGEAGoals: [GEA_Goal!]! @relationship(type: "CONTAINS", direction: OUT)
   containsGEAStrategies: [GEA_Strategy!]! @relationship(type: "CONTAINS", direction: OUT)
+  sourceForTransformations: [Transformation!]! @relationship(type: "TRANSFORMS_FROM", direction: IN)
+  targetForTransformations: [Transformation!]! @relationship(type: "TRANSFORMS_TO", direction: IN)
   parentArchitecture: [Architecture!]! @relationship(type: "PART_OF", direction: OUT)
   childArchitectures: [Architecture!]! @relationship(type: "PART_OF", direction: IN)
   diagrams: [Diagram!]! @relationship(type: "BELONGS_TO", direction: IN)
@@ -1908,6 +1999,36 @@ enum ArchitectureType {
   FUTURE_STATE
   TRANSITION
   CONCEPTUAL
+}
+
+"""
+Transformation lifecycle status values
+"""
+enum TransformationStatus {
+  IDEA
+  OPTION
+  PLANNING
+  IMPLEMENTING
+  DONE
+}
+
+"""
+Priority values for transformations
+"""
+enum TransformationPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+"""
+Impact action values for transformation relationships
+"""
+enum TransformationImpactAction {
+  CREATED
+  CHANGED
+  REMOVED
 }
 
 """

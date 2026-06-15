@@ -1256,6 +1256,58 @@ NextGen EAM consists of multiple components delivered as Docker containers:
 - Applied changes are persisted with full audit metadata (who, when, why, prompt/context, before/after snapshot, run ID).
 - Changes can only be executed for companies the user is authorized to access; unauthorized actions are blocked and logged.
 
+### 2.16 Transformation management
+
+#### FR-TR-01: Capture transformation elements
+
+**Description:** The system must support creating and managing transformation elements that describe planned or ongoing changes to the enterprise architecture.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Users can create new transformations with the following attributes:
+  - Name
+  - Description
+  - Status (idea, option, planning, implementing, done)
+  - Target date
+  - Start date
+  - Completion date
+  - Priority
+  - Business rationale / expected outcome
+  - Tags/categories
+- Every transformation must be assigned to exactly one company for tenant isolation.
+- Every transformation must have an owning person.
+- If no explicit owner is selected during creation, the logged-in user is proposed as the default owner.
+- Transformations can be edited, deleted, or archived after creation.
+
+#### FR-TR-02: Link transformations to architecture change scope
+
+**Description:** The system must support linking transformations to the architectural baseline, target states, goals, and impacted architecture elements.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- A transformation can be linked to one source architecture and one or more target architectures.
+- A transformation can be linked to one or more goals.
+- A transformation can be linked to one or more of the following architecture element types:
+  - Business capabilities
+  - Applications
+  - AI components
+  - Data objects
+  - Interfaces
+  - Infrastructure
+  - Business processes
+- Each relationship from a transformation to an impacted architecture element stores a change action with the values `created`, `changed`, or `removed`.
+- Optional relationship notes can be stored to explain the intended change in more detail.
+
+#### FR-TR-03: Allow incremental transformation modeling
+
+**Description:** The system must support creating transformation records early and enriching them with relationships over time.  
+**Priority:** High  
+**Acceptance criteria:**
+
+- Company assignment and owner assignment are mandatory when creating a transformation.
+- Source architecture, target architectures, goals, and impacted architecture elements are optional during initial creation and can be added later.
+- Users can update relationship scope and change actions as the transformation progresses.
+
 ## 3. Non-functional requirements
 
 ### 3.1 Performance and scalability
