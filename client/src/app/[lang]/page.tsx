@@ -113,7 +113,8 @@ const Dashboard = () => {
     notifyOnNetworkStatusChange: true,
   })
 
-  const sovereigntyCompany = companyData?.companies?.[0] ?? selectedCompany
+  const dashboardCompany = companyData?.companies?.[0] ?? selectedCompany
+  const sovereigntyCompany = dashboardCompany
 
   useEffect(() => {
     if (!isRecalculating) return
@@ -822,10 +823,10 @@ const Dashboard = () => {
         >
           <Box sx={{ flex: 1, minWidth: 280 }}>
             <Typography variant="h5" sx={{ mb: 0.5 }}>
-              {selectedCompany?.name || t('companyNotSelected')}
+              {dashboardCompany?.name || t('companyNotSelected')}
             </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {selectedCompany?.description || t('description_placeholder')}
+            <Typography variant="body1" color="text.secondary" sx={{ whiteSpace: 'pre-line' }}>
+              {dashboardCompany?.description?.trim() || t('description_placeholder')}
             </Typography>
           </Box>
 
