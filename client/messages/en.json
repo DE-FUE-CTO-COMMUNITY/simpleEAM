@@ -915,6 +915,7 @@
       "updateError": "Error updating transformation",
       "deleteSuccess": "Transformation deleted successfully",
       "deleteError": "Error deleting transformation",
+      "lensDisabled": "Transformation Architecture lens is disabled for the selected company.",
       "selectCompanyFirst": "Please select a company first.",
       "ownerRequired": "An owner is required.",
       "nameRequired": "A name is required."

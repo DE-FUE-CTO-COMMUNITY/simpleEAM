@@ -915,6 +915,7 @@
       "updateError": "Erreur lors de la mise à jour de la transformation",
       "deleteSuccess": "Transformation supprimée avec succès",
       "deleteError": "Erreur lors de la suppression de la transformation",
+      "lensDisabled": "La lentille d'architecture de transformation est désactivée pour l'entreprise sélectionnée.",
       "selectCompanyFirst": "Veuillez d'abord sélectionner une entreprise.",
       "ownerRequired": "Un propriétaire est requis.",
       "nameRequired": "Un nom est requis."

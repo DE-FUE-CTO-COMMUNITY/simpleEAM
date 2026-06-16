@@ -45,7 +45,7 @@ import {
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { login, useAuth, isAdmin, isArchitect, canManageCompanies } from '@/lib/auth'
-import { useLensSelection, type LensKey } from '@/lib/lens-settings'
+import { useLensSelection, useLensSettings, type LensKey } from '@/lib/lens-settings'
 import { useFeatureFlags } from '@/lib/feature-flags'
 import { useCompanyContext } from '@/contexts/CompanyContext'
 import { useAnalyticsConfig } from '@/lib/runtime-config'
@@ -78,6 +78,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const [importExportDialogOpen, setImportExportDialogOpen] = useState(false)
   const t = useTranslations('navigation')
   const { selectedLens } = useLensSelection()
+  const { lensFlags } = useLensSettings()
   const { featureFlags } = useFeatureFlags()
   const { selectedCompany } = useCompanyContext()
   const analyticsConfig = useAnalyticsConfig()
@@ -376,11 +377,15 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
       icon: <RuleIcon />,
       href: '/architecture-principles',
     },
-    {
-      text: t('transformations'),
-      icon: <TransformationIcon />,
-      href: '/transformations',
-    },
+    ...(lensFlags.transformationArchitecture
+      ? [
+          {
+            text: t('transformations'),
+            icon: <TransformationIcon />,
+            href: '/transformations',
+          },
+        ]
+      : []),
     { isDivider: true, text: 'divider', icon: null },
     ...visibleArchitectureItems,
     // Abschnitt: Organisation & Personen

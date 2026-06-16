@@ -22,7 +22,6 @@ export const NOT_IMPLEMENTED_LENSES: readonly LensKey[] = [
   'solutionArchitecture',
   'cybersecurityArchitecture',
   'infrastructureArchitecture',
-  'transformationArchitecture',
 ] as const
 
 export const FEATURE_FLAGS = [

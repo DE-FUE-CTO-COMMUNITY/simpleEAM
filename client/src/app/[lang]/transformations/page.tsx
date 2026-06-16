@@ -30,6 +30,7 @@ import {
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
 import { useCurrentPerson } from '@/hooks/useCurrentPerson'
 import { isArchitect } from '@/lib/auth'
+import { useLensSettings } from '@/lib/lens-settings'
 
 const addImpactCreateField = (
   input: Record<string, unknown>,
@@ -73,6 +74,8 @@ export default function TransformationsPage() {
   const { enqueueSnackbar } = useSnackbar()
   const { selectedCompanyId } = useCompanyContext()
   const { currentPerson } = useCurrentPerson()
+  const { lensFlags } = useLensSettings()
+  const isTransformationLensEnabled = lensFlags.transformationArchitecture
   const canEdit = isArchitect()
 
   const [globalFilter, setGlobalFilter] = useState('')
@@ -90,6 +93,7 @@ export default function TransformationsPage() {
   } = useQuery(GET_TRANSFORMATIONS, {
     fetchPolicy: 'cache-and-network',
     notifyOnNetworkStatusChange: true,
+    skip: !isTransformationLensEnabled,
     variables: { where: transformationWhere },
   })
 
@@ -121,6 +125,14 @@ export default function TransformationsPage() {
   } = useTransformationFilter({ transformations })
 
   const activeFiltersCount = useMemo(() => countActiveFilters(filterState), [filterState])
+
+  if (!isTransformationLensEnabled) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Alert severity="info">{t('messages.lensDisabled')}</Alert>
+      </Box>
+    )
+  }
 
   const handleCreateTransformation = async (data: TransformationFormValues) => {
     if (!selectedCompanyId) {

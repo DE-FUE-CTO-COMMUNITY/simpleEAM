@@ -890,6 +890,7 @@
       "updateError": "Fehler beim Aktualisieren der Transformation",
       "deleteSuccess": "Transformation erfolgreich gelöscht",
       "deleteError": "Fehler beim Löschen der Transformation",
+      "lensDisabled": "Die Lens Transformationsarchitektur ist für das ausgewählte Unternehmen deaktiviert.",
       "selectCompanyFirst": "Bitte zuerst ein Unternehmen auswählen.",
       "ownerRequired": "Ein Verantwortlicher ist erforderlich.",
       "nameRequired": "Ein Name ist erforderlich."

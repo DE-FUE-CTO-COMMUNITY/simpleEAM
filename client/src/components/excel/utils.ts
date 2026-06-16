@@ -192,6 +192,9 @@ export const transformInputForUpdate = (input: any): any => {
     if (key.includes('connect') || key.includes('disconnect') || key.includes('create')) {
       // Relationship fields - keep as is
       transformed[key] = value
+    } else if (value instanceof Date) {
+      // Date and DateTime scalars in update inputs use mutation wrappers
+      transformed[key] = { set: value }
     } else if (Array.isArray(value)) {
       // Array fields - wrap in { set: array }
       transformed[key] = { set: value }
