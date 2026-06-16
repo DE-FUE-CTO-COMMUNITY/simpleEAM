@@ -9,6 +9,7 @@ interface ExcelExportOptions {
   sheetName: string
   format: 'xlsx' | 'csv'
   includeHeaders: boolean
+  enumConstraints?: Partial<Record<string, readonly string[]>>
 }
 
 /**
@@ -30,11 +31,40 @@ interface MultiTabExportOptions {
   filename: string
   format: 'xlsx'
   includeHeaders: boolean
+  enumConstraintsBySheet?: Record<string, Partial<Record<string, readonly string[]>>>
 }
 
 export interface ImportedExcelSheet {
   sheetName: string
   data: ExcelExportData[]
+}
+
+const appendEnumReferenceSheet = (
+  workbook: XLSX.WorkBook,
+  enumConstraintsBySheet: Record<string, Partial<Record<string, readonly string[]>>>
+): void => {
+  const rows = Object.entries(enumConstraintsBySheet).flatMap(([sheetName, fieldMap]) => {
+    return Object.entries(fieldMap).flatMap(([field, allowedValues]) => {
+      if (!allowedValues || allowedValues.length === 0) {
+        return []
+      }
+
+      return [
+        {
+          sheetName,
+          field,
+          allowedValues: allowedValues.join(', '),
+        },
+      ]
+    })
+  })
+
+  if (rows.length === 0) {
+    return
+  }
+
+  const worksheet = XLSX.utils.json_to_sheet(rows)
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Enum Values')
 }
 
 /**
@@ -56,6 +86,10 @@ export const exportToExcel = async (
   // Erstelle ein neues Arbeitsbuch
   const workbook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(workbook, worksheet, options.sheetName)
+
+  if (options.format === 'xlsx' && options.enumConstraints) {
+    appendEnumReferenceSheet(workbook, { [options.sheetName]: options.enumConstraints })
+  }
 
   // Bestimme den MIME-Type und die Dateiendung basierend auf dem Format
   const mimeType =
@@ -111,6 +145,10 @@ export const exportMultiTabToExcel = async (
       XLSX.utils.book_append_sheet(workbook, worksheet, tabName)
     }
   })
+
+  if (options.enumConstraintsBySheet) {
+    appendEnumReferenceSheet(workbook, options.enumConstraintsBySheet)
+  }
 
   // Schreibe die Datei
   const wbout = XLSX.write(workbook, {
@@ -622,6 +660,7 @@ export const downloadTemplateWithRealFields = async (
     getValuesTemplate,
     getGoalsTemplate,
     getStrategiesTemplate,
+    getEnumFieldValuesByEntityType,
     // getDiagramsTemplate, - Ausgeblendet für Excel-Export
   } = moduleImport
 
@@ -650,45 +689,38 @@ export const downloadTemplateWithRealFields = async (
       // Diagrams: [getDiagramsTemplate()], - Ausgeblendet für Excel (zu große JSON-Daten)
     }
 
+    const enumConstraintsBySheet = {
+      'Business Capabilities': getEnumFieldValuesByEntityType('businessCapabilities'),
+      'Business Processes': getEnumFieldValuesByEntityType('businessProcesses'),
+      Applications: getEnumFieldValuesByEntityType('applications'),
+      'Data Objects': getEnumFieldValuesByEntityType('dataObjects'),
+      Interfaces: getEnumFieldValuesByEntityType('interfaces'),
+      Persons: getEnumFieldValuesByEntityType('persons'),
+      Architectures: getEnumFieldValuesByEntityType('architectures'),
+      'Architecture Principles': getEnumFieldValuesByEntityType('architecturePrinciples'),
+      Infrastructures: getEnumFieldValuesByEntityType('infrastructures'),
+      'Product Families': getEnumFieldValuesByEntityType('productFamilies'),
+      'Software Products': getEnumFieldValuesByEntityType('softwareProducts'),
+      'Software Versions': getEnumFieldValuesByEntityType('softwareVersions'),
+      'Hardware Products': getEnumFieldValuesByEntityType('hardwareProducts'),
+      'Hardware Versions': getEnumFieldValuesByEntityType('hardwareVersions'),
+      Visions: getEnumFieldValuesByEntityType('visions'),
+      Missions: getEnumFieldValuesByEntityType('missions'),
+      Values: getEnumFieldValuesByEntityType('values'),
+      Goals: getEnumFieldValuesByEntityType('goals'),
+      Strategies: getEnumFieldValuesByEntityType('strategies'),
+    }
+
     await exportMultiTabToExcel(allTemplates, {
       filename: 'NextGenEAM_Complete_Import_Template',
       format: 'xlsx',
       includeHeaders: true,
+      enumConstraintsBySheet,
     })
     return
   }
 
-  // TypeScript knows that entityType here is not "all"
-  if (entityType === 'aicomponents') {
-    // Temporäre Lösung für AI Components Template
-    const aicomponentsTemplate = {
-      id: '',
-      name: '',
-      description: '',
-      version: '',
-      modelType: '',
-      trainingData: '',
-      accuracy: '',
-      vendor: '',
-      license: '',
-      apiEndpoint: '',
-      isActive: '',
-      createdAt: '',
-      updatedAt: '',
-    }
-
-    await exportToExcel([aicomponentsTemplate], {
-      filename: 'AI_Components_Import_Template',
-      sheetName: 'Import Template',
-      format: 'xlsx',
-      includeHeaders: true,
-    })
-    return
-  }
-
-  const template = getTemplateByEntityType(
-    entityType as Exclude<typeof entityType, 'all' | 'aicomponents'>
-  )
+  const template = getTemplateByEntityType(entityType as Exclude<typeof entityType, 'all'>)
 
   const entityTypeLabels = {
     businessCapabilities: 'Business Capabilities',
@@ -719,5 +751,8 @@ export const downloadTemplateWithRealFields = async (
     sheetName: 'Import Template',
     format: 'xlsx',
     includeHeaders: true,
+    enumConstraints: getEnumFieldValuesByEntityType(
+      entityType as Exclude<typeof entityType, 'all'>
+    ),
   })
 }

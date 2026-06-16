@@ -655,7 +655,9 @@ export const exportEntityData = async (
         })
       } else {
         // Excel/CSV Export
-        const { fetchDataByEntityTypeAndFormat } = await import('../../utils/excelDataService')
+        const { fetchDataByEntityTypeAndFormat, getEnumFieldValuesByEntityType } = await import(
+          '../../utils/excelDataService'
+        )
         const { exportMultiTabToExcel } = await import('../../utils/excelUtils')
         const allData = await fetchDataByEntityTypeAndFormat(
           apolloClient,
@@ -670,10 +672,35 @@ export const exportEntityData = async (
         }
 
         if (format === 'xlsx') {
+          const enumConstraintsBySheet = {
+            'Business Capabilities': getEnumFieldValuesByEntityType('businessCapabilities'),
+            'Business Processes': getEnumFieldValuesByEntityType('businessProcesses'),
+            Applications: getEnumFieldValuesByEntityType('applications'),
+            'Data Objects': getEnumFieldValuesByEntityType('dataObjects'),
+            Interfaces: getEnumFieldValuesByEntityType('interfaces'),
+            Persons: getEnumFieldValuesByEntityType('persons'),
+            Architectures: getEnumFieldValuesByEntityType('architectures'),
+            Diagrams: getEnumFieldValuesByEntityType('diagrams'),
+            'Architecture Principles': getEnumFieldValuesByEntityType('architecturePrinciples'),
+            Infrastructures: getEnumFieldValuesByEntityType('infrastructures'),
+            'Product Families': getEnumFieldValuesByEntityType('productFamilies'),
+            'Software Products': getEnumFieldValuesByEntityType('softwareProducts'),
+            'Software Versions': getEnumFieldValuesByEntityType('softwareVersions'),
+            'Hardware Products': getEnumFieldValuesByEntityType('hardwareProducts'),
+            'Hardware Versions': getEnumFieldValuesByEntityType('hardwareVersions'),
+            'AI Components': getEnumFieldValuesByEntityType('aicomponents'),
+            Visions: getEnumFieldValuesByEntityType('visions'),
+            Missions: getEnumFieldValuesByEntityType('missions'),
+            Values: getEnumFieldValuesByEntityType('values'),
+            Goals: getEnumFieldValuesByEntityType('goals'),
+            Strategies: getEnumFieldValuesByEntityType('strategies'),
+          }
+
           await exportMultiTabToExcel(excelPayload, {
             filename: `NextGenEAM_Complete_Export${companySuffix}`,
             format: 'xlsx',
             includeHeaders: true,
+            enumConstraintsBySheet,
           })
         }
       }
@@ -722,7 +749,9 @@ export const exportEntityData = async (
         })
       } else {
         // Excel/CSV Export
-        const { fetchDataByEntityTypeAndFormat } = await import('../../utils/excelDataService')
+        const { fetchDataByEntityTypeAndFormat, getEnumFieldValuesByEntityType } = await import(
+          '../../utils/excelDataService'
+        )
         const { exportToExcel, exportMultiTabToExcel } = await import('../../utils/excelUtils')
         const data = (await fetchDataByEntityTypeAndFormat(
           apolloClient,
@@ -744,6 +773,9 @@ export const exportEntityData = async (
               filename,
               format: 'xlsx',
               includeHeaders: true,
+              enumConstraintsBySheet: {
+                [sheetName]: getEnumFieldValuesByEntityType(entityType as any),
+              },
             }
           )
         } else if (format === 'csv') {

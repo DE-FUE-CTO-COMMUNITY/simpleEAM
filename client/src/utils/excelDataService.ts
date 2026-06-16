@@ -20,6 +20,32 @@ import { GET_SOFTWARE_PRODUCTS } from '../graphql/softwareProduct'
 import { GET_SOFTWARE_VERSIONS } from '../graphql/softwareVersion'
 import { GET_HARDWARE_PRODUCTS } from '../graphql/hardwareProduct'
 import { GET_HARDWARE_VERSIONS } from '../graphql/hardwareVersion'
+import {
+  AiComponentStatus,
+  AiComponentType,
+  ApplicationStatus,
+  ArchitectureDomain,
+  ArchitectureType,
+  CapabilityStatus,
+  CapabilityType,
+  CriticalityLevel,
+  DataClassification,
+  DiagramType,
+  InfrastructureStatus,
+  InfrastructureType,
+  InterfaceProtocol,
+  InterfaceStatus,
+  InterfaceType,
+  LifecycleStatus,
+  PrincipleCategory,
+  PrinciplePriority,
+  ProcessStatus,
+  ProcessType,
+  ProductFamilyType,
+  SevenRStrategy,
+  TimeCategory,
+} from '../gql/generated'
+import { getAllowedProtocolsForInterfaceType } from '../components/interfaces/utils'
 
 export interface ExcelExportData {
   [key: string]: string | number | boolean | Date
@@ -48,6 +74,66 @@ export type EntityType =
   | 'goals'
   | 'strategies'
   | 'all'
+
+export type EntityEnumFieldValues = Partial<Record<string, readonly string[]>>
+
+const ENTITY_ENUM_FIELD_VALUES: Partial<Record<Exclude<EntityType, 'all'>, EntityEnumFieldValues>> =
+  {
+    businessCapabilities: {
+      status: Object.values(CapabilityStatus),
+      type: Object.values(CapabilityType),
+    },
+    businessProcesses: {
+      processType: Object.values(ProcessType),
+      status: Object.values(ProcessStatus),
+    },
+    applications: {
+      status: Object.values(ApplicationStatus),
+      criticality: Object.values(CriticalityLevel),
+      timeCategory: Object.values(TimeCategory),
+      sevenRStrategy: Object.values(SevenRStrategy),
+    },
+    dataObjects: {
+      classification: Object.values(DataClassification),
+    },
+    interfaces: {
+      interfaceType: Object.values(InterfaceType),
+      protocol: Object.values(InterfaceProtocol),
+      status: Object.values(InterfaceStatus),
+    },
+    architectures: {
+      domain: Object.values(ArchitectureDomain),
+      type: Object.values(ArchitectureType),
+    },
+    diagrams: {
+      diagramType: Object.values(DiagramType),
+    },
+    architecturePrinciples: {
+      category: Object.values(PrincipleCategory),
+      priority: Object.values(PrinciplePriority),
+    },
+    infrastructures: {
+      infrastructureType: Object.values(InfrastructureType),
+      status: Object.values(InfrastructureStatus),
+    },
+    productFamilies: {
+      type: Object.values(ProductFamilyType),
+    },
+    softwareProducts: {
+      lifecycleStatus: Object.values(LifecycleStatus),
+    },
+    hardwareProducts: {
+      lifecycleStatus: Object.values(LifecycleStatus),
+    },
+    aicomponents: {
+      aiType: Object.values(AiComponentType),
+      status: Object.values(AiComponentStatus),
+    },
+  }
+
+export const getEnumFieldValuesByEntityType = (
+  entityType: Exclude<EntityType, 'all'>
+): EntityEnumFieldValues => ENTITY_ENUM_FIELD_VALUES[entityType] ?? {}
 
 // Hilfsfunktion: Company-Filter (inkl. Diagramm-OR-Sonderfall)
 const companyWhere = (entityType: EntityType, companyId?: string): any | undefined => {
@@ -2129,22 +2215,7 @@ export interface ValidationWarning {
  */
 export const validateImportData = (
   data: any[],
-  entityType:
-    | 'businessCapabilities'
-    | 'businessProcesses'
-    | 'applications'
-    | 'dataObjects'
-    | 'interfaces'
-    | 'persons'
-    | 'architectures'
-    | 'diagrams'
-    | 'architecturePrinciples'
-    | 'infrastructures'
-    | 'productFamilies'
-    | 'softwareProducts'
-    | 'softwareVersions'
-    | 'hardwareProducts'
-    | 'hardwareVersions'
+  entityType: Exclude<EntityType, 'all'>
 ): ValidationResult => {
   const errors: ValidationError[] = []
   const warnings: ValidationWarning[] = []
@@ -2152,6 +2223,7 @@ export const validateImportData = (
 
   const requiredFields = getRequiredFieldsByEntityType(entityType)
   const optionalFields = getOptionalFieldsByEntityType(entityType)
+  const enumFieldValues = getEnumFieldValuesByEntityType(entityType)
   const allValidFields = ['id', ...requiredFields, ...optionalFields]
 
   // Analyze field coverage from the first row (assuming all rows have same structure)
@@ -2190,6 +2262,63 @@ export const validateImportData = (
         })
       }
     })
+
+    Object.entries(enumFieldValues).forEach(([field, allowedValues]) => {
+      if (!allowedValues || allowedValues.length === 0) {
+        return
+      }
+
+      const rawValue = row[field]
+
+      if (rawValue === undefined || rawValue === null) {
+        return
+      }
+
+      const value = String(rawValue).trim()
+      if (!value) {
+        return
+      }
+
+      if (!allowedValues.includes(value)) {
+        const suggestion = allowedValues.find(
+          allowedValue => allowedValue.toUpperCase() === value.toUpperCase()
+        )
+        const suggestionText = suggestion ? ` Did you mean '${suggestion}'?` : ''
+
+        errors.push({
+          row: rowNumber,
+          field,
+          message: `Invalid enum value '${value}' for '${field}'. Allowed values: ${allowedValues.join(', ')}.${suggestionText}`,
+          severity: 'error',
+        })
+        rowIsValid = false
+      }
+    })
+
+    if (entityType === 'interfaces') {
+      const rawInterfaceType = row.interfaceType
+      const rawProtocol = row.protocol
+      const interfaceType = typeof rawInterfaceType === 'string' ? rawInterfaceType.trim() : ''
+      const protocol = typeof rawProtocol === 'string' ? rawProtocol.trim() : ''
+
+      if (
+        interfaceType &&
+        protocol &&
+        Object.values(InterfaceType).includes(interfaceType as InterfaceType)
+      ) {
+        const allowedProtocols = getAllowedProtocolsForInterfaceType(interfaceType as InterfaceType)
+
+        if (!allowedProtocols.includes(protocol as InterfaceProtocol)) {
+          errors.push({
+            row: rowNumber,
+            field: 'protocol',
+            message: `Invalid protocol '${protocol}' for interfaceType '${interfaceType}'. Allowed values: ${allowedProtocols.join(', ')}.`,
+            severity: 'error',
+          })
+          rowIsValid = false
+        }
+      }
+    }
 
     // Prüfe ID-Format (falls vorhanden)
     if (row.id && !/^[a-zA-Z0-9-_]+$/.test(row.id)) {
@@ -2280,7 +2409,7 @@ export const getTemplateWithExamples = (
           name: 'Customer Management',
           description: 'Manage customer data and relationships',
           maturityLevel: 3,
-          status: 'active',
+          status: CapabilityStatus.ACTIVE,
           businessValue: 85,
           owners: 'user-123,user-456',
           tags: 'customer,management,core',
@@ -2319,8 +2448,8 @@ export const getTemplateWithExamples = (
           id: 'app-001',
           name: 'CRM System',
           description: 'Customer Relationship Management System',
-          status: 'production',
-          criticality: 'high',
+          status: ApplicationStatus.ACTIVE,
+          criticality: CriticalityLevel.HIGH,
           costs: 50000,
           vendor: 'Salesforce',
           version: '2024.1',
@@ -2366,10 +2495,10 @@ export const getTemplateWithExamples = (
           id: 'int-001',
           name: 'Customer API',
           description: 'REST API for customer data access',
-          interfaceType: 'REST',
-          protocol: 'HTTPS',
+          interfaceType: InterfaceType.API,
+          protocol: InterfaceProtocol.HTTPS,
           version: 'v2.1',
-          status: 'active',
+          status: InterfaceStatus.ACTIVE,
           introductionDate: '2023-03-15T00:00:00.000Z',
           endOfLifeDate: '2026-12-31T23:59:59.000Z',
           owners: 'user-123',

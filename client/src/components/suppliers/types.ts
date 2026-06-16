@@ -34,7 +34,7 @@ export interface FilterProps {
 
 export interface SupplierFormValues {
   name: string
-  description: string
+  description?: string
   supplierType: SupplierTypeEnum
   status: SupplierStatus
   address?: string

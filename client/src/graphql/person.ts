@@ -25,6 +25,7 @@ export const GET_PERSONS = gql`
       companies {
         id
         name
+        description
         primaryColor
         secondaryColor
         font

@@ -59,7 +59,11 @@ import {
 
 // Import der Utilities
 import { exportToExcel, downloadTemplateWithRealFields } from '../../utils/excelUtils'
-import { validateImportData, getTemplateWithExamples } from '../../utils/excelDataService'
+import {
+  validateImportData,
+  getTemplateWithExamples,
+  getEnumFieldValuesByEntityType,
+} from '../../utils/excelDataService'
 import { validateJsonImportData } from '../../utils/jsonDataService'
 
 interface ImportExportDialogProps {
@@ -628,6 +632,7 @@ const ImportExportDialog: React.FC<ImportExportDialogProps> = ({
         filename: `${importSettings.entityType}-template`,
         sheetName: 'Template',
         includeHeaders: true,
+        enumConstraints: getEnumFieldValuesByEntityType(importSettings.entityType as any),
       })
     } catch (error) {
       enqueueSnackbar(
