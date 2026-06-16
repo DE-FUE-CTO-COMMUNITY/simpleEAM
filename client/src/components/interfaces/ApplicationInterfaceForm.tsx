@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useForm } from '@tanstack/react-form'
+import { useForm, useStore } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
@@ -32,6 +32,7 @@ import NestedEntityFormDialog from '../common/NestedEntityFormDialog'
 import { isArchitect } from '@/lib/auth'
 import { DataObject } from '@/gql/generated'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
+import { getAllowedProtocolsForInterfaceType } from './utils'
 
 // Base schema factory function that accepts translations
 const createBaseApplicationInterfaceSchema = (t: any) =>
@@ -40,7 +41,9 @@ const createBaseApplicationInterfaceSchema = (t: any) =>
     description: z
       .string()
       .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .max(1000, t('validation.descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     interfaceType: z.nativeEnum(InterfaceType, {
       errorMap: () => ({ message: t('validation.interfaceTypeRequired') }),
     }),
@@ -64,6 +67,17 @@ const createBaseApplicationInterfaceSchema = (t: any) =>
 // Extended schema factory function with lifecycle logic
 export const createApplicationInterfaceSchema = (t: any, tForm: any) =>
   createBaseApplicationInterfaceSchema(t).superRefine((data, ctx) => {
+    if (data.protocol) {
+      const allowedProtocols = getAllowedProtocolsForInterfaceType(data.interfaceType)
+      if (!allowedProtocols.includes(data.protocol)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: t('validation.protocolNotAllowedForType'),
+          path: ['protocol'],
+        })
+      }
+    }
+
     // Lifecycle date validation with individual error messages
     const dates = [
       { field: 'planningDate', date: data.planningDate, label: tForm('planningDate') },
@@ -188,6 +202,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
   const t = useTranslations('interfaces.form')
   const tTabs = useTranslations('interfaces.tabs')
   const tTypes = useTranslations('interfaces.interfaceTypes')
+  const tProtocols = useTranslations('interfaces.protocols')
   const tStatuses = useTranslations('interfaces.statuses')
 
   const [nestedFormState, setNestedFormState] = useState<{
@@ -232,20 +247,7 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
 
   // Helper function for interface type labels
   const getInterfaceTypeLabel = (type: InterfaceType) => {
-    switch (type) {
-      case InterfaceType.API:
-        return tTypes('API')
-      case InterfaceType.DATABASE:
-        return tTypes('DATABASE')
-      case InterfaceType.FILE:
-        return tTypes('FILE')
-      case InterfaceType.MESSAGE_QUEUE:
-        return tTypes('MESSAGE_QUEUE')
-      case InterfaceType.OTHER:
-        return tTypes('OTHER')
-      default:
-        return type
-    }
+    return tTypes(type)
   }
 
   // Helper function for status labels
@@ -356,6 +358,28 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
     },
   })
 
+  const selectedInterfaceType = useStore(form.store, state => state.values.interfaceType)
+  const selectedProtocol = useStore(form.store, state => state.values.protocol)
+  const allowedProtocols = React.useMemo(
+    () => getAllowedProtocolsForInterfaceType(selectedInterfaceType as InterfaceType | null),
+    [selectedInterfaceType]
+  )
+  const protocolOptions = React.useMemo(() => {
+    const nextProtocols = [...allowedProtocols]
+
+    if (selectedProtocol && !nextProtocols.includes(selectedProtocol as InterfaceProtocol)) {
+      nextProtocols.push(selectedProtocol as InterfaceProtocol)
+    }
+
+    return [
+      { value: '', label: t('none') },
+      ...nextProtocols.map(protocol => ({
+        value: protocol,
+        label: tProtocols(protocol),
+      })),
+    ]
+  }, [allowedProtocols, selectedProtocol, t, tProtocols])
+
   // Update form when data changes
   useEffect(() => {
     // Non-reactive flag for unexpected state handling
@@ -438,7 +462,6 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       type: 'text',
       multiline: true,
       rows: 3,
-      required: true,
       validators: baseApplicationInterfaceSchema.shape.description,
       size: { xs: 12 },
       tabId: 'general',
@@ -455,6 +478,16 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
         value: type,
         label: getInterfaceTypeLabel(type),
       })),
+      onChange: value => {
+        if (
+          selectedProtocol &&
+          !getAllowedProtocolsForInterfaceType(value as InterfaceType).includes(
+            selectedProtocol as InterfaceProtocol
+          )
+        ) {
+          form.setFieldValue('protocol', null)
+        }
+      },
     },
     {
       name: 'protocol',
@@ -463,13 +496,12 @@ const ApplicationInterfaceForm: React.FC<ApplicationInterfaceFormProps> = ({
       validators: baseApplicationInterfaceSchema.shape.protocol,
       size: { xs: 12, md: 6 },
       tabId: 'technical',
-      options: [
-        { value: '', label: t('none') },
-        ...Object.values(InterfaceProtocol).map(protocol => ({
-          value: protocol,
-          label: protocol,
-        })),
-      ],
+      options: protocolOptions,
+      onChange: value => {
+        if (value === '') {
+          form.setFieldValue('protocol', null)
+        }
+      },
     },
     {
       name: 'version',

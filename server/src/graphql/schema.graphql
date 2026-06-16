@@ -1741,10 +1741,15 @@ enum DataClassification {
 Interface types for application integrations
 """
 enum InterfaceType {
-  API
-  FILE
-  DATABASE
-  MESSAGE_QUEUE
+  API # synchrone Service-Aufrufe
+  FILE # File-basierter Austausch
+  DATABASE # direkter DB-Zugriff
+  MESSAGE_QUEUE # asynchrone Messaging-Systeme
+  EVENT_STREAM # Event-getriebene Streaming-Systeme
+  BATCH # zeitgesteuerte Verarbeitungen
+  UI # Mensch-zu-System Schnittstellen
+  IDENTITY # AuthN/AuthZ/Directory
+  INTEGRATION_PLATFORM # z.B. ESB, iPaaS
   OTHER
 }
 
@@ -1752,21 +1757,54 @@ enum InterfaceType {
 Protocols used by application interfaces
 """
 enum InterfaceProtocol {
+  # API / Web
   REST
   SOAP
   GRAPHQL
+  GRPC
+  ODATA
+
+  # Transport
   HTTP
   HTTPS
+
+  # File Transfer
   FTP
   SFTP
-  TCP
-  UDP
+  FTPS
+  SCP
+  NFS
+  SMB
+  WEBDAV
+
+  # Messaging / Streaming
+  AMQP
+  JMS
+  KAFKA
+  MQTT
+
+  # Mail / Directory
   SMTP
+  IMAP
+  POP3
   LDAP
+  LDAPS
+
+  # Database Connectivity
   JDBC
   ODBC
+
+  # Vendor / Specific
   ORACLE
-  MQTT
+  SAP_IDOC
+  EDI
+  AS2
+
+  # Security / Identity
+  OAUTH2
+  OPENID_CONNECT
+  SAML
+
   OTHER
 }
 

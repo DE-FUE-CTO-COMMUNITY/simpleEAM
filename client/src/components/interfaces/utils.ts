@@ -3,6 +3,73 @@
 import { GenericFilterState } from '../common/GenericFilterDialog'
 import { InterfaceType, InterfaceProtocol, InterfaceStatus } from '../../gql/generated'
 
+export const INTERFACE_PROTOCOLS_BY_TYPE: Record<InterfaceType, InterfaceProtocol[]> = {
+  [InterfaceType.API]: [
+    InterfaceProtocol.REST,
+    InterfaceProtocol.SOAP,
+    InterfaceProtocol.GRAPHQL,
+    InterfaceProtocol.GRPC,
+    InterfaceProtocol.ODATA,
+    InterfaceProtocol.HTTP,
+    InterfaceProtocol.HTTPS,
+  ],
+  [InterfaceType.FILE]: [
+    InterfaceProtocol.FTP,
+    InterfaceProtocol.SFTP,
+    InterfaceProtocol.FTPS,
+    InterfaceProtocol.SCP,
+    InterfaceProtocol.NFS,
+    InterfaceProtocol.SMB,
+    InterfaceProtocol.WEBDAV,
+    InterfaceProtocol.AS2,
+  ],
+  [InterfaceType.DATABASE]: [
+    InterfaceProtocol.JDBC,
+    InterfaceProtocol.ODBC,
+    InterfaceProtocol.ORACLE,
+  ],
+  [InterfaceType.MESSAGE_QUEUE]: [InterfaceProtocol.AMQP, InterfaceProtocol.JMS],
+  [InterfaceType.EVENT_STREAM]: [InterfaceProtocol.KAFKA, InterfaceProtocol.MQTT],
+  [InterfaceType.BATCH]: [
+    InterfaceProtocol.JDBC,
+    InterfaceProtocol.ODBC,
+    InterfaceProtocol.FTP,
+    InterfaceProtocol.SFTP,
+  ],
+  [InterfaceType.UI]: [InterfaceProtocol.HTTP, InterfaceProtocol.HTTPS],
+  [InterfaceType.IDENTITY]: [
+    InterfaceProtocol.LDAP,
+    InterfaceProtocol.LDAPS,
+    InterfaceProtocol.OAUTH2,
+    InterfaceProtocol.OPENID_CONNECT,
+    InterfaceProtocol.SAML,
+  ],
+  [InterfaceType.INTEGRATION_PLATFORM]: [
+    InterfaceProtocol.JMS,
+    InterfaceProtocol.AMQP,
+    InterfaceProtocol.HTTP,
+    InterfaceProtocol.HTTPS,
+    InterfaceProtocol.SOAP,
+    InterfaceProtocol.REST,
+  ],
+  [InterfaceType.OTHER]: [
+    InterfaceProtocol.SMTP,
+    InterfaceProtocol.IMAP,
+    InterfaceProtocol.POP3,
+    InterfaceProtocol.SAP_IDOC,
+    InterfaceProtocol.EDI,
+    InterfaceProtocol.OTHER,
+  ],
+}
+
+export const getAllowedProtocolsForInterfaceType = (interfaceType?: InterfaceType | null) => {
+  if (!interfaceType) {
+    return []
+  }
+
+  return INTERFACE_PROTOCOLS_BY_TYPE[interfaceType] ?? []
+}
+
 /**
  * Helper function for date formatting
  */
@@ -22,16 +89,26 @@ export const getInterfaceTypeLabel = (type: InterfaceType): string => {
   switch (type) {
     case InterfaceType.API:
       return 'API'
+    case InterfaceType.BATCH:
+      return 'Batch'
     case InterfaceType.DATABASE:
       return 'Datenbank'
+    case InterfaceType.EVENT_STREAM:
+      return 'Event Stream'
     case InterfaceType.FILE:
       return 'Datei'
+    case InterfaceType.IDENTITY:
+      return 'Identitaet'
+    case InterfaceType.INTEGRATION_PLATFORM:
+      return 'Integrationsplattform'
     case InterfaceType.MESSAGE_QUEUE:
       return 'Nachrichtenwarteschlange'
     case InterfaceType.OTHER:
       return 'Sonstige'
+    case InterfaceType.UI:
+      return 'UI'
     default:
-      return 'Unbekannt'
+      return type
   }
 }
 
@@ -146,35 +223,73 @@ export const countActiveFilters = (filterState: GenericFilterState): number => {
  */
 export const getProtocolDisplayLabel = (protocol: InterfaceProtocol): string => {
   switch (protocol) {
+    case InterfaceProtocol.AMQP:
+      return 'AMQP'
+    case InterfaceProtocol.AS2:
+      return 'AS2'
+    case InterfaceProtocol.EDI:
+      return 'EDI'
     case InterfaceProtocol.FTP:
       return 'FTP'
+    case InterfaceProtocol.FTPS:
+      return 'FTPS'
     case InterfaceProtocol.GRAPHQL:
       return 'GraphQL'
+    case InterfaceProtocol.GRPC:
+      return 'gRPC'
     case InterfaceProtocol.HTTP:
       return 'HTTP'
     case InterfaceProtocol.HTTPS:
       return 'HTTPS'
+    case InterfaceProtocol.IMAP:
+      return 'IMAP'
     case InterfaceProtocol.JDBC:
       return 'JDBC'
+    case InterfaceProtocol.JMS:
+      return 'JMS'
+    case InterfaceProtocol.KAFKA:
+      return 'Kafka'
     case InterfaceProtocol.LDAP:
       return 'LDAP'
+    case InterfaceProtocol.LDAPS:
+      return 'LDAPS'
+    case InterfaceProtocol.MQTT:
+      return 'MQTT'
+    case InterfaceProtocol.NFS:
+      return 'NFS'
     case InterfaceProtocol.ODBC:
       return 'ODBC'
+    case InterfaceProtocol.OAUTH2:
+      return 'OAuth 2.0'
+    case InterfaceProtocol.ODATA:
+      return 'OData'
+    case InterfaceProtocol.OPENID_CONNECT:
+      return 'OpenID Connect'
+    case InterfaceProtocol.ORACLE:
+      return 'Oracle'
     case InterfaceProtocol.OTHER:
       return 'Sonstige'
+    case InterfaceProtocol.POP3:
+      return 'POP3'
     case InterfaceProtocol.REST:
       return 'REST'
+    case InterfaceProtocol.SAML:
+      return 'SAML'
+    case InterfaceProtocol.SAP_IDOC:
+      return 'SAP IDoc'
+    case InterfaceProtocol.SCP:
+      return 'SCP'
     case InterfaceProtocol.SFTP:
       return 'SFTP'
+    case InterfaceProtocol.SMB:
+      return 'SMB'
     case InterfaceProtocol.SMTP:
       return 'SMTP'
     case InterfaceProtocol.SOAP:
       return 'SOAP'
-    case InterfaceProtocol.TCP:
-      return 'TCP'
-    case InterfaceProtocol.UDP:
-      return 'UDP'
+    case InterfaceProtocol.WEBDAV:
+      return 'WebDAV'
     default:
-      return 'Unbekannt'
+      return protocol
   }
 }

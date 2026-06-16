@@ -31,7 +31,7 @@ import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 // Schema for form validation
 export const architectureSchema = z.object({
   name: z.string().min(3).max(100),
-  description: z.string().min(10).max(1000),
+  description: z.string().min(10).max(1000).optional().or(z.literal('')),
   timestamp: z.date({
     required_error: 'Architekturdatum ist erforderlich',
     invalid_type_error: 'Architekturdatum muss ein gültiges Datum sein',
@@ -471,7 +471,6 @@ const ArchitectureForm: React.FC<ArchitectureFormProps> = ({
       name: 'description',
       label: t('form.description'),
       type: 'textarea',
-      required: true,
       validators: architectureSchema.shape.description,
       tabId: 'general',
       rows: 4,

@@ -62,7 +62,7 @@ import {
 const createTransformationSchema = (nameRequiredMessage: string) =>
   z.object({
     name: z.string().trim().min(1, nameRequiredMessage),
-    description: z.string(),
+    description: z.string().optional().or(z.literal('')),
     status: z.nativeEnum(TransformationStatus),
     targetDate: z.date().nullable().optional(),
     startDate: z.date().nullable().optional(),

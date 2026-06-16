@@ -11,7 +11,7 @@ import { isValidCombination } from './timeCategoryDependencies'
 // Base schema ohne cross-field validation
 export const baseApplicationSchema = z.object({
   name: z.string().min(1, 'Name ist erforderlich'),
-  description: z.string().min(1, 'Beschreibung ist erforderlich'),
+  description: z.string().optional().or(z.literal('')),
   status: z.nativeEnum(ApplicationStatus),
   criticality: z.nativeEnum(CriticalityLevel),
   costs: z.number().min(0, 'Costs must be positive'),

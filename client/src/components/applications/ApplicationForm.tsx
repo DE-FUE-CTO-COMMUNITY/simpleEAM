@@ -59,7 +59,9 @@ const createBaseApplicationSchema = (t: any) =>
     description: z
       .string()
       .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .max(1000, t('validation.descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     status: z.nativeEnum(ApplicationStatus),
     criticality: z.nativeEnum(CriticalityLevel),
     costs: z.number().min(0, t('validation.costsMin')).optional().nullable(),
@@ -654,7 +656,6 @@ const ApplicationForm: React.FC<ApplicationFormProps> = ({
       name: 'description',
       label: t('description'),
       type: 'textarea',
-      required: true,
       tabId: 'general',
       validators: baseApplicationSchema.shape.description,
       rows: 4,

@@ -27,7 +27,9 @@ const createArchitecturePrincipleSchema = (t: any) =>
     description: z
       .string()
       .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .max(1000, t('validation.descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     category: z.nativeEnum(PrincipleCategory),
     priority: z.nativeEnum(PrinciplePriority),
     rationale: z.string().optional(),
@@ -345,7 +347,6 @@ const ArchitecturePrincipleForm: React.FC<
       name: 'description',
       label: t('form.description'),
       type: 'textarea',
-      required: true,
       tabId: 'general',
       size: 12,
       rows: 4,

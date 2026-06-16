@@ -31,7 +31,12 @@ import { buildSovereigntyAchievedFields } from '../common/SovereigntyFields'
 const createBaseSupplierSchema = (t: any) =>
   z.object({
     name: z.string().min(3, t('nameMin')).max(100, t('nameMax')),
-    description: z.string().min(10, t('descriptionMin')).max(1000, t('descriptionMax')),
+    description: z
+      .string()
+      .min(10, t('descriptionMin'))
+      .max(1000, t('descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     supplierType: z.nativeEnum(SupplierTypeEnum),
     status: z.nativeEnum(SupplierStatus),
     address: z.string().max(500, t('addressMax')).optional(),
@@ -228,7 +233,8 @@ const SupplierForm: React.FC<GenericFormProps<Supplier, SupplierFormValues>> = (
         sovereigntyAchResilience: supplier?.sovereigntyAchResilience ?? null,
         sovereigntyAchSecurity: supplier?.sovereigntyAchSecurity ?? null,
         sovereigntyAchControl: supplier?.sovereigntyAchControl ?? null,
-        sovereigntyAchStrategicAutonomyEvidence: supplier?.sovereigntyAchStrategicAutonomyEvidence ?? '',
+        sovereigntyAchStrategicAutonomyEvidence:
+          supplier?.sovereigntyAchStrategicAutonomyEvidence ?? '',
         lastSovereigntyAssessmentAt: supplier?.lastSovereigntyAssessmentAt
           ? new Date(supplier.lastSovereigntyAssessmentAt)
           : null,

@@ -40,7 +40,9 @@ const createBaseDataObjectSchema = (t: any) =>
     description: z
       .string()
       .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .max(1000, t('validation.descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     classification: z.nativeEnum(DataClassification),
     format: z.string().max(50, t('validation.formatMax')).optional().nullable(),
     dataSources: z.array(z.string()).optional(),
@@ -348,7 +350,6 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       name: 'description',
       label: t('description'),
       type: 'textarea',
-      required: true,
       validators: baseDataObjectSchema.shape.description,
       rows: 4,
       size: 12,

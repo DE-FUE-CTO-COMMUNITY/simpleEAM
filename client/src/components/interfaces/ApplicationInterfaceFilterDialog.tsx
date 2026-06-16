@@ -29,20 +29,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
 
   // Helper function for interface type labels
   const getInterfaceTypeLabel = (type: InterfaceType) => {
-    switch (type) {
-      case InterfaceType.API:
-        return tTypes('API')
-      case InterfaceType.DATABASE:
-        return tTypes('DATABASE')
-      case InterfaceType.FILE:
-        return tTypes('FILE')
-      case InterfaceType.MESSAGE_QUEUE:
-        return tTypes('MESSAGE_QUEUE')
-      case InterfaceType.OTHER:
-        return tTypes('OTHER')
-      default:
-        return type
-    }
+    return tTypes(type)
   }
 
   // Helper function for status labels
@@ -65,30 +52,7 @@ const ApplicationInterfaceFilterDialog: React.FC<FilterProps> = ({
 
   // Helper function for protocol labels
   const getProtocolDisplayLabel = (protocol: InterfaceProtocol) => {
-    switch (protocol) {
-      case InterfaceProtocol.HTTP:
-        return tProtocols('HTTP')
-      case InterfaceProtocol.HTTPS:
-        return tProtocols('HTTPS')
-      case InterfaceProtocol.FTP:
-        return tProtocols('FTP')
-      case InterfaceProtocol.SFTP:
-        return tProtocols('SFTP')
-      case InterfaceProtocol.SOAP:
-        return tProtocols('SOAP')
-      case InterfaceProtocol.REST:
-        return tProtocols('REST')
-      case InterfaceProtocol.GRAPHQL:
-        return tProtocols('GRAPHQL')
-      case InterfaceProtocol.TCP:
-        return tProtocols('TCP')
-      case InterfaceProtocol.UDP:
-        return tProtocols('UDP')
-      case InterfaceProtocol.OTHER:
-        return tProtocols('OTHER')
-      default:
-        return protocol
-    }
+    return tProtocols(protocol)
   }
 
   // Konfiguration der Filterfelder

@@ -14,7 +14,11 @@ import TransformationTable, {
   TRANSFORMATION_DEFAULT_COLUMN_VISIBILITY,
 } from '@/components/transformations/TransformationTable'
 import TransformationToolbar from '@/components/transformations/TransformationToolbar'
-import { ImpactRelation, TransformationFormValues, TransformationType } from '@/components/transformations/types'
+import {
+  ImpactRelation,
+  TransformationFormValues,
+  TransformationType,
+} from '@/components/transformations/types'
 import { useTransformationFilter } from '@/components/transformations/useTransformationFilter'
 import {
   countActiveFilters,
@@ -108,7 +112,7 @@ export default function TransformationsPage() {
   }, [enqueueSnackbar, error, t])
 
   const transformations = useMemo(
-    () => ((transformationData?.transformations as TransformationType[] | undefined) ?? []),
+    () => (transformationData?.transformations as TransformationType[] | undefined) ?? [],
     [transformationData?.transformations]
   )
 
@@ -299,7 +303,9 @@ export default function TransformationsPage() {
         ) : null}
       </Box>
 
-      {!selectedCompanyId ? <Alert severity="info">{t('messages.selectCompanyFirst')}</Alert> : null}
+      {!selectedCompanyId ? (
+        <Alert severity="info">{t('messages.selectCompanyFirst')}</Alert>
+      ) : null}
 
       <Card>
         <CardContent sx={{ p: 0 }}>

@@ -38030,22 +38030,39 @@ export type IntScalarMutations = {
 
 /** Protocols used by application interfaces */
 export enum InterfaceProtocol {
+  AMQP = 'AMQP',
+  AS2 = 'AS2',
+  EDI = 'EDI',
   FTP = 'FTP',
+  FTPS = 'FTPS',
   GRAPHQL = 'GRAPHQL',
+  GRPC = 'GRPC',
   HTTP = 'HTTP',
   HTTPS = 'HTTPS',
+  IMAP = 'IMAP',
   JDBC = 'JDBC',
+  JMS = 'JMS',
+  KAFKA = 'KAFKA',
   LDAP = 'LDAP',
+  LDAPS = 'LDAPS',
   MQTT = 'MQTT',
+  NFS = 'NFS',
+  OAUTH2 = 'OAUTH2',
+  ODATA = 'ODATA',
   ODBC = 'ODBC',
+  OPENID_CONNECT = 'OPENID_CONNECT',
   ORACLE = 'ORACLE',
   OTHER = 'OTHER',
+  POP3 = 'POP3',
   REST = 'REST',
+  SAML = 'SAML',
+  SAP_IDOC = 'SAP_IDOC',
+  SCP = 'SCP',
   SFTP = 'SFTP',
+  SMB = 'SMB',
   SMTP = 'SMTP',
   SOAP = 'SOAP',
-  TCP = 'TCP',
-  UDP = 'UDP',
+  WEBDAV = 'WEBDAV',
 }
 
 /** InterfaceProtocol filters */
@@ -38082,10 +38099,15 @@ export type InterfaceStatusEnumScalarMutations = {
 /** Interface types for application integrations */
 export enum InterfaceType {
   API = 'API',
+  BATCH = 'BATCH',
   DATABASE = 'DATABASE',
+  EVENT_STREAM = 'EVENT_STREAM',
   FILE = 'FILE',
+  IDENTITY = 'IDENTITY',
+  INTEGRATION_PLATFORM = 'INTEGRATION_PLATFORM',
   MESSAGE_QUEUE = 'MESSAGE_QUEUE',
   OTHER = 'OTHER',
+  UI = 'UI',
 }
 
 /** InterfaceType filters */

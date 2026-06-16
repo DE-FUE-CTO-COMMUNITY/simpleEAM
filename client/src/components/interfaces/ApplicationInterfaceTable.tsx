@@ -9,7 +9,6 @@ import ApplicationInterfaceForm from './ApplicationInterfaceForm'
 import { createColumnHelper } from '@tanstack/react-table'
 import { SortingState, VisibilityState } from '@tanstack/react-table'
 import { Chip } from '@mui/material'
-import { getProtocolLabel } from './utils'
 import { DataObject, Application, Person } from '@/gql/generated'
 import usePersistentColumnVisibility from '../../hooks/usePersistentColumnVisibility'
 
@@ -79,6 +78,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
 }) => {
   const t = useTranslations('interfaces.table')
   const tTypes = useTranslations('interfaces.interfaceTypes')
+  const tProtocols = useTranslations('interfaces.protocols')
   const tStatuses = useTranslations('interfaces.statuses')
   const locale = useLocale()
   const columnHelper = createColumnHelper<ApplicationInterface>()
@@ -99,20 +99,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
   // Helper function for interface type labels
   const getInterfaceTypeLabel = useCallback(
     (type: any) => {
-      switch (type) {
-        case 'API':
-          return tTypes('API')
-        case 'DATABASE':
-          return tTypes('DATABASE')
-        case 'FILE':
-          return tTypes('FILE')
-        case 'MESSAGE_QUEUE':
-          return tTypes('MESSAGE_QUEUE')
-        case 'OTHER':
-          return tTypes('OTHER')
-        default:
-          return type
-      }
+      return tTypes(type)
     },
     [tTypes]
   )
@@ -194,7 +181,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
           const protocol = info.getValue()
           return (
             <Chip
-              label={getProtocolLabel(protocol)}
+              label={protocol ? tProtocols(protocol) : '-'}
               color={protocol ? 'secondary' : 'default'}
               size="small"
               variant="filled"
@@ -331,7 +318,7 @@ const ApplicationInterfaceTable: React.FC<ApplicationInterfaceTableProps> = ({
         enableHiding: true,
       }),
     ],
-    [columnHelper, t, getInterfaceTypeLabel, getInterfaceStatusLabel, formatDate]
+    [columnHelper, t, tProtocols, getInterfaceTypeLabel, getInterfaceStatusLabel, formatDate]
   )
 
   // Mapping from ApplicationInterface to expected FormValues for the form

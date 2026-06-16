@@ -31,7 +31,9 @@ const createStrategySchema = (t: any) =>
     description: z
       .string()
       .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .max(1000, t('validation.descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     ownerId: z.string().optional(),
     achievesGoalsRelations: z
       .array(
@@ -198,7 +200,6 @@ const StrategyForm: React.FC<GenericFormProps<Gea_Strategy, StrategyFormValues>>
       name: 'description',
       label: tForm('description'),
       type: 'textarea',
-      required: true,
       validators: strategySchema.shape.description,
       size: { xs: 12, md: 12 },
       tabId: 'general',

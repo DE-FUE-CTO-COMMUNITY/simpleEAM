@@ -129,7 +129,7 @@ const normalizeDiagramFont = (font?: string | null): ExcalidrawFont => {
 // Schema for form validation (export for external use)
 export const companySchema = z.object({
   name: z.string().min(3).max(100),
-  description: z.string().min(10).max(1000).optional(),
+  description: z.string().min(10).max(1000).optional().or(z.literal('')),
   address: z.string().max(500).optional(),
   industry: z.string().max(100).optional(),
   website: z.string().url().optional().or(z.literal('')),
@@ -494,11 +494,13 @@ const CompaniesForm: React.FC<GenericFormProps<CompanyType, CompanyFormValues>> 
       name: 'description',
       label: t('form.description'),
       type: 'textarea',
-      required: true,
       tabId: 'general',
       validators: {
         onChange: ({ value }: { value: string }) => {
-          if (!value || value.length < 10) {
+          if (!value) {
+            return undefined
+          }
+          if (value.length < 10) {
             return tForms('validation.minLength', { count: 10 })
           }
           if (value.length > 1000) {

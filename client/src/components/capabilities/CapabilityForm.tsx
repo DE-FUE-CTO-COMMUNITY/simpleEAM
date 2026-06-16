@@ -35,7 +35,9 @@ const createCapabilitySchema = (t: any) =>
     description: z
       .string()
       .min(10, t('validation.descriptionMin'))
-      .max(1000, t('validation.descriptionMax')),
+      .max(1000, t('validation.descriptionMax'))
+      .optional()
+      .or(z.literal('')),
     maturityLevel: z
       .number()
       .int()
@@ -324,7 +326,6 @@ const CapabilityForm: React.FC<CapabilityFormProps> = ({
       name: 'description',
       label: tForm('description'),
       type: 'textarea',
-      required: true,
       validators: capabilitySchema.shape.description,
       rows: 4,
       size: 12,
