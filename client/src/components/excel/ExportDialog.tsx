@@ -225,6 +225,7 @@ const ExportDialog: React.FC<ExportDialogProps> = ({
                       'dataSources',
                       'usedByApplications',
                       'relatedToCapabilities',
+                      'relatedDataObjects',
                       'partOfArchitectures',
                       'depictedInDiagrams',
                       'createdAt',

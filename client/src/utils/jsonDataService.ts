@@ -22,6 +22,7 @@ import { GET_HARDWARE_PRODUCTS } from '../graphql/hardwareProduct'
 import { GET_HARDWARE_VERSIONS } from '../graphql/hardwareVersion'
 import { ValidationResult } from '../components/excel/types'
 import { getRequiredFieldsByEntityType, getOptionalFieldsByEntityType } from './excelDataService'
+import { encodeDataObjectRelationshipValue } from './dataObjectRelationshipUtils'
 
 /**
  * Typen für JSON-Export
@@ -303,7 +304,13 @@ export const fetchDataObjectsForJson = async (
       usedByApplications: obj.usedByApplications || [],
       relatedToCapabilities: obj.relatedToCapabilities || [],
       transferredInInterfaces: obj.transferredInInterfaces || [],
-      relatedDataObjects: obj.relatedDataObjects || [],
+      relatedDataObjects:
+        obj.relatedDataObjectsConnection?.edges?.map((edge: any) => ({
+          id: edge.node?.id,
+          name: edge.node?.name,
+          exportValue: encodeDataObjectRelationshipValue(edge.node?.id || '', edge.properties?.name),
+          properties: edge.properties || {},
+        })) || obj.relatedDataObjects || [],
       partOfArchitectures: obj.partOfArchitectures || [],
       depictedInDiagrams: obj.depictedInDiagrams || [],
     }))

@@ -63,6 +63,17 @@ export const GET_DATA_OBJECTS = gql`
         id
         name
       }
+      relatedDataObjectsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            name
+          }
+        }
+      }
       partOfArchitectures {
         id
         name
@@ -121,6 +132,17 @@ export const GET_DATA_OBJECT = gql`
       relatedDataObjects {
         id
         name
+      }
+      relatedDataObjectsConnection {
+        edges {
+          node {
+            id
+            name
+          }
+          properties {
+            name
+          }
+        }
       }
       depictedInDiagrams {
         id

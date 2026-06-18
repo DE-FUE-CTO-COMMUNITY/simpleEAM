@@ -19,6 +19,7 @@ import {
   doesTabNameMatchEntityType,
   reverseEntityTypeMapping,
 } from './constants'
+import { parseDataObjectRelationshipValue } from '../../utils/dataObjectRelationshipUtils'
 
 class ExcelTabMismatchError extends Error {
   sheetName: string
@@ -705,14 +706,14 @@ export const exportEntityData = async (
 
       if (format === 'json') {
         const { fetchDataByEntityTypeForJson } = await import('../../utils/jsonDataService')
-        const data = await fetchDataByEntityTypeForJson(
+        const data = (await fetchDataByEntityTypeForJson(
           apolloClient,
           entityType as any,
           includeGea,
           selectedCompanyId
-        )
+        )) as any[]
         const tabName = entityTypeLabels[entityType] || entityType
-        const exportPayload = {
+        const exportPayload: { [tabName: string]: any[] } = {
           [tabName]: data,
           Companies: exportCompanies,
         }
@@ -956,6 +957,75 @@ const createRelationshipUpdateInput = (
 ): any => {
   const input: any = {}
 
+  const processDataObjectRelationshipField = (value: any) => {
+    let relationshipItems: Array<{ id: string; edgeName?: string }> = []
+
+    if (!value) {
+      return undefined
+    }
+
+    if (typeof value === 'string') {
+      relationshipItems = value
+        .split(',')
+        .map(item => item.trim())
+        .filter(Boolean)
+        .map(item => parseDataObjectRelationshipValue(item))
+    } else if (Array.isArray(value)) {
+      relationshipItems = value
+        .filter(item => item && (typeof item === 'string' || typeof item === 'object'))
+        .map(item => {
+          if (typeof item === 'string') {
+            return parseDataObjectRelationshipValue(item)
+          }
+
+          if (typeof item === 'object' && item.id) {
+            return {
+              id: String(item.id),
+              edgeName:
+                typeof item.properties?.name === 'string'
+                  ? item.properties.name
+                  : typeof item.edgeName === 'string'
+                    ? item.edgeName
+                    : typeof item.relationshipName === 'string'
+                      ? item.relationshipName
+                      : undefined,
+            }
+          }
+
+          return parseDataObjectRelationshipValue(String(item))
+        })
+    } else if (typeof value === 'object' && value.id) {
+      relationshipItems = [
+        {
+          id: String(value.id),
+          edgeName:
+            typeof value.properties?.name === 'string'
+              ? value.properties.name
+              : typeof value.edgeName === 'string'
+                ? value.edgeName
+                : typeof value.relationshipName === 'string'
+                  ? value.relationshipName
+                  : undefined,
+        },
+      ]
+    } else {
+      relationshipItems = [parseDataObjectRelationshipValue(String(value))]
+    }
+
+    if (relationshipItems.length > 0) {
+      return {
+        connect: relationshipItems
+          .filter(item => item.id.trim())
+          .map(item => ({
+            where: { node: { id: { eq: item.id.trim() } } },
+            edge: { name: item.edgeName?.trim() || 'related' },
+          })),
+      }
+    }
+
+    return undefined
+  }
+
   // Helper function to process relationship field with connect format (KORREKTE SYNTAX aus Excel-Import)
   const processRelationshipField = (fieldName: string, value: any) => {
     // Robuste Typprüfung für verschiedene Eingabeformate
@@ -1116,10 +1186,7 @@ const createRelationshipUpdateInput = (
         )
       }
       if (row.relatedDataObjects) {
-        input.relatedDataObjects = processRelationshipField(
-          'relatedDataObjects',
-          row.relatedDataObjects
-        )
+        input.relatedDataObjects = processDataObjectRelationshipField(row.relatedDataObjects)
       }
       if (row.depictedInDiagrams) {
         input.depictedInDiagrams = processRelationshipField(
@@ -1250,10 +1317,7 @@ const createRelationshipUpdateInput = (
         )
       }
       if (row.relatedDataObjects) {
-        input.relatedDataObjects = processRelationshipField(
-          'relatedDataObjects',
-          row.relatedDataObjects
-        )
+        input.relatedDataObjects = processDataObjectRelationshipField(row.relatedDataObjects)
       }
       if (row.partOfArchitectures) {
         input.partOfArchitectures = processRelationshipField(

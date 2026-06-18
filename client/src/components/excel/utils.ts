@@ -20,6 +20,10 @@ import {
   ProcessType,
   ProcessStatus,
 } from '../../gql/generated'
+import {
+  encodeDataObjectRelationshipValue,
+  parseDataObjectRelationshipValue,
+} from '../../utils/dataObjectRelationshipUtils'
 
 // Helper function to parse comma-separated relationship IDs
 export const parseRelationshipIds = (value: string | undefined | null): string[] => {
@@ -819,6 +823,45 @@ export const mapRelationshipValues = (
 
   relationshipFields.forEach(field => {
     if (row[field]) {
+      if (entityType === 'dataObjects' && field === 'relatedDataObjects') {
+        const mappedValues = parseRelationshipIds(
+          typeof row[field] === 'string'
+            ? row[field]
+            : Array.isArray(row[field])
+              ? row[field]
+                  .map(item => {
+                    if (typeof item === 'string') {
+                      return item
+                    }
+
+                    if (typeof item === 'object' && item?.id) {
+                      return encodeDataObjectRelationshipValue(
+                        item.id,
+                        item.properties?.name || item.edgeName || item.relationshipName
+                      )
+                    }
+
+                    return String(item)
+                  })
+                  .join(',')
+              : String(row[field])
+        )
+          .map(item => parseDataObjectRelationshipValue(item))
+          .filter(item => item.id)
+          .map(item =>
+            encodeDataObjectRelationshipValue(
+              allEntityMappings[item.id] || item.id,
+              item.edgeName
+            )
+          )
+
+        if (mappedValues.length > 0) {
+          updatedRow[field] = mappedValues.join(',')
+        }
+
+        return
+      }
+
       let relationshipItems: Array<{ id: string; score?: number }> = []
 
       // Handle different formats of relationship data

@@ -1614,11 +1614,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
             onClick={handleSave}
             variant="contained"
             disabled={
-              !title.trim() ||
-              !selectedArchitecture ||
-              isAnalyzing ||
-              saving ||
-              creatingElements
+              !title.trim() || !selectedArchitecture || isAnalyzing || saving || creatingElements
             }
             startIcon={saving || creatingElements ? <CircularProgress size={20} /> : undefined}
           >

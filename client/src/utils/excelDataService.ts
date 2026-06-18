@@ -20,6 +20,7 @@ import { GET_SOFTWARE_PRODUCTS } from '../graphql/softwareProduct'
 import { GET_SOFTWARE_VERSIONS } from '../graphql/softwareVersion'
 import { GET_HARDWARE_PRODUCTS } from '../graphql/hardwareProduct'
 import { GET_HARDWARE_VERSIONS } from '../graphql/hardwareVersion'
+import { encodeDataObjectRelationshipValue } from './dataObjectRelationshipUtils'
 import {
   AiComponentStatus,
   AiComponentType,
@@ -383,6 +384,12 @@ export const fetchDataObjectsForExport = async (
       usedByApplications: obj.usedByApplications?.map((app: any) => app.id).join(',') || '',
       relatedToCapabilities: obj.relatedToCapabilities?.map((cap: any) => cap.id).join(',') || '',
       relatedDataObjects:
+        obj.relatedDataObjectsConnection?.edges
+          ?.map((edge: any) =>
+            encodeDataObjectRelationshipValue(edge.node?.id || '', edge.properties?.name)
+          )
+          .filter(Boolean)
+          .join(',') ||
         obj.relatedDataObjects?.map((dataObject: any) => dataObject.id).join(',') || '',
       partOfArchitectures: obj.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
       depictedInDiagrams: obj.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
@@ -1482,7 +1489,7 @@ export const getBusinessCapabilitiesTemplate = (): ExcelExportData => ({
   parents: '', // Komma-getrennte Parent-IDs
   supportedByApplications: '', // Komma-getrennte Application-IDs
   partOfArchitectures: '', // Komma-getrennte Architecture-IDs
-  relatedDataObjects: '', // Komma-getrennte DataObject-IDs
+  relatedDataObjects: '', // Komma-getrennte DataObject-Werte als id|~|beziehungsname
   depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
 })
 
