@@ -382,6 +382,7 @@ export const fetchDataObjectsForExport = async (
       dataSources: obj.dataSources?.map((app: any) => app.id).join(',') || '',
       usedByApplications: obj.usedByApplications?.map((app: any) => app.id).join(',') || '',
       relatedToCapabilities: obj.relatedToCapabilities?.map((cap: any) => cap.id).join(',') || '',
+      relatedDataObjects: obj.relatedDataObjects?.map((dataObject: any) => dataObject.id).join(',') || '',
       partOfArchitectures: obj.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
       depictedInDiagrams: obj.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
       createdAt: formatDateForExport(obj.createdAt),
@@ -1538,6 +1539,7 @@ export const getDataObjectsTemplate = (): ExcelExportData => ({
   dataSources: '', // Komma-getrennte Application-IDs
   usedByApplications: '', // Komma-getrennte Application-IDs
   relatedToCapabilities: '', // Komma-getrennte Capability-IDs
+  relatedDataObjects: '', // Komma-getrennte DataObject-IDs
   partOfArchitectures: '', // Komma-getrennte Architecture-IDs
   depictedInDiagrams: '', // Komma-getrennte Diagram-IDs
   createdAt: '', // ISO-Format: 2024-01-01T12:00:00.000Z
@@ -2814,6 +2816,7 @@ export function getOptionalFieldsByEntityType(entityType: EntityType): string[] 
         'usedByApplications',
         'relatedToCapabilities',
         'transferredInInterfaces',
+        'relatedDataObjects',
         'partOfArchitectures',
         'depictedInDiagrams',
         'createdAt',

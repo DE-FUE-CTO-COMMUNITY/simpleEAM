@@ -303,6 +303,7 @@ export const fetchDataObjectsForJson = async (
       usedByApplications: obj.usedByApplications || [],
       relatedToCapabilities: obj.relatedToCapabilities || [],
       transferredInInterfaces: obj.transferredInInterfaces || [],
+      relatedDataObjects: obj.relatedDataObjects || [],
       partOfArchitectures: obj.partOfArchitectures || [],
       depictedInDiagrams: obj.depictedInDiagrams || [],
     }))

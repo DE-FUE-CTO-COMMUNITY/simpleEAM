@@ -77,7 +77,9 @@ export const getRelationshipFields = (entityType: string): string[] => {
         'usedByApplications',
         'relatedToCapabilities',
         'transferredInInterfaces',
+        'relatedDataObjects',
         'partOfArchitectures',
+        'depictedInDiagrams',
       ]
     case 'interfaces':
       return [

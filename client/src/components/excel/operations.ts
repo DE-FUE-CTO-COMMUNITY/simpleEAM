@@ -600,30 +600,6 @@ export const exportEntityData = async (
       }
     }
 
-    const primaryExportCompany = exportCompanies[0]
-
-    const addCompanyMetadataToRows = (rows: any[]): any[] => {
-      if (!Array.isArray(rows)) return []
-      if (!primaryExportCompany?.id || !primaryExportCompany?.name) return rows
-
-      return rows.map(row => ({
-        ...row,
-        _exportCompanyId: primaryExportCompany.id,
-        _exportCompanyName: primaryExportCompany.name,
-        _exportCompanyDescription: primaryExportCompany.description || '',
-        _exportCompanyAddress: primaryExportCompany.address || '',
-        _exportCompanyIndustry: primaryExportCompany.industry || '',
-        _exportCompanyWebsite: primaryExportCompany.website || '',
-        _exportCompanyPrimaryColor: primaryExportCompany.primaryColor || '',
-        _exportCompanySecondaryColor: primaryExportCompany.secondaryColor || '',
-        _exportCompanyFont: primaryExportCompany.font || '',
-        _exportCompanyDiagramFont: primaryExportCompany.diagramFont || '',
-        _exportCompanyLogo: primaryExportCompany.logo || '',
-        _exportCompanyFeatures: primaryExportCompany.features || '',
-        _exportCompanySize: primaryExportCompany.size || '',
-      }))
-    }
-
     // Company-Name für Dateiname auflösen (optional)
     let companySuffix = ''
     if (selectedCompanyId) {
@@ -735,10 +711,9 @@ export const exportEntityData = async (
           includeGea,
           selectedCompanyId
         )
-        const dataWithMetadata = addCompanyMetadataToRows(data as any[])
         const tabName = entityTypeLabels[entityType] || entityType
         const exportPayload = {
-          [tabName]: dataWithMetadata,
+          [tabName]: data,
           Companies: exportCompanies,
         }
 
@@ -760,13 +735,11 @@ export const exportEntityData = async (
           includeGea,
           selectedCompanyId
         )) as any[]
-        const dataWithMetadata = addCompanyMetadataToRows(data)
-
         if (format === 'xlsx') {
           const sheetName = entityTypeLabels[entityType] || entityType
           await exportMultiTabToExcel(
             {
-              [sheetName]: dataWithMetadata,
+              [sheetName]: data,
               Companies: exportCompanies,
             },
             {
@@ -780,7 +753,7 @@ export const exportEntityData = async (
           )
         } else if (format === 'csv') {
           // CSV-Export für Diagramme ist jetzt möglich (ohne diagramJson)
-          await exportToExcel(dataWithMetadata, {
+          await exportToExcel(data, {
             filename,
             sheetName: entityTypeLabels[entityType] || entityType,
             format: 'csv',
@@ -1276,10 +1249,22 @@ const createRelationshipUpdateInput = (
           row.transferredInInterfaces
         )
       }
+      if (row.relatedDataObjects) {
+        input.relatedDataObjects = processRelationshipField(
+          'relatedDataObjects',
+          row.relatedDataObjects
+        )
+      }
       if (row.partOfArchitectures) {
         input.partOfArchitectures = processRelationshipField(
           'partOfArchitectures',
           row.partOfArchitectures
+        )
+      }
+      if (row.depictedInDiagrams) {
+        input.depictedInDiagrams = processRelationshipField(
+          'depictedInDiagrams',
+          row.depictedInDiagrams
         )
       }
       break
