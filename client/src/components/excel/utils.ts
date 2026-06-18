@@ -849,10 +849,7 @@ export const mapRelationshipValues = (
           .map(item => parseDataObjectRelationshipValue(item))
           .filter(item => item.id)
           .map(item =>
-            encodeDataObjectRelationshipValue(
-              allEntityMappings[item.id] || item.id,
-              item.edgeName
-            )
+            encodeDataObjectRelationshipValue(allEntityMappings[item.id] || item.id, item.edgeName)
           )
 
         if (mappedValues.length > 0) {

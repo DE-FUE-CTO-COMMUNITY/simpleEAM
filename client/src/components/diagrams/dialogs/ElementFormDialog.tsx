@@ -31,6 +31,7 @@ import { UPDATE_INFRASTRUCTURE } from '@/graphql/infrastructure'
 import { UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
 import { UPDATE_APPLICATION_INTERFACE } from '@/graphql/applicationInterface'
 import { UPDATE_Aicomponent } from '@/graphql/aicomponent'
+import { buildDataObjectRelationshipConnectInput } from '@/utils/dataObjectRelationshipUtils'
 
 interface ElementFormDialogProps {
   element: ExcalidrawElement | null
@@ -858,7 +859,7 @@ function DataObjectFormWrapper({
     console.log('🔵 [DataObjectFormWrapper] handleSubmit called with formData:', formData)
     try {
       // Destructure IDs from form data
-      const { ownerId, usedByApplications, ...dataObjectData } = formData
+      const { ownerId, usedByApplications, relatedDataObjects, ...dataObjectData } = formData
 
       console.log('🔵 [DataObjectFormWrapper] Transforming form data to GraphQL input format...')
 
@@ -891,6 +892,15 @@ function DataObjectFormWrapper({
         }
       } else {
         input.usedByApplications = { disconnect: [{ where: {} }] }
+      }
+
+      if (relatedDataObjects && relatedDataObjects.length > 0) {
+        input.relatedDataObjects = {
+          disconnect: [{ where: {} }],
+          connect: buildDataObjectRelationshipConnectInput(relatedDataObjects),
+        }
+      } else {
+        input.relatedDataObjects = { disconnect: [{ where: {} }] }
       }
 
       console.log('🔵 [DataObjectFormWrapper] Transformed input:', input)

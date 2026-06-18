@@ -16,6 +16,7 @@ import { GET_CAPABILITIES, GET_CAPABILITY, UPDATE_CAPABILITY } from '@/graphql/c
 import { GET_DATA_OBJECT, UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
 import { GET_INFRASTRUCTURE, UPDATE_INFRASTRUCTURE } from '@/graphql/infrastructure'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
+import { buildDataObjectRelationshipConnectInput } from '@/utils/dataObjectRelationshipUtils'
 import ApplicationForm, { ApplicationFormValues } from '../applications/ApplicationForm'
 import ArchitecturePrincipleForm, {
   ArchitecturePrincipleFormValues,
@@ -452,7 +453,16 @@ function NestedDataObjectForm({
       usedByApplications: relationArrayValue(formData.usedByApplications),
       relatedToCapabilities: relationArrayValue(formData.relatedToCapabilities),
       transferredInInterfaces: relationArrayValue(formData.transferredInInterfaces),
-      relatedDataObjects: relationArrayValue(formData.relatedDataObjects),
+      relatedDataObjects: [
+        formData.relatedDataObjects?.length
+          ? {
+              disconnect: disconnectAll,
+              connect: buildDataObjectRelationshipConnectInput(formData.relatedDataObjects),
+            }
+          : {
+              disconnect: disconnectAll,
+            },
+      ],
       partOfArchitectures: relationArrayValue(formData.partOfArchitectures),
     }
 

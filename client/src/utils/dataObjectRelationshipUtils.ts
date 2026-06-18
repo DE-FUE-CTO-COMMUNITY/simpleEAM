@@ -5,6 +5,11 @@ export interface DataObjectRelationshipValue {
   edgeName?: string
 }
 
+export interface DataObjectRelationshipFormValue {
+  dataObjectId: string
+  relationshipName: string
+}
+
 export const encodeDataObjectRelationshipValue = (id: string, edgeName?: string): string => {
   const trimmedId = id.trim()
   const trimmedEdgeName = edgeName?.trim()
@@ -36,3 +41,42 @@ export const parseDataObjectRelationshipValue = (value: string): DataObjectRelat
     edgeName: edgeName || undefined,
   }
 }
+
+export const buildDataObjectRelationshipConnectInput = (
+  relationships?: readonly DataObjectRelationshipFormValue[]
+) =>
+  (relationships ?? [])
+    .map(relationship => ({
+      dataObjectId: relationship.dataObjectId.trim(),
+      relationshipName: relationship.relationshipName.trim(),
+    }))
+    .filter(
+      relationship =>
+        relationship.dataObjectId.length > 0 && relationship.relationshipName.length > 0
+    )
+    .map(relationship => ({
+      where: {
+        node: {
+          id: { eq: relationship.dataObjectId },
+        },
+      },
+      edge: {
+        name: relationship.relationshipName,
+      },
+    }))
+
+export const sortDataObjectRelationshipFormValues = (
+  relationships?: readonly DataObjectRelationshipFormValue[]
+) =>
+  [...(relationships ?? [])]
+    .map(relationship => ({
+      dataObjectId: relationship.dataObjectId.trim(),
+      relationshipName: relationship.relationshipName.trim(),
+    }))
+    .sort((left, right) => {
+      if (left.dataObjectId === right.dataObjectId) {
+        return left.relationshipName.localeCompare(right.relationshipName)
+      }
+
+      return left.dataObjectId.localeCompare(right.dataObjectId)
+    })

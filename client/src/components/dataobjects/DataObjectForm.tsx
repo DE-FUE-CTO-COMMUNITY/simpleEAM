@@ -1,11 +1,13 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import { Button, IconButton, MenuItem, Stack, TextField } from '@mui/material'
 import { useForm } from '@tanstack/react-form'
 import { z } from 'zod'
 import { useQuery } from '@apollo/client'
 import { useTranslations } from 'next-intl'
 import {
+  Add as AddIcon,
   Assignment as PlanningIcon,
   RocketLaunch as LaunchIcon,
   Pause as PauseIcon,
@@ -33,6 +35,11 @@ import { isArchitect } from '@/lib/auth'
 import { useChipClickHandlers } from '@/hooks/useChipClickHandlers'
 import { buildSovereigntyRequirementFields } from '../common/SovereigntyFields'
 
+interface RelatedDataObjectRelationInput {
+  dataObjectId: string
+  relationshipName: string
+}
+
 // Basis-Schema factory function with translations
 const createBaseDataObjectSchema = (t: any) =>
   z.object({
@@ -49,7 +56,14 @@ const createBaseDataObjectSchema = (t: any) =>
     usedByApplications: z.array(z.string()).optional(),
     relatedToCapabilities: z.array(z.string()).optional(),
     transferredInInterfaces: z.array(z.string()).optional(),
-    relatedDataObjects: z.array(z.string()).optional(),
+    relatedDataObjects: z
+      .array(
+        z.object({
+          dataObjectId: z.string().min(1, t('validation.relatedDataObjectRequired')),
+          relationshipName: z.string().min(1, t('validation.relationshipNameRequired')),
+        })
+      )
+      .optional(),
     introductionDate: z.date().optional().nullable(),
     endOfLifeDate: z.date().optional().nullable(),
     planningDate: z.date().optional().nullable(),
@@ -209,7 +223,11 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
       usedByApplications: dataObject?.usedByApplications?.map(app => app.id) || [],
       relatedToCapabilities: dataObject?.relatedToCapabilities?.map(cap => cap.id) || [],
       transferredInInterfaces: dataObject?.transferredInInterfaces?.map(inter => inter.id) || [],
-      relatedDataObjects: dataObject?.relatedDataObjects?.map(obj => obj.id) || [],
+      relatedDataObjects:
+        dataObject?.relatedDataObjectsConnection?.edges?.map(edge => ({
+          dataObjectId: edge?.node?.id ?? '',
+          relationshipName: edge?.properties?.name ?? '',
+        })) || [],
       introductionDate: dataObject?.introductionDate ? new Date(dataObject.introductionDate) : null,
       endOfLifeDate: dataObject?.endOfLifeDate ? new Date(dataObject.endOfLifeDate) : null,
       planningDate: dataObject?.planningDate ? new Date(dataObject.planningDate) : null,
@@ -271,7 +289,11 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         usedByApplications: dataObject.usedByApplications?.map(app => app.id) ?? [],
         relatedToCapabilities: dataObject.relatedToCapabilities?.map(cap => cap.id) ?? [],
         transferredInInterfaces: dataObject.transferredInInterfaces?.map(inter => inter.id) ?? [],
-        relatedDataObjects: dataObject.relatedDataObjects?.map(obj => obj.id) ?? [],
+        relatedDataObjects:
+          dataObject.relatedDataObjectsConnection?.edges?.map(edge => ({
+            dataObjectId: edge?.node?.id ?? '',
+            relationshipName: edge?.properties?.name ?? '',
+          })) ?? [],
         introductionDate: dataObject.introductionDate
           ? new Date(dataObject.introductionDate)
           : null,
@@ -552,34 +574,109 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
     {
       name: 'relatedDataObjects',
       label: t('relatedDataObjects'),
-      type: 'autocomplete',
+      type: 'custom',
       validators: baseDataObjectSchema.shape.relatedDataObjects,
-      size: { xs: 12, md: 6 },
-      options:
-        dataObjectsData?.dataObjects?.map(
-          (obj: { id: string; name: string }): SelectOption => ({
-            value: obj.id,
-            label: obj.name,
-          })
-        ) || [],
-      multiple: true,
-      loadingOptions: dataObjectsLoading,
-      getOptionLabel: (option: any) => {
-        if (typeof option === 'string') {
-          const matchingDataObject = dataObjectsData?.dataObjects?.find(
-            (obj: { id: string; name: string }) => obj.id === option
+      size: 12,
+      customRender: (formField, disabled) => {
+        const relations = Array.isArray(formField.state.value)
+          ? (formField.state.value as RelatedDataObjectRelationInput[])
+          : []
+        const allDataObjects = dataObjectsData?.dataObjects || []
+        const selectedDataObjectIds = new Set(
+          relations.map(relation => relation.dataObjectId).filter(Boolean)
+        )
+        const hasMoreDataObjectsToAdd = allDataObjects.some(
+          (obj: { id: string }) => !selectedDataObjectIds.has(obj.id)
+        )
+
+        const updateRelation = (
+          index: number,
+          key: keyof RelatedDataObjectRelationInput,
+          value: string
+        ) => {
+          formField.handleChange(
+            relations.map((relation, relationIndex) =>
+              relationIndex === index ? { ...relation, [key]: value } : relation
+            )
           )
-          return matchingDataObject?.name || option
         }
-        return option?.label || ''
-      },
-      isOptionEqualToValue: (option: any, value: any) => {
-        if (typeof value === 'string') {
-          return option.value === value
+
+        const removeRelation = (index: number) => {
+          formField.handleChange(
+            relations.filter((_, relationIndex) => relationIndex !== index)
+          )
         }
-        return option.value === value?.value || option.value === value
+
+        const addRelation = () => {
+          formField.handleChange([
+            ...relations,
+            { dataObjectId: '', relationshipName: '' },
+          ])
+        }
+
+        return (
+          <Stack spacing={2}>
+            {relations.map((relation, index) => {
+              const availableDataObjectsForRow = allDataObjects.filter(
+                (obj: { id: string }) =>
+                  obj.id === relation.dataObjectId || !selectedDataObjectIds.has(obj.id)
+              )
+
+              return (
+                <Stack
+                  key={`related-data-object-${index}`}
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                >
+                  <TextField
+                    select
+                    label={t('relatedDataObject')}
+                    value={relation.dataObjectId}
+                    onChange={event => updateRelation(index, 'dataObjectId', event.target.value)}
+                    disabled={disabled}
+                    fullWidth
+                  >
+                    {availableDataObjectsForRow.map((obj: { id: string; name: string }) => (
+                      <MenuItem key={obj.id} value={obj.id}>
+                        {obj.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <TextField
+                    label={t('relationshipName')}
+                    value={relation.relationshipName}
+                    onChange={event =>
+                      updateRelation(index, 'relationshipName', event.target.value)
+                    }
+                    disabled={disabled}
+                    sx={{ minWidth: 240 }}
+                  />
+
+                  <IconButton
+                    onClick={() => removeRelation(index)}
+                    disabled={disabled}
+                    aria-label={t('removeRelatedDataObjectRelationship')}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Stack>
+              )
+            })}
+
+            <Button
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={addRelation}
+              disabled={disabled || dataObjectsLoading || !hasMoreDataObjectsToAdd}
+              sx={{ alignSelf: 'flex-start' }}
+            >
+              {t('addRelatedDataObjectRelationship')}
+            </Button>
+          </Stack>
+        )
       },
-      onChipClick: createChipClickHandler('relatedDataObjects'),
       tabId: 'relationships',
     },
     {

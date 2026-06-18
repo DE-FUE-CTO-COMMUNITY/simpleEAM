@@ -308,9 +308,14 @@ export const fetchDataObjectsForJson = async (
         obj.relatedDataObjectsConnection?.edges?.map((edge: any) => ({
           id: edge.node?.id,
           name: edge.node?.name,
-          exportValue: encodeDataObjectRelationshipValue(edge.node?.id || '', edge.properties?.name),
+          exportValue: encodeDataObjectRelationshipValue(
+            edge.node?.id || '',
+            edge.properties?.name
+          ),
           properties: edge.properties || {},
-        })) || obj.relatedDataObjects || [],
+        })) ||
+        obj.relatedDataObjects ||
+        [],
       partOfArchitectures: obj.partOfArchitectures || [],
       depictedInDiagrams: obj.depictedInDiagrams || [],
     }))

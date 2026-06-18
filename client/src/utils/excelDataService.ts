@@ -390,7 +390,8 @@ export const fetchDataObjectsForExport = async (
           )
           .filter(Boolean)
           .join(',') ||
-        obj.relatedDataObjects?.map((dataObject: any) => dataObject.id).join(',') || '',
+        obj.relatedDataObjects?.map((dataObject: any) => dataObject.id).join(',') ||
+        '',
       partOfArchitectures: obj.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
       depictedInDiagrams: obj.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
       createdAt: formatDateForExport(obj.createdAt),

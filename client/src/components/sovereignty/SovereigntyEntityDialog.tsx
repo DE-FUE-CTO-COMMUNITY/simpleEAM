@@ -18,6 +18,7 @@ import { GET_APPLICATIONS } from '@/graphql/application'
 import { GET_DATA_OBJECT, UPDATE_DATA_OBJECT } from '@/graphql/dataObject'
 import { GET_Aicomponent, UPDATE_Aicomponent } from '@/graphql/aicomponent'
 import { GET_INFRASTRUCTURE, UPDATE_INFRASTRUCTURE } from '@/graphql/infrastructure'
+import { buildDataObjectRelationshipConnectInput } from '@/utils/dataObjectRelationshipUtils'
 import { EntityRef } from './types'
 
 // Builds a Neo4j relationship update (disconnect all → reconnect with new IDs).
@@ -240,6 +241,14 @@ export default function SovereigntyEntityDialog({ entity, onClose }: Props) {
       dataSources: relArr(data.dataSources),
       usedByApplications: relArr(data.usedByApplications),
       relatedToCapabilities: relArr(data.relatedToCapabilities),
+      relatedDataObjects: data.relatedDataObjects?.length
+        ? [
+            {
+              disconnect: [{ where: {} }],
+              connect: buildDataObjectRelationshipConnectInput(data.relatedDataObjects),
+            },
+          ]
+        : [{ disconnect: [{ where: {} }] }],
     }
     if (data.depictedInDiagrams !== undefined) {
       input.depictedInDiagrams = relArr(data.depictedInDiagrams)

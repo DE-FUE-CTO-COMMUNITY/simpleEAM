@@ -20,6 +20,10 @@ import DataObjectTable, {
 import DataObjectToolbar from '@/components/dataobjects/DataObjectToolbar'
 import DataObjectFilterDialog from '@/components/dataobjects/DataObjectFilterDialog'
 import DataObjectForm, { DataObjectFormValues } from '@/components/dataobjects/DataObjectForm'
+import {
+  buildDataObjectRelationshipConnectInput,
+  sortDataObjectRelationshipFormValues,
+} from '@/utils/dataObjectRelationshipUtils'
 import { useDataObjectFilter } from '@/components/dataobjects/useDataObjectFilter'
 import { DataObject } from '@/gql/generated'
 import { useCompanyWhere } from '@/hooks/useCompanyWhere'
@@ -209,11 +213,7 @@ const DataObjectsPage = () => {
           : undefined,
         relatedDataObjects: data.relatedDataObjects?.length
           ? {
-              connect: data.relatedDataObjects.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
+              connect: buildDataObjectRelationshipConnectInput(data.relatedDataObjects),
             }
           : undefined,
         partOfArchitectures: data.partOfArchitectures?.length
@@ -461,23 +461,23 @@ const DataObjectsPage = () => {
       }
 
       // RelatedDataObjects Update - only update if changed
-      const currentRelatedDataObjectIds =
-        currentDataObject.relatedDataObjects?.map(obj => obj.id).sort() || []
-      const newRelatedDataObjectIds = data.relatedDataObjects?.sort() || []
+      const currentRelatedDataObjects = sortDataObjectRelationshipFormValues(
+        currentDataObject.relatedDataObjectsConnection?.edges?.map(edge => ({
+          dataObjectId: edge?.node?.id ?? '',
+          relationshipName: edge?.properties?.name ?? '',
+        }))
+      )
+      const newRelatedDataObjects = sortDataObjectRelationshipFormValues(data.relatedDataObjects)
 
       const relatedDataObjectsChanged =
-        JSON.stringify(currentRelatedDataObjectIds) !== JSON.stringify(newRelatedDataObjectIds)
+        JSON.stringify(currentRelatedDataObjects) !== JSON.stringify(newRelatedDataObjects)
 
       if (relatedDataObjectsChanged) {
-        if (newRelatedDataObjectIds.length > 0) {
+        if (newRelatedDataObjects.length > 0) {
           input.relatedDataObjects = [
             {
               disconnect: [{ where: {} }], // Alle bestehenden Verbindungen trennen
-              connect: newRelatedDataObjectIds.map(id => ({
-                where: {
-                  node: { id: { eq: id } },
-                },
-              })),
+              connect: buildDataObjectRelationshipConnectInput(newRelatedDataObjects),
             },
           ]
         } else {
