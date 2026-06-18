@@ -426,6 +426,7 @@
         "loadingArchitectures": "Lade Architekturen...",
         "architectureHelperText": "Pflichtfeld: Ordnet das Diagramm einer bestimmten Architektur zu",
         "loadingArchitecturesError": "Fehler beim Laden der Architekturen: {message}",
+        "analyzing": "Diagramm wird analysiert...",
         "saving": "Speichere...",
         "saveAsCopy": "Als Kopie speichern",
         "update": "Aktualisieren",

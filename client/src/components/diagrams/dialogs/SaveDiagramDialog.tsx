@@ -215,6 +215,7 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
   const [diagramType, setDiagramType] = useState('ARCHITECTURE')
   const [selectedArchitecture, setSelectedArchitecture] = useState<any>(null)
   const [saving, setSaving] = useState(false)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [titleError, setTitleError] = useState(false)
   const [architectureError, setArchitectureError] = useState(false)
 
@@ -233,6 +234,16 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   // State for name changes
   const [detectedNameChanges, setDetectedNameChanges] = useState<NameChange[]>([])
+
+  const resetAnalysisState = () => {
+    setDetectedNameChanges([])
+    setDetectedNewElements([])
+    setSelectedNewElements([])
+    setDetectedNewRelationships([])
+    setSelectedNewRelationships([])
+    setDetectedIncompleteRelationships([])
+    setDetectedInvalidRelationships([])
+  }
 
   // Handler for name change edits
   const handleNameChangeEdit = (index: number, newName: string) => {
@@ -373,32 +384,47 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
 
   // Detect changes when dialog opens
   React.useEffect(() => {
+    let isCancelled = false
+
     if (open && diagramData) {
       const detectChanges = async () => {
+        setIsAnalyzing(true)
+        resetAnalysisState()
+
         try {
           const parsedDiagramData = JSON.parse(diagramData)
           const elements = parsedDiagramData.elements || []
 
           // Detect name changes
           const nameChanges = detectNameChanges(parsedDiagramData)
-          setDetectedNameChanges(nameChanges)
+          if (!isCancelled) {
+            setDetectedNameChanges(nameChanges)
+          }
 
           // Detect new elements
           const newElements = detectNewElements(elements)
-          setDetectedNewElements(newElements)
-          setSelectedNewElements(newElements.map(el => ({ ...el, selected: true })))
+          if (!isCancelled) {
+            setDetectedNewElements(newElements)
+            setSelectedNewElements(newElements.map(el => ({ ...el, selected: true })))
+          }
 
           // Perform arrow analysis
           const arrowAnalysis = await analyzeArrows(elements, apolloClient)
-          setDetectedNewRelationships(arrowAnalysis.validRelationships)
-          setSelectedNewRelationships(
-            arrowAnalysis.validRelationships.map(rel => ({ ...rel, selected: true }))
-          )
-          setDetectedIncompleteRelationships(arrowAnalysis.incompleteRelationships)
-          setDetectedInvalidRelationships(arrowAnalysis.invalidRelationships)
+          if (!isCancelled) {
+            setDetectedNewRelationships(arrowAnalysis.validRelationships)
+            setSelectedNewRelationships(
+              arrowAnalysis.validRelationships.map(rel => ({ ...rel, selected: true }))
+            )
+            setDetectedIncompleteRelationships(arrowAnalysis.incompleteRelationships)
+            setDetectedInvalidRelationships(arrowAnalysis.invalidRelationships)
+          }
 
           // Update diagram if bindings were corrected
-          if (arrowAnalysis.correctedElements && arrowAnalysis.correctedElements.length > 0) {
+          if (
+            !isCancelled &&
+            arrowAnalysis.correctedElements &&
+            arrowAnalysis.correctedElements.length > 0
+          ) {
             const correctedElementMap = new Map(
               arrowAnalysis.correctedElements.map(el => [el.id, el])
             )
@@ -413,10 +439,21 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           }
         } catch (error) {
           console.warn('Error detecting changes:', error)
+        } finally {
+          if (!isCancelled) {
+            setIsAnalyzing(false)
+          }
         }
       }
 
       detectChanges()
+    } else {
+      setIsAnalyzing(false)
+      resetAnalysisState()
+    }
+
+    return () => {
+      isCancelled = true
     }
   }, [open, diagramData, apolloClient, onDiagramUpdate])
 
@@ -1556,13 +1593,33 @@ const SaveDiagramDialog: React.FC<SaveDiagramDialogProps> = ({
           </Box>
         )}
         <DialogActions>
+          {isAnalyzing && (
+            <Box
+              sx={{
+                mr: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1.5,
+                color: 'text.secondary',
+              }}
+            >
+              <CircularProgress size={18} />
+              <Typography variant="body2">{t('dialogs.save.analyzing')}</Typography>
+            </Box>
+          )}
           <Button onClick={onClose} disabled={saving || creatingElements}>
             {tCommon('cancel')}
           </Button>
           <Button
             onClick={handleSave}
             variant="contained"
-            disabled={!title.trim() || !selectedArchitecture || saving || creatingElements}
+            disabled={
+              !title.trim() ||
+              !selectedArchitecture ||
+              isAnalyzing ||
+              saving ||
+              creatingElements
+            }
             startIcon={saving || creatingElements ? <CircularProgress size={20} /> : undefined}
           >
             {saving || creatingElements

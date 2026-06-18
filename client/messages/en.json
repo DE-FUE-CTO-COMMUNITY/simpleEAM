@@ -420,6 +420,7 @@
         "loadingArchitectures": "Loading architectures...",
         "architectureHelperText": "Required field: Assigns the diagram to a specific architecture",
         "loadingArchitecturesError": "Error loading architectures: {message}",
+        "analyzing": "Analyzing diagram...",
         "saving": "Saving...",
         "saveAsCopy": "Save as Copy",
         "update": "Update",

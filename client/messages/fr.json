@@ -420,6 +420,7 @@
         "loadingArchitectures": "Chargement des architectures...",
         "architectureHelperText": "Champ obligatoire : Attribue le diagramme à une architecture spécifique",
         "loadingArchitecturesError": "Erreur de chargement des architectures : {message}",
+        "analyzing": "Analyse du diagramme en cours...",
         "saving": "Économie...",
         "saveAsCopy": "Enregistrer en tant que copie",
         "update": "Mise à jour",

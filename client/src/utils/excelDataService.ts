@@ -382,7 +382,8 @@ export const fetchDataObjectsForExport = async (
       dataSources: obj.dataSources?.map((app: any) => app.id).join(',') || '',
       usedByApplications: obj.usedByApplications?.map((app: any) => app.id).join(',') || '',
       relatedToCapabilities: obj.relatedToCapabilities?.map((cap: any) => cap.id).join(',') || '',
-      relatedDataObjects: obj.relatedDataObjects?.map((dataObject: any) => dataObject.id).join(',') || '',
+      relatedDataObjects:
+        obj.relatedDataObjects?.map((dataObject: any) => dataObject.id).join(',') || '',
       partOfArchitectures: obj.partOfArchitectures?.map((arch: any) => arch.id).join(',') || '',
       depictedInDiagrams: obj.depictedInDiagrams?.map((diag: any) => diag.id).join(',') || '',
       createdAt: formatDateForExport(obj.createdAt),
