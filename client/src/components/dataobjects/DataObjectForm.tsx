@@ -602,16 +602,11 @@ const DataObjectForm: React.FC<GenericFormProps<DataObject, DataObjectFormValues
         }
 
         const removeRelation = (index: number) => {
-          formField.handleChange(
-            relations.filter((_, relationIndex) => relationIndex !== index)
-          )
+          formField.handleChange(relations.filter((_, relationIndex) => relationIndex !== index))
         }
 
         const addRelation = () => {
-          formField.handleChange([
-            ...relations,
-            { dataObjectId: '', relationshipName: '' },
-          ])
+          formField.handleChange([...relations, { dataObjectId: '', relationshipName: '' }])
         }
 
         return (

@@ -278,7 +278,9 @@ const DataObjectsPage = () => {
         sovereigntyReqSecurity: { set: data.sovereigntyReqSecurity ?? null },
         sovereigntyReqControl: { set: data.sovereigntyReqControl ?? null },
         sovereigntyReqWeight: { set: data.sovereigntyReqWeight ?? null },
-        sovereigntyReqStrategicAutonomyRationale: { set: data.sovereigntyReqStrategicAutonomyRationale ?? null },
+        sovereigntyReqStrategicAutonomyRationale: {
+          set: data.sovereigntyReqStrategicAutonomyRationale ?? null,
+        },
         classification: { set: data.classification },
         format: { set: data.format },
         planningDate: { set: data.planningDate },

@@ -35,6 +35,7 @@ export const INTERFACE_PROTOCOLS_BY_TYPE: Record<InterfaceType, InterfaceProtoco
     InterfaceProtocol.ODBC,
     InterfaceProtocol.FTP,
     InterfaceProtocol.SFTP,
+    InterfaceProtocol.ORACLE,
   ],
   [InterfaceType.UI]: [InterfaceProtocol.HTTP, InterfaceProtocol.HTTPS],
   [InterfaceType.IDENTITY]: [
